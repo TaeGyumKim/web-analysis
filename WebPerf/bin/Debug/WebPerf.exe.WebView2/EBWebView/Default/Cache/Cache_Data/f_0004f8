@@ -1,0 +1,281 @@
+@charset "utf-8";
+.hana-body #container.hana-main {width:100%;font-family:'NotoSans_Regular';padding-bottom: 0;padding-right: 0;box-sizing:border-box}
+.hana-body #container.hana-main * {box-sizing:border-box;font-family:inherit;}
+.hana-body #container.hana-main .hana-contents {margin:0 auto;float:none;width:auto;background:#f4f6f7;}
+.hana-main h1,.hana-main h2,.hana-main h3,.hana-main h4,.hana-main h5,.hana-main h6,.hana-main strong {font-weight:normal;}
+.hana-main h1,.hana-main h2,.hana-main h3,.hana-main h4,.hana-main h5,.hana-main h6 {margin:0;padding:0;height:auto;}
+div, p, ol, ul, li, h1, h2, h3, h4, form, dl, dt, dd {margin:0;padding:0;letter-spacing:0;line-height:inherit;height:auto;}
+
+/*.util-wrap {display:none;}*/
+.cs {margin-top:196px}
+.hana-main .hana-contents {width:100%;float:none;margin:0 auto;}
+.hana-main .main-ca {position:relative;background:#fff;z-index: 0;}
+
+
+/*20180115 메인 수정*/
+.main-ca {height:503px;position:relative;}
+.main-ca .bg-cont {position:absolute;left:0;width:100%;height:503px;z-index:-1;background: #fff;}
+.main-ca .bg-cont img{position:absolute;left:50%;margin-left: -825px;z-index: 1;}
+.main-ca .bg-cont i.before{display:block;position:absolute;right:50%;top:355px;width:50%; height:3px;}
+.main-ca .bg-cont i.after {display:block;position:absolute;left:50%;top:193px;width:50%; height:3px;}
+.main-ca .bg-cont.bg1 i.before, .main-ca .bg-cont.bg1 i.after{border-top:3px solid #000}
+.main-ca .bg-cont.bg2 i.before, .main-ca .bg-cont.bg2 i.after{border-top:3px solid #69aeff}
+.main-ca .bg-cont.bg3 i.before, .main-ca .bg-cont.bg3 i.after{border-top:3px solid #eea53d}
+.main-ca .bg-cont.bg4 i.before, .main-ca .bg-cont.bg4 i.after{border-top:3px solid #f88457}
+.main-ca .bg-cont.bg5 i.before, .main-ca .bg-cont.bg5 i.after{border-top:3px solid #f67979}
+.main-ca .bg-cont.bg6 i.before, .main-ca .bg-cont.bg6 i.after{border-top:3px solid #01888c}
+.main-ca .bg-cont.bgDefine i.before, .main-ca .bg-cont.bgDefine i.after{border-top:3px solid #34d0a1}
+.main-ca .autoplay {position:absolute;left:0;z-index: 11;left:50%;top:60px; margin-left: -350px;}
+.main-ca .autoplay button {display:block;width:24px;height:24px;}
+.main-ca .autoplay button span {font-size:0;line-height:0;color:transparent;}
+.main-ca .autoplay button.play {display:none;background:url(https://image.kebhana.com/cont/common/img/newmain/main-autoplay-play.png) 0 0 no-repeat;}
+.main-ca .autoplay button.stop {background:url(https://image.kebhana.com/cont/common/img/newmain/main-autoplay-stop.png) 0 0 no-repeat;}
+.main-ca .slick-dots {position:absolute;left:50%;top:70px;width: auto;margin-left:-505px;}
+.main-ca .slick-prev,.main-ca .slick-next {width:24px;height:24px; top:66px}<!-- 2019-03-19 수정 -->
+.main-ca .slick-prev {left: 50%;margin-left:-420px;}
+.main-ca .slick-next {left: 50%;margin-left:-385px;}
+.main-ca .slick-prev:after {background:url(https://image.kebhana.com/cont/common/img/newmain/btn-main-ca-left.png) 0 0 no-repeat;}
+.main-ca .slick-next:after {background:url(https://image.kebhana.com/cont/common/img/newmain/btn-main-ca-right.png) 0 0 no-repeat;}
+.main-ca .slick-slide {position:relative;height:503px;overflow: hidden;}
+.main-ca .text-wrap {position:absolute; display:table;top:100px; left:50%;margin-left:-510px;}
+.main-ca .text-cont p{font-size:34px;font-family:'NotoSans_Light' !important; line-height:38px; color:#062925;letter-spacing:-.5px;}
+.main-ca .text-cont .m-btn {margin-top:35px;}
+.main-ca .text-cont .m-btn a {display:inline-block;min-width:125px;line-height:44px;font-size:20px;color:#fff;font-family:'NotoSans_Regular';text-align:center;padding:0 23px;border-radius:50px;}
+.main-ca .text-cont .m-btn a.bg1{background:#0077be}
+.main-ca .text-cont .m-btn a.bg2{background:#69aeff}
+.main-ca .text-cont .m-btn a.bg3{background:#eea53d}
+.main-ca .text-cont .m-btn a.bg4{background:#f88457}
+.main-ca .text-cont .m-btn a.bg5{background:#f67979}
+.main-ca .text-cont .m-btn a.bg6{background:#01888c}
+
+
+.quick-link {width: 824px; height: 128px;margin: -64px auto 0;position: relative;z-index: 1; padding-right:60px;}
+.quick-link ul {position:relative;display:table;table-layout:fixed;width:100%;height: 128px;box-shadow: 3px 4px 20px 0px rgba(0, 0, 0, 0.2);-webkit-box-shadow: 3px 4px 20px 0px rgba(0, 0, 0, 0.2);}
+.quick-link ul li{display:table-cell;width: 20%;vertical-align: middle;text-align:center;}
+.quick-link ul li a {position:relative;display: table-cell;font-size:18px;font-family:'NotoSans_Medium';width: 100%;text-align: center;vertical-align: middle;height: 128px;background: #fff;z-index:1;color:#062925;}
+.quick-link ul li a:hover,.quick-link ul li a:focus {background:#28b2a5;color:#fff;text-decoration:none;
+	z-index:2;
+	transform:scale(1.13);
+	-webkit-transform:scale(1.13);
+	transition:transform .3s cubic-bezier(0.345, 0.125, 0.200, 1.540);
+	-webkit-transition:transform .3s cubic-bezier(0.345, 0.125, 0.200, 1.540);
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+	-webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.quick-link ul li a:after {display:block;content:'';position:absolute;left:0;top:24px;height:80px;width:1px;background:#e4e4e4;}
+.quick-link ul li:first-child a:after,
+.quick-link ul li a:hover:after,.quick-link ul li a:focus:after {display:none;}
+.quick-link ul li:after {display:table-cell;content:'';vertical-align:middle;width: 1px;height: 1px;}
+.quick-link ul li a .ico {display:block;width:100%;height:47px;margin-bottom:18px;}
+.quick-link ul li.link-num1 a .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num1.png) center center no-repeat;}
+.quick-link ul li.link-num2 a .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num2.png) center center no-repeat;}
+.quick-link ul li.link-num3 a .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num3.png) center center no-repeat;}
+.quick-link ul li.link-num4 a .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num4.png) center center no-repeat;}
+.quick-link ul li.link-num5 a .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num5.png) center center no-repeat;}
+.quick-link ul li.link-num6 a .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num6.png) center center no-repeat;}
+
+.quick-link ul li.link-num1 a:hover .ico,.quick-link ul li.link-num1 a:focus .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num1-active.png) center center no-repeat;}
+.quick-link ul li.link-num2 a:hover .ico,.quick-link ul li.link-num2 a:focus .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num2-active.png) center center no-repeat;}
+.quick-link ul li.link-num3 a:hover .ico,.quick-link ul li.link-num3 a:focus .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num3-active.png) center center no-repeat;}
+.quick-link ul li.link-num4 a:hover .ico,.quick-link ul li.link-num4 a:focus .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num4-active.png) center center no-repeat;}
+.quick-link ul li.link-num5 a:hover .ico,.quick-link ul li.link-num5 a:focus .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num5-active.png) center center no-repeat;}
+.quick-link ul li.link-num6 a:hover .ico,.quick-link ul li.link-num6 a:focus .ico {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-quick-num6-active.png) center center no-repeat;}
+
+.hana-main .inner {width: 1210px; margin:0 auto; padding-right: 60px;}
+.hana-main .h3-title {font-family:'NotoSans_Medium';font-size:26px;color:#062925;line-height: 26px;}
+.hana-main .h3-title .num {position:relative; display:inline-block; padding-right:88px;}
+.hana-main .h3-title .num:after {content:""; display:block; position:absolute; top:13px; left:47px; width:56px; height:3px; background:#d8d8d8;}
+.hana-main .notice-event {margin-top:50px; padding-bottom:103px;}
+.quick_costom{position:relative;left:50%;margin-left:-384px;padding:20px;width:708px;text-align:center;background:url(https://image.kebhana.com/cont/common/img/newmain/quick_customBG.png) 70px 20px no-repeat;}
+.hana-main .quick_costom a{padding-left:16px;padding-right:16px;color:#8e9796;font-size:14px;}
+
+.notice-event:after {display:block;content:'';clear:both;}
+.notice-event .notice-cont {position:relative;float:left;width: 482px;padding-left:104px;}
+.notice-event .event-cont {position:relative;float:left;width: 668px;overflow: hidden;}
+.notice-event .h3-title {margin-bottom:35px;}
+.notice-event .carousel-cont {}
+.hana-main .event-cont .btn-more {position: absolute;right: 0;top: 0;width:84px;height:34px;line-height:33px;-webkit-border-radius:17px;border-radius:17px;border:1px solid #27b2a5;font-size:14px;color:#27b2a5;text-align:center;}
+.hana-main .event-cont .btn-more:hover {text-decoration:none;}
+.hana-main .event-cont .btn-more span {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-more-plus.png) no-repeat left center; padding-left:15px;}
+
+
+.notice-event .carousel-cont .section a {position:relative;display: block;height: 300px;color:#fff;padding: 35px 70px 35px 30px;}
+.notice-event .carousel-cont .section a:hover,.notice-event .carousel-cont .section a:focus {text-decoration:none;}
+.notice-event .carousel-cont .section a.bg1 {background:#27b2a5;}
+.notice-event .carousel-cont .section a.bg2 {background:#27a0b2;}
+.notice-event .carousel-cont .section a.bg3 {background:#556b7a;}
+.notice-event .carousel-cont .section a.bg4 {background:#465e6f;}
+.notice-event .carousel-cont .section a.bg5 {background:#000000;}
+.notice-event .carousel-cont .section a > strong {display:block;font-size:24px;line-height:28px;font-family:'NotoSans_Light';margin-bottom:25px;}
+.notice-event .carousel-cont .section a > span {display:block;font-size:20px;line-height:24px;font-family:'NotoSans_Light';}
+.notice-event .carousel-cont .section a > i {display:block;font-size:20px;font-family:'NotoSans_Light';position:absolute;right:30px;bottom:30px;}
+.notice-event .carousel-cont .section a img {display:block;}
+.notice-event .carousel-cont .section a:before {content:""; display:block; position:absolute; top:30px; right:30px; width:36px; height:36px; -webkit-border-radius:50%; border-radius:50%; border:1px solid #f4f6f7; opacity:.7;}
+.notice-event .carousel-cont .section a:after {content:""; display:block; position:absolute; top:41px; right:43px; width:10px; height:15px; background:url(https://image.kebhana.com/cont/common/img/newmain/btn-link-more.png) no-repeat left top;}
+.notice-event .slick-prev,
+.notice-event .slick-next {top:auto;bottom:20px;width:24px;height:24px;/*display:none !important; top:50%;margin-top:-23px;*/}
+.notice-event .slick-prev {left: 140px;}
+.notice-event .slick-next {left: 174px;right:auto;}
+.notice-event .slick-prev:after {background:url(https://image.kebhana.com/cont/common/img/newmain/btn-event-prev.png) 0 0 no-repeat; opacity: .7;}
+.notice-event .slick-next:after {background:url(https://image.kebhana.com/cont/common/img/newmain/btn-event-next.png) 0 0 no-repeat; opacity: .7;}
+.notice-event .slick-dots {left:23px;bottom:18px;width: auto;}
+.notice-event .slick-dots li button {padding:10px 2px 10px 3px}
+.notice-event .slick-dots li button:after {background:url(https://image.kebhana.com/cont/common/img/newmain/bul-indi2.png) center center no-repeat;width: 8px;height: 8px;position: relative;}
+.notice-event .slick-dots li.slick-active {}
+.notice-event .slick-dots li.slick-active button:after {background:url(https://image.kebhana.com/cont/common/img/newmain/bul-indi2-active.png) center center no-repeat;width: 32px;}
+.notice-event .autoplay {position:absolute;bottom:20px;left: 208px;z-index:1;}
+.notice-event .autoplay button {display:block;width:24px;height:24px; opacity: .5;
+	filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
+	-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50);}
+.notice-event .autoplay button span {font-size:0;line-height:0;color:transparent;}
+.notice-event .autoplay button.play {display:none;background:url(https://image.kebhana.com/cont/common/img/newmain/btn-event-play.png) 0 0 no-repeat;}
+.notice-event .autoplay button.stop {background:url(https://image.kebhana.com/cont/common/img/newmain/btn-event-stop.png) 0 0 no-repeat;}
+
+.hana-main .notice-event .notice-cont ul {/* border-bottom:1px solid #ddd; */}
+.hana-main .notice-event .notice-cont ul li {border-top: 1px solid  #ddd;}
+.hana-main .notice-event .notice-cont ul li a {display: block;padding:15px 0;}
+.hana-main .notice-event .notice-cont ul li a p {display:block;width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:16px;color: #062925;line-height:20px;}
+.hana-main .notice-event .notice-cont ul li a .date {display:block;font-size: 14px;color:#637079;padding-top:5px;}
+.hana-main .notice-event .notice-cont ul li a .link-more {display:table-cell;text-indent:-9999px;background:url(https://image.kebhana.com/cont/common/img/newmain/btn-link-more2.png) center center no-repeat;width:4%;}
+.hana-main .notice-event .notice-cont .btn-more {position:absolute; top:0; right:0; display:block; width:84px; height:34px; line-height:33px; -webkit-border-radius:17px; border-radius:17px; border:1px solid #27b2a5; font-size:14px; color:#27b2a5; text-align:center;}
+.hana-main .notice-event .notice-cont .btn-more:hover {text-decoration:none;}
+.hana-main .notice-event .notice-cont .btn-more span {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-more-plus.png) no-repeat left center; padding-left:15px;}
+
+.product-wrap {position:relative; border-top:1px solid #e7eaea; background:#fff; padding:137px 0 143px;}
+.product-wrap:after {content:""; display:block; width:859px; height:439px; position:absolute; top:-64px; right:0; background:url(https://image.kebhana.com/cont/common/img/newmain/bg-product-wrap.png) no-repeat right top; }
+.product-wrap .h3-title {margin-bottom:64px;}
+.product-wrap .sub-title {display:block; font-size:40px; line-height:40px; color:#062925; margin-bottom:30px;}
+.product-wrap .txt {font-size:18px; line-height:26px; color:#062925;}
+.product-wrap .list {margin-top:70px;}
+.product-wrap .list:after {content:""; display:block; clear:both;}
+.product-wrap .list .section {position:relative; float:left; width:567px; border:2px solid #e6e9e9; -webkit-border-radius:4px; border-radius:4px; padding:25px 25px 0 25px; height:200px;}
+.product-wrap .list .section.type1 {border-left:3px solid #27b2a5; margin-bottom:16px; background:url(https://image.kebhana.com/cont/common/img/newmain/ico-deposit.png) no-repeat 455px 108px;}
+.product-wrap .list .section.type2 {border-left:3px solid #ff9801; margin:0 0 16px 16px; background:url(https://image.kebhana.com/cont/common/img/newmain/ico-fund.png) no-repeat 451px 108px;}
+.product-wrap .list .section.type3 {border-left:3px solid #925fc0; background:url(https://image.kebhana.com/cont/common/img/newmain/ico-foreign.png) no-repeat 445px 72px;}
+.product-wrap .list .section.type4 {border-left:3px solid #f25871; margin-left:16px; background:url(https://image.kebhana.com/cont/common/img/newmain/ico-loan.png) no-repeat 456px 93px;}
+.product-wrap .list .section a {position:absolute; top:0; left:0; width:100%; height:100%;}
+.product-wrap .list .section .h4-title {color:#062925; font-size:16px; margin-bottom:32px;}
+.product-wrap .list .section .slogan {display:block; color:#062925; font-size:24px; margin-bottom:18px;}
+.product-wrap .list .section .captions {color:#8e9796; font-size:18px;}
+
+.apps-wrap {background:#31d1a0;}
+.apps-wrap .inner {background:url(https://image.kebhana.com/cont/common/img/newmain/bg-phone-apps.png) no-repeat right top; height:870px; margin-top:-1px;}
+.apps-wrap .h3-title {color:#fff; padding:100px 0 55px;}
+.apps-wrap .h3-title .num:after {background:#adedd9;}
+.apps-wrap .sub-title {display:block; font-size:40px; line-height:40px; color:#fff; margin-bottom:30px;}
+.apps-wrap .txt {font-size:18px; line-height:26px; color:#fff; margin-bottom:40px;}
+.apps-wrap .btn-apps {display:block; width:185px; height:48px; line-height:48px; border:1px solid #83e3c6; -webkit-border-radius:24px; border-radius:24px; color:#fff; font-size:18px; padding-left:18px; margin-top:7px;}
+.apps-wrap .btn-apps:hover {text-decoration:none;}
+.apps-wrap .btn-apps span {padding-left:30px;}
+.apps-wrap .btn-android {background:url(https://image.kebhana.com/cont/common/img/newmain/btn-android.png) no-repeat left center;}
+.apps-wrap .btn-ios {background:url(https://image.kebhana.com/cont/common/img/newmain/btn-ios.png) no-repeat left center;}
+
+/* gnb 검색박스 최초입력 한글 201080103 */
+.search-area .input-wrap input[type="text"]{ime-mode: active}
+
+/* 메인 로고변경 20180109 /pbk/resource/simple/css/layout-new.css 갱신 */
+#header .header-wrap h1 {float:left;width:206px;height:32px;margin-right:5px;background:url(https://image.kebhana.com/cont/common/img/newmain/h1-logo-kbhana.jpg) center center no-repeat;}
+#header .header-wrap h1 a {display:block;font-size:0;line-height:0;text-indent:-9999px;width:206px;height:32px;}
+.customer-info {float:left;margin-left:30px;}
+.customer-info .btn-login, .customer-info .btn-logout{width:86px;}
+.customer-info .btn-login{}
+.customer-info .btn-certify{margin-left:3px;}
+.customer-info .btn-logout{}
+.customer-info .btn-login a{padding-left:20px;height:32px;width:82px;text-indent:-99999px;background:url(https://image.kebhana.com/cont/common/img/newmain/main_login_btn_bg.jpg) center center no-repeat;}
+.customer-info .btn-certify a{padding-left:34px;height:32px;width:97px;text-indent:-99999px;background:url(https://image.kebhana.com/cont/common/img/newmain/main_gnb_btn01_bg.jpg) center center no-repeat;}
+.customer-info .btn-logout a{padding-left:34px;height:32px;width:94px;border:0;text-indent:-99999px;background:url(https://image.kebhana.com/cont/common/img/newmain/main_logout_btn_bg.jpg) center center no-repeat}
+.portal-link > ul > li{float:left;padding-left:15px;}
+
+/*20180115 이벤트 새소식 컨텐츠 수정*/
+.section_product_wrap{position:relative; top:0; left:0; padding:25px 60px 60px 0; background:#f4f6f7;}
+.section_product_inner{width:1150px; margin:0 auto; overflow:hidden}
+.nw_productArea{float:left; width:806px;}
+.nw_eventArea{position:relative; top:0; left:0; float:right; width:344px;}
+.section_product_inner h3{margin-bottom:15px; font-size:22px; color:#062925;}
+.nw_btn_more{position:absolute; top:5px; right:10px; font-size:14px; /*color:#27b2a5*/color:#00a48e; padding-left:14px; background:url(https://image.kebhana.com/cont/common/img/newmain/ico-more-plus.png) 0 center no-repeat;}/*2019-03-19수정*/
+.nw_procust_list{overflow:hidden;}
+.nw_procust_list>li{float:left; width:378px; margin-right:25px; margin-bottom:9px; background:#FFF; border-radius:4px; border:1px solid #d8dfdf; box-sizing:border-box; -webkit-box-sizing:border-box;}
+.nw_procust_list>li>a{display:table; width:100%; height:126px; padding:20px 30px 24px 30px; text-decoration:none; box-sizing:border-box; -webkit-box-sizing:border-box;}
+.nw_procust_list>li>a>div{display:table-cell; vertical-align:middle;}
+.nw_procust_list>li>a>p{display:table-cell; text-align:right; vertical-align:bottom;}
+.nw_procust_list>li h4{font-size:22px; line-height:24px; color:#062925; margin:16px 0 8px 0}
+.nw_procust_list>li div>p{font-size:16px; color:#8e9796;}
+.section_appNews_wrap{position:relative; top:0; left:0; padding-bottom:70px; background:#FFF}
+.section_appNews_inner{width:1150px; margin:0 auto; overflow:hidden}
+.nw_app_benefit{margin-bottom:50px; background:url(https://image.kebhana.com/cont/common/img/newmain/main_appIntroduce_img02_n.jpg) right bottom no-repeat;}
+.hanaApp_list{position:relative; top:0; left:0; height:90px;}
+.hanaApp_list>li{position:absolute; top:0;}
+/* 7개일경우
+.app_pt01{left:0px}
+.app_pt02{left:119px}
+.app_pt03{left:250px}
+.app_pt04{left:368px}
+.app_pt05{left:488px}
+.app_pt06{left:642px;}
+.app_pt07{left:766px}
+*/
+.app_pt01{left:4px}
+.app_pt02{left:145px}
+.app_pt03{left:292px}
+.app_pt04{left:435px}
+.app_pt05{left:610px}
+.app_pt06{left:760px;}
+
+
+.app_pt08{right:0}
+.hanaApp_list{float:left;}
+.main_sns-list{float:right; width:276px; background:url(https://image.kebhana.com/cont/common/img/newmain/sns_bg.png) 0 center no-repeat;}
+.main_sns-list>li{float:left; margin-left:45px;}
+.main_sns-list>li>a{display:block; margin-bottom:4px;}
+
+.section_appNews_wrap{padding:0 60px 70px 0}
+.section_appNews_wrap h3{font-size:24px; color:#062925; margin:50px 0 20px 0;}
+.nw_news{position:relative; top:0; left:0}
+.nw_news_list{border-top:1px solid #c1c9c9;}
+.nw_news_list>li{padding:15px 12px 15px 20px ; border-bottom:1px solid #f0f2f2; background:url(https://image.kebhana.com/cont/common/img/common/bul_dot.gif) 0 center no-repeat; overflow:hidden;}
+.nw_news_list>li>a{display:inline-block;width:100%;}
+.nw_news_list>li>a>p{float:right; font-size:14px; color:#637079;}
+.nw_news_list>li>a>p:first-child{float:left; font-size:16px; color:#062925;}
+
+.product_t01{border-left:3px solid #27b2a5;}/*예금*/
+.product_t02{border-left:3px solid #ff9801;}/*펀드*/
+.product_t03{border-left:3px solid #925fc0;}/*외환*/
+.product_t04{border-left:3px solid #f25871;}/*대출*/
+.nw_product_bg{padding:1px 14px 2px 14px; font-size:14px; line-height:15px; color:#FFF; border-radius:15px;}
+.product_n01{/*background:#27b2a5*/background:#00a48e}/*2019-03-19수정*/
+.product_n02{/*background:#ff9801*/background:#e88200}/*2019-03-19수정*/
+.product_n03{background:#925fc0}
+.product_n04{background:#f25871}
+.mb0{margin-bottom:0 !important}
+/*event slide*/
+.nw_event_cont{position:relative; top:0; left:0;height:265px;}
+.nw_event_cont .carousel-cont .section a{position:relative; display:block; height:265px; color:#fff;padding:20px 28px;}
+.nw_event_cont .carousel-cont .section a:hover,.notice-event .carousel-cont .section a:focus {text-decoration:none;}
+.nw_event_cont .carousel-cont .section a.bg1{/*background:#27b2a5;*/background:#00a48e;}/*2019-03-19수정*/
+.nw_event_cont .carousel-cont .section a.bg2{background:#27a0b2}
+.nw_event_cont .carousel-cont .section a.bg3{background:#556b7a;}
+.nw_event_cont .carousel-cont .section a.bg4{background:#465e6f;}
+.nw_event_cont .carousel-cont .section a.bg5{background:#000000;}
+.nw_event_cont .carousel-cont .section a h4{display:block;font-size:22px;line-height:26px;font-family:'NotoSans_Light' !important;color:#FFF;margin:55px 0 24px 0;}
+.nw_event_cont .carousel-cont .section a p{display:block;font-size:16px; line-height:18px;font-family:'NotoSans_Light' !important; color:#FFF;}
+.nw_event_cont .carousel-cont .section a i{display:block;font-size:16px; line-height:18px; font-family:'NotoSans_Light' !important; color:#FFF;position:absolute;left:30px;bottom:30px;}
+.nw_event_cont .slick-prev,
+.nw_event_cont .slick-next {top:30px;width:24px;height:24px;/*display:none !important; top:50%;margin-top:-23px;*/}
+.nw_event_cont .slick-prev {left:140px;}
+.nw_event_cont .slick-next {left:174px; right:auto;}
+.nw_event_cont .slick-prev:after{background:url(https://image.kebhana.com/cont/common/img/newmain/btn-event-prev.png) 0 0 no-repeat; opacity: .7;}
+.nw_event_cont .slick-next:after{background:url(https://image.kebhana.com/cont/common/img/newmain/btn-event-next.png) 0 0 no-repeat; opacity: .7;}
+.nw_event_cont .slick-dots{left:23px;top:30px; width: auto; }
+.nw_event_cont .slick-dots li button {padding:10px 2px 10px 3px}
+.nw_event_cont .slick-dots li button:after{background:url(https://image.kebhana.com/cont/common/img/newmain/bul-indi2.png) center center no-repeat;width: 8px;height: 8px;position: relative;}
+.nw_event_cont .slick-dots li.slick-active button:after{background:url(https://image.kebhana.com/cont/common/img/newmain/bul-indi2-active.png) center center no-repeat;width: 32px;}
+.nw_event_cont .autoplay{position:absolute;top:30px; left:208px; z-index:1;}
+.nw_event_cont .autoplay button {display:block;width:24px;height:24px; opacity: .5; filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50); -ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50);}
+.nw_event_cont .autoplay button span{font-size:0;line-height:0;color:transparent;}
+.nw_event_cont .autoplay button.play{display:none;background:url(https://image.kebhana.com/cont/common/img/newmain/btn-event-play.png) 0 0 no-repeat;}
+.nw_event_cont .autoplay button.stop{background:url(https://image.kebhana.com/cont/common/img/newmain/btn-event-stop.png) 0 0 no-repeat;}
+
+
+.all-menu-list ul.depth1 li .menu-main.allmenu-img98813:after {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-alm31.png) left center no-repeat;}
+.all-menu-list ul.depth1 li .menu-main.allmenu-img102587:after {background:url(https://image.kebhana.com/cont/common/img/newmain/ico-alm34.png) left center no-repeat;}

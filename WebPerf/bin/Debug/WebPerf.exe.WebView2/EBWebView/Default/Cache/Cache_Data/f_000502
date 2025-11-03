@@ -1,0 +1,183 @@
+@charset 'UTF-8';
+
+/* 뱅킹메뉴 설정 */
+.layerSet {position: absolute;width:100%;height:100%;left:0;top:-9999px;z-index:99;display:none;}
+
+.layerSet.on {top:0;display:block}
+.bankSetLayer {position:absolute;width:720px;display:inline-block;background:#fff;top: 75px;left:50%;margin-left: 200px;padding:45px 40px;z-index:99;}
+#HANA_HEAD_DIV .bankSetLayer h1 {text-align:left !important}
+
+.layerSet .menuArea {zoom:1;margin-top:5px;}
+.layerSet .menuArea:after {content:"";display:block;clear:both;}
+.layerSet .menuArea > div {float:left;width:298px;}
+.layerSet .menuArea > div h2 {font:normal 21px/21px NotoSans_Dl, sans-serif;color:#3c3c3c;text-align:center;margin-bottom:22px;letter-spacing:-1px;padding:0 !important;height:auto !important;}
+
+.layerSet .menuArea > .menuListBox {background:url(../img/common/blt_bank_menu_arrow.gif) no-repeat right 50%;padding-right:71px;}
+.layerSet .menuArea > .myMenuBox {margin-left:31px;}
+.layerSet .menuArea > div > div {width:298px;height:343px;background:#fff;border:1px solid #e1e1e1;}
+.layerSet .menuArea > div > .menuList {overflow-y:auto;}
+.layerSet .menuArea > div > .myMenu > ul {background:#fff;}
+.layerSet .menuArea > div > .myMenu > p {font:normal 14px/16px NotoSans_Dl, sans-serif;text-align:center;color:#6e7277;letter-spacing:-1px;margin-top:120px;}
+.layerSet .menuArea > div > .menuList > ul {padding:10px 0;}
+
+.layerSet .menuList ul li {display:block;position:relative;}
+.layerSet .menuList ul li ul {display:none;}
+.layerSet .menuList ul li button {position:absolute;top:4px;right:15px;}
+
+.layerSet .menuArea > div > .menuList > ul li a {display:block;font-family:NotoSans_Regular,sans-serif;letter-spacing:-1px;line-height: 30px;color:#444;}
+.layerSet .menuArea > div > .menuList > ul li a:hover {background-color:#f2f7fa;}
+.layerSet .menuArea > div > .menuList > ul li a:hover,.layerSet .menuArea > div > .menuList > ul li a:focus,.layerSet .menuArea > div > .menuList > ul li a:active {text-decoration:none !important;}
+.layerSet .menuArea > div > .menuList > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 24px 10px;background-repeat: no-repeat;padding-left:38px;font-size:16px;}
+.layerSet .menuArea > div > .menuList > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+.layerSet .menuArea > div > .menuList > ul > li a em {display:inline-block;text-indent:-9999px;}
+.layerSet .menuArea > div > .menuList a.onlyMenu {background-image:none;}
+.layerSet .menuArea > div > .menuList a.open {color:#008485;}
+
+/* 뱅킹메뉴 설정 메뉴목록 수정 20161026 */
+.layerSet .menuArea > div > .menuList > ul li span {display:block;font-family:NotoSans_Regular,sans-serif;letter-spacing:-1px;line-height: 30px;color:#444;}
+.layerSet .menuArea > div > .menuList > ul li span:hover{background-color:#f2f7fa;}
+.layerSet .menuArea > div > .menuList > ul li span:hover{text-decoration:none !important;}
+.layerSet .menuArea > div > .menuList span.onlyMenu {background-image:none;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > span {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 48px 10px;background-repeat: no-repeat;padding-left:62px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > span {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 72px 10px;background-repeat: no-repeat;padding-left:86px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > span.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+/* 뱅킹메뉴 설정 메뉴목록 수정 20161026 */
+
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 48px 10px;background-repeat: no-repeat;padding-left:62px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 44px 12px;background-repeat: no-repeat;}
+
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 72px 10px;background-repeat: no-repeat;padding-left:86px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > a {font-size:14px;color:#444;display:block;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li i {font-style:normal;width:135px;line-height:17px;display:inline-block;}
+
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a {background-position: 84px 10px;background-repeat: no-repeat;padding-left:98px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a.open {background-position: 20px 12px;background-repeat: no-repeat;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a {font-size:14px;color:#444;display:block;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li i {font-style:normal;width:135px;line-height:17px;display:inline-block;}
+
+.layerSet .menuArea > div > .menuList > ul > li > ul > li button {float:right;width:44px;height:22px;background:url(../img/common/btn_list_add_on.gif) no-repeat right center;display:block;text-indent:-9999px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li button.off {background:url(../img/common/btn_list_add_off.gif) no-repeat right center;}
+
+.layerSet .menuArea > div > .myMenu {background:#f9f9fb;overflow-y:auto;}
+.layerSet .menuArea > div > .myMenu .noMenu {display:none;}
+.layerSet .menuArea > div > .myMenu h3 {position:absolute;top:-9999px;width:0;height:0;font-size:0;line-height:0;overflow:hidden;}
+.layerSet .menuArea > div > .myMenu ul > li {position:relative;border-bottom:1px solid #e1e1e1;padding-left:40px;cursor:default;font:normal 14px/42px NotoSans_Dl, sans-serif;background:#fff;min-height: 23px;line-height: 20px;padding-top: 10px;padding-bottom: 9px;}
+.layerSet .menuArea > div > .myMenu ul > li a {font:normal 14px/42px NotoSans_Dl, sans-serif;color:#6e7277;letter-spacing:-1px;cursor:default;line-height: 14px;}
+.layerSet .menuArea > div > .myMenu ul > li:hover {background:#f2f7fa;cursor:default;}
+.layerSet .menuArea > div > .myMenu ul > li:hover a {color:#008485;text-decoration:none !important;}
+.layerSet .menuArea > div > .myMenu ul.edit li > a {font:normal 15px/42px NotoSans_Regular, sans-serif;color:#444;}
+
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn {position:absolute;top:0;left:16px;width:15px;height:100%;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button {position:relative;width:15px;height:8px;text-indent:-9999px;display:block;vertical-align: middle;margin-top: 4px;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button:first-child {margin-top: 2px;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp {background:url(../img/common/btn_list_up.png) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp:hover {background:url(../img/common/btn_list_up_over.png) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown {background:url(../img/common/btn_list_down.png) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown:hover {background:url(../img/common/btn_list_down_over.png) no-repeat left top;}
+
+/* 뱅킹메뉴 설정 나만의 메뉴 수정 20161026 */
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp.disable{background:url(../img/common/btn_disabled_up.png) no-repeat left top;cursor:initial;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp.disable:hover{background:url(../img/common/btn_disabled_up.png) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown.disable{background:url(../img/common/btn_disabled_down.png) no-repeat left top;cursor:initial;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown.disable:hover{background:url(../img/common/btn_disabled_down.png) no-repeat left top;}
+/* 뱅킹메뉴 설정 나만의 메뉴 수정 20161026 */
+
+.layerSet .menuArea > div > .myMenu ul > li button {position:absolute;top:10px;display:block;text-indent:-9999px;}
+.layerSet .menuArea > div > .myMenu ul > li button.fix {right:10px;width:44px;height:22px;background:url(../img/common/btn_list_fix.gif) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li button.fixed {background:url(../img/common/btn_list_fixed.gif) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li button.del {right:10px;width:44px;height:22px;background:url(../img/common/btn_list_del.gif) no-repeat left top;}
+
+.bankSetLayer .contNotice {width:640px;margin-top:45px;padding:30px; border:1px solid #ebebeb;}
+.bankSetLayer .contNotice .orderListDot {margin:0;}
+.bankSetLayer .contNotice .orderListDot li {color:#444;line-height:17px;background:url(../img/common/bul_dot.gif) no-repeat 0 6px !important;}
+
+.layerSet .btnWrapTop {position:absolute; width:auto; top:40px; right:40px;}
+.layerSet .btnWrapTop .btnClose {display:block; width:27px; height:27px; background:url(../img/common/btn_close_pop.gif) no-repeat 50% 50%; text-indent:-9999px;}
+
+.layerSet .btnBoxCenter {margin-top:40px;}
+.layerSet .btnCncl {display:inline-block; height:45px; min-width:110px; margin:0 5px; background:#fff; border:1px solid #d6d6d6;font-size:14px;font-weight:bold;color:#6f6f6f;letter-spacing:-0.5px;line-height:44px;text-align:center; vertical-align:middle;}
+.layerSet .btnCncl span {padding:0 19px;}
+.layerSet .btnCncl:hover, .btnCncl:focus {background:#fff;border:1px solid #d6d6d6;color:#6f6f6f;text-decoration:none; cursor:pointer;}
+
+.layerSet.on .dim {display:block;}
+.layerSet .dim {display:none; position:fixed;width:100%;height:100%;overflow:auto;top:0;left:0;background:#000;opacity:0.15;-ms-filter:alpha(opacity=15);filter:alpha(opacity=15)}
+
+.menuArea {zoom:1;margin-top:40px;}
+.menuArea:after {content:"";display:block;clear:both;}
+.menuArea > div {float:left;width:298px;}
+.menuArea > div h2 {font:normal 21px/21px NotoSans_Dl, sans-serif;color:#3c3c3c;text-align:center;margin-bottom:22px;letter-spacing:-1px;}
+
+.menuArea > .menuListBox {background:url(../img/common/blt_bank_menu_arrow.gif) no-repeat right 50%;padding-right:71px;}
+.menuArea > .myMenuBox {margin-left:31px;}
+.menuArea > div > div {width:298px;height:343px;background:#fff;border:1px solid #e1e1e1;}
+.menuArea > div > .menuList {overflow-y:auto;}
+.menuArea > div > .myMenu > ul {background:#fff;}
+.menuArea > div > .myMenu > p {font:normal 14px/16px NotoSans_Dl, sans-serif;text-align:center;color:#6e7277;letter-spacing:-1px;margin-top:120px;}
+.menuArea > div > .menuList > ul {padding:10px 0;}
+
+.menuList ul li {display:block;position:relative;}
+.menuList ul li ul {display:none;}
+.menuList ul li button {position:absolute;top:4px;right:15px;}
+
+.menuArea > div > .menuList > ul li a {display:block;font-family:NotoSans_Regular,sans-serif;letter-spacing:-1px;line-height: 30px;color:#444;}
+.menuArea > div > .menuList > ul li a:hover {background-color:#f2f7fa;}
+.menuArea > div > .menuList > ul li a:hover,.menuArea > div > .menuList > ul li a:focus,.menuArea > div > .menuList > ul li a:active {text-decoration:none !important;}
+.menuArea > div > .menuList > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 24px 10px;background-repeat: no-repeat;padding-left:38px;font-size:16px;}
+.menuArea > div > .menuList > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+.menuArea > div > .menuList > ul > li a em {display:inline-block;text-indent:-9999px;}
+.menuArea > div > .menuList a.onlyMenu {background-image:none;}
+.menuArea > div > .menuList a.open {color:#008485;}
+
+.menuArea > div > .menuList > ul > li > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 48px 10px;background-repeat: no-repeat;padding-left:62px;font-size:14px;}
+.menuArea > div > .menuList > ul > li > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 44px 12px;background-repeat: no-repeat;}
+
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 72px 10px;background-repeat: no-repeat;padding-left:86px;font-size:14px;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > a {font-size:14px;color:#444;display:block;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li i {font-style:normal;width:135px;line-height:17px;display:inline-block;}
+
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a {background-position: 84px 10px;background-repeat: no-repeat;padding-left:98px;font-size:14px;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a.open {background-position: 20px 12px;background-repeat: no-repeat;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a {font-size:14px;color:#444;display:block;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li i {font-style:normal;width:135px;line-height:17px;display:inline-block;}
+
+.menuArea > div > .menuList > ul > li > ul > li button {float:right;width:44px;height:22px;
+background:url(../img/common/btn_list_add_on.gif) no-repeat right center;display:block;text-indent:-9999px;}
+.menuArea > div > .menuList > ul > li > ul > li button.off {background:url(../img/common/btn_list_add_off.gif) no-repeat right center;}
+
+.menuArea > div > .myMenu {background:#f9f9fb;}
+.menuArea > div > .myMenu h3 {position:absolute;top:-9999px;width:0;height:0;font-size:0;line-height:0;overflow:hidden;}
+.menuArea > div > .myMenu ul > li {position:relative;border-bottom:1px solid #e1e1e1;padding-left:40px;}
+.menuArea > div > .myMenu ul > li a {font:normal 14px/42px NotoSans_Dl, sans-serif;color:#6e7277;letter-spacing:-1px;}
+.menuArea > div > .myMenu ul > li:hover {background:#f2f7fa;cursor:pointer;}
+.menuArea > div > .myMenu ul > li:hover a {color:#008485;text-decoration:none !important;}
+.menuArea > div > .myMenu ul.edit a {font:normal 15px/42px NotoSans_Regular, sans-serif;color:#444;}
+
+.menuArea > div > .myMenu ul > li div.arrayBtn {position:absolute;top:0;left:16px;width:15px;height:100%;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button {position:relative;width:15px;height:8px;text-indent:-9999px;display:block;vertical-align: middle;margin-top: 4px;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button:first-child {margin-top: 2px;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp {background:url(../img/common/btn_list_up.png) no-repeat left top;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp:hover {background:url(../img/common/btn_list_up_over.png) no-repeat left top;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown {background:url(../img/common/btn_list_down.png) no-repeat left top;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown:hover {background:url(../img/common/btn_list_down_over.png) no-repeat left top;}
+
+.menuArea > div > .myMenu ul > li button {position:absolute;top:10px;display:block;text-indent:-9999px;}
+.menuArea > div > .myMenu ul > li button.fix {right:64px;width:32px;height:22px;background:url(../img/common/btn_list_fix.gif) no-repeat left top;}
+.menuArea > div > .myMenu ul > li button.fixed {background:url(../img/common/btn_list_fixed.gif) no-repeat left top;}
+.menuArea > div > .myMenu ul > li button.del {right:15px;width:44px;height:22px;background:url(../img/common/btn_list_del.gif) no-repeat left top;}
+
+.bankSetLayer .contNotice {width:640px;margin-top:45px;padding:30px; border:1px solid #ebebeb;}
+.bankSetLayer .contNotice .orderListDot {margin:0;}
+.bankSetLayer .contNotice .orderListDot li {color:#444;line-height:17px;background:url(../img/common/bul_dot.gif) no-repeat 0 6px !important;}
+
+.layerSet .btnWrapTop {position:absolute; width:auto; top:40px; right:40px;}
+.layerSet .btnWrapTop .btnClose {display:block; width:27px; height:27px; background:url(../img/common/btn_close_pop.gif) no-repeat 50% 50%; text-indent:-9999px;}
+
+.btnBoxCenter {margin-top:40px;}
+.btnCncl {display:inline-block; height:45px; min-width:110px; margin:0 5px; background:#fff; border:1px solid #d6d6d6;font-size:14px;font-weight:bold;color:#6f6f6f;letter-spacing:-0.5px;line-height:44px;text-align:center; vertical-align:middle;}
+.btnCncl span {padding:0 19px;}
+.btnCncl:hover, .btnCncl:focus {background:#fff;border:1px solid #d6d6d6;color:#6f6f6f;text-decoration:none; cursor:pointer;}
+
+.layerSet.on .dim {display:block;}
+.dim {display:none; position:fixed;width:100%;height:100%;overflow:auto;top:0;left:0;background:#000;opacity:0.15;-ms-filter:alpha(opacity=15);filter:alpha(opacity=15)}

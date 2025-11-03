@@ -1,0 +1,563 @@
+var myPopUp = "";
+var myPopTitle = "나만의 특별한 혜택";
+var myPopPosition = "";
+
+var goCrCampaignName = "";
+var goCrServiceLinkURL="";
+var goCrServiceLinkURL2 = "";
+var goCrServiceLinkURL_Main = "";
+var goCrServiceLinkButton = "";
+var goCrServiceLinkMSG = "";
+
+var goIrCampaignName = "";
+var goIrServiceLinkURL2 = "";
+var goIrServiceLinkURL_Main = "";
+var goIrServiceLinkButton = "";
+var goIrServiceLinkMSG = "";
+
+var goIrPayplanner = "";
+var goCrPayplanner = "";
+
+getMyEvent = function(val) {
+  AjaxOption.progressBarYn = "N";
+  AjaxOption.modalProgressBarYn= "N";
+  AjaxOption.encription = true;
+  myPopPosition = val;
+
+  //전체 대상 캠페인 아이디 추가
+  myPopUp = 'MAS06|';
+
+  var reqMap = {
+    targetMethod : "getMyEvent",
+    RANKMAP : myPopUp
+  }
+  executeAction("OCM90000000M.ajax", eval(reqMap), callBackCheckPopupRank, AjaxOption);
+}
+callBackCheckPopupRank = function(dataMap) { try {
+  spider.extJS.loadingLayer.close();
+  if(dataMap.RESPONSE_MESSAGE != undefined && dataMap.RESPONSE_MESSAGE != null) {
+    return;
+  }
+
+  var isIR = false;
+  var isCR = false;
+
+  //팝업 HTML 조회결과 저장 변수
+  var data = "";
+  var lostCard = "";
+  var myPagePopUp_Html = "";
+
+  //팝업 HTML 조회
+  if(dataMap._BeginLoop_A != null && dataMap._BeginLoop_A.data != undefined) {
+    data = dataMap._BeginLoop_A.data;
+  }
+
+  //분실신고 리스트
+  if(dataMap._BeginLoop_B != null && dataMap._BeginLoop_B.data != undefined) {
+    lostCard = dataMap._BeginLoop_B.data;
+  }
+
+  // 장기카드대출 캠페인 대상자
+  if(dataMap.IR_YN == 'Y') {
+    //페이플래너 대상 여부
+    if(dataMap.IR_CMP_NM.indexOf('페이플래너') != -1) goIrPayplanner = "Y";
+
+    //ARS 대상자이며 이벤트 미응모자
+    if(dataMap.IR_ARS_RG_NYN == 'Y' && dataMap.IR_CMP_ENTR_DT == '00010101') {
+      goIrServiceLinkMSG = "행사등록 참여시 위와 같은 혜택을 드립니다.";
+      goIrServiceLinkURL2 = "appFinDsc('LTM'); return false;";
+      goIrServiceLinkURL_Main = "goMenuLink('OPP35000001D.web?schID=ncd&mID=OPP35000000D&EVN_SEQ=3654'); return false;";
+      goIrServiceLinkButton = "행사등록";
+      if(goIrPayplanner == 'Y') {
+        goIrServiceLinkMSG = "<b style='color:#ee245a'>지금, 페이플래너</b> 통해 장기카드대출 이용시<br>이자율 할인 혜택을 드립니다.";
+        goIrServiceLinkButton = "페이플래너 둘러보기";
+      }
+    }
+    //ARS응답 대상자이지만 이미 이벤트에 응모한 대상자
+    else if(dataMap.IR_ARS_RG_NYN == 'Y' && dataMap.IR_CMP_ENTR_DT != '00010101') {
+      goIrServiceLinkMSG = "인터넷에서도 편리한 금융!<br>장기카드대출(카드론) 연 이자율 할인 혜택을 드립니다.";
+      goIrServiceLinkURL2 = "goMenuLink('OPF10000000M.web?schID=pcd&mID=OPF10000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+      goIrServiceLinkURL_Main = "goMenuLink('OPF10000000M.web?schID=pcd&mID=OPF10000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+      goIrServiceLinkButton = "신청하기";
+      if(goIrPayplanner == 'Y') {
+        goIrServiceLinkMSG = "<b style='color:#ee245a'>지금, 페이플래너</b> 통해 장기카드대출 이용시<br>이자율 할인 혜택을 드립니다.";
+        goIrServiceLinkURL2 = "goMenuLink('OPF70000000M.web?schID=pcd&mID=OPF70000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+        goIrServiceLinkButton = "페이플래너 둘러보기";
+      }
+    }
+    else {
+      goIrServiceLinkMSG = "인터넷에서도 편리한 금융!<br>장기카드대출(카드론) 연 이자율 할인 혜택을 드립니다.";
+      goIrServiceLinkURL2 = "goMenuLink('OPF10000000M.web?schID=pcd&mID=OPF10000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+      goIrServiceLinkURL_Main = "goMenuLink('OPF10000000M.web?schID=pcd&mID=OPF10000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+      goIrServiceLinkButton = "신청하기";
+      if(goIrPayplanner == 'Y') {
+        goIrServiceLinkMSG = "<b style='color:#ee245a'>지금, 페이플래너</b> 통해 장기카드대출 이용시<br>이자율 할인 혜택을 드립니다.";
+        goIrServiceLinkURL2 = "goMenuLink('OPF70000000M.web?schID=pcd&mID=OPF70000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+        goIrServiceLinkButton = "페이플래너 둘러보기";
+      }
+    }
+
+    isIR = true;
+  }
+  // 단기카드대출 캠페인 대상자
+  if(dataMap.CR_YN == 'Y') {
+    if(dataMap.CR_CMP_NM.indexOf('페이플래너') != -1) goCrPayplanner = "Y";
+
+    //ARS 대상자이며 이벤트 미응모자
+    if(dataMap.CR_ARS_RG_NYN == 'Y' && dataMap.CR_CMP_ENTR_DT == '00010101') {
+      goCrServiceLinkMSG = "인터넷에서도 편리한 금융!<br>단기카드대출(현금서비스) 연 이자율 할인 혜택을 드립니다.";
+      goCrServiceLinkURL2 = "appFinDsc('STM'); return false;";
+      goCrServiceLinkURL_Main = "goMenuLink('OPP35000001D.web?schID=ncd&mID=OPP35000000D&EVN_SEQ=2546'); return false;";
+      goCrServiceLinkButton = "행사등록";
+      if(goCrPayplanner == 'Y') {
+        goCrServiceLinkMSG = "<b style='color:#ee245a'>지금, 페이플래너</b> 통해 단기카드대출 이용시<br>이자율 할인 혜택을 드립니다.";
+        goCrServiceLinkButton = "페이플래너 둘러보기";
+      }
+    }
+    //ARS응답 대상자이지만 이미 이벤트에 응모한 대상자
+    else if(dataMap.CR_ARS_RG_NYN == 'Y' && dataMap.CR_CMP_ENTR_DT != '00010101') {
+      goCrServiceLinkMSG = "인터넷에서도 편리한 금융!<br>단기카드대출(현금서비스) 연 이자율 할인 혜택을 드립니다.";
+      goCrServiceLinkURL2 = "goMenuLink('OPF05000000M.web?schID=pcd&mID=OPF05000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+      goCrServiceLinkButton = "신청하기";
+      goCrServiceLinkURL_Main = "goMenuLink('OPF05000000M.web?schID=pcd&mID=OPF05000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+      if(goCrPayplanner == 'Y') {
+        goCrServiceLinkMSG = "<b style='color:#ee245a'>지금, 페이플래너</b> 통해 단기카드대출 이용시<br>이자율 할인 혜택을 드립니다.";
+        goCrServiceLinkURL2 = "goMenuLink('OPF70000000M.web?schID=pcd&mID=OPF70000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+        goCrServiceLinkButton = "페이플래너 둘러보기";
+      }
+    }
+    else {
+      goCrServiceLinkMSG = "인터넷에서도 편리한 금융!<br>단기카드대출(현금서비스) 연 이자율 할인 혜택을 드립니다.";
+      goCrServiceLinkURL2 = "goMenuLink('OPF05000000M.web?schID=pcd&mID=OPF05000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+      goCrServiceLinkButton = "신청하기";
+      goCrServiceLinkURL_Main = "goMenuLink('OPF05000000M.web?schID=pcd&mID=OPF05000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+      if(goCrPayplanner == 'Y') {
+        goCrServiceLinkMSG = "<b style='color:#ee245a'>지금, 페이플래너</b> 통해 단기카드대출 이용시<br>이자율 할인 혜택을 드립니다.";
+        goCrServiceLinkURL2 = "goMenuLink('OPF70000000M.web?schID=pcd&mID=OPF70000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc'); return false;";
+        goCrServiceLinkButton = "페이플래너 둘러보기";
+      }
+    }
+
+    isCR = true;
+  }
+
+  var idx = 0;
+  //팝업 HTML 조회
+  var lostCardPopYN = false;
+  if(dataMap.REISSUE_POP == "Y" && "" == getCookie("pagePopUp_Html_reIsu")){
+  	lostCardPopYN = true;
+  }
+
+  if(lostCardPopYN){
+    myPagePopUp_Html += '<div class="modal_wrap ty_benefit">';
+    myPagePopUp_Html += '  <div class="modal_header">';
+    myPagePopUp_Html += '    <h2>분실신고 신청결과 안내</h2>';
+    myPagePopUp_Html += '  </div>';
+    myPagePopUp_Html += '  <div class="modal_body pop_ty">';
+    myPagePopUp_Html += '    <article class="cont">';
+    myPagePopUp_Html += '      <h4 class="blind">나만의 혜택</h4>';
+    myPagePopUp_Html += '      <div class="benefit_spec_area">';
+    myPagePopUp_Html += '        <ul class="benefit_spec_slide">';
+    myPagePopUp_Html += '          <li class="li">';
+    myPagePopUp_Html += '            <div class="text_box">';
+    myPagePopUp_Html += '              <strong class="s_txt">'+ lostCard[0].CST_NM +' 고객님이 '+makeDate(lostCard[0].LS_RCPDT) +' 신청하신<br>';
+    myPagePopUp_Html += '              <span class="t_point">'+ lostCard[0].CD_PD_KND_NM +' ('+lostCard[0].CDNO_ENC+')';
+    if(lostCard.length > 1){
+      myPagePopUp_Html += ' 외 '+ Number(lostCard.length - 1) +'건</span> 이';
+    }else{
+      myPagePopUp_Html += '</span> 가';
+    }
+    myPagePopUp_Html += '<br>안전하게 분실 등록 되었습니다.';
+    myPagePopUp_Html += '              </strong>';
+    myPagePopUp_Html += '              <p class="s_txt">재발급 신청시 빠른 시일내 배송해 드립니다.</p>';
+    myPagePopUp_Html += '              <ul class="btn_area">';
+    myPagePopUp_Html += '                <li>';
+    myPagePopUp_Html += '                  <a href="javascript:void(0);" onclick="goMenuLink(\'OPY35350400M.web?schID=pcd&mID=OPY35350400M&\'); return false;" class="btn_m btn_ty02">재발급 신청</a>';
+    myPagePopUp_Html += '                </li>';
+    myPagePopUp_Html += '              </ul>';
+    myPagePopUp_Html += '            </div>';
+    myPagePopUp_Html += '          </li>';
+    myPagePopUp_Html += '        </ul>';
+    myPagePopUp_Html += '        <div class="pagn_area">';
+    myPagePopUp_Html += '          <div class="pagn_s"></div>';
+    myPagePopUp_Html += '        </div>';
+    myPagePopUp_Html += '      </div>';
+    myPagePopUp_Html += '    </article>';
+
+    myPagePopUp_Html += '    <div class="benefit_spec_today">';
+    myPagePopUp_Html += '      <div class="ez-checkbox "><input type="checkbox" class="ez-hide" id="chk_today"></div>';
+    myPagePopUp_Html += '      <label for="chk_today">7일간 다시 보지 않기</label>';
+    myPagePopUp_Html += '    </div>';
+    myPagePopUp_Html += '  </div>';
+
+    myPagePopUp_Html += '  <button onclick="WeekPopupClose(\'pagePopUp_Html_reIsu\', \'no\');return false;" class="pop01_close btn_pop_close">팝업 닫기</button>';
+    myPagePopUp_Html += '</div>';
+
+    //팝업HTML조회결과 저장
+    jQuery("#pagePopUp_Html").html(myPagePopUp_Html);
+
+    formTemp();
+
+    //변수 초기화
+    myPagePopUp_Html = "";
+    if(myPopPosition != "main") {
+      jQuery('#pagePopUp_Html').popup('show');
+      jQuery('.benefit_spec_slide').myBenefitSlide();
+    }
+  }
+  else if(data != null && data.length > 0) {
+
+    myPagePopUp_Html += '<div class="modal_wrap ty_benefit">';
+    myPagePopUp_Html += '  <div class="modal_header">';
+    myPagePopUp_Html += '    <h2>나만의 특별한 혜택</h2>';
+    myPagePopUp_Html += '  </div>';
+    myPagePopUp_Html += '  <div class="modal_body pop_ty">';
+    myPagePopUp_Html += '    <article class="cont">';
+    myPagePopUp_Html += '      <h4 class="blind">나만의 혜택</h4>';
+    myPagePopUp_Html += '      <div class="benefit_spec_area">';
+    myPagePopUp_Html += '        <ul class="benefit_spec_slide">';
+
+    for(var i=0; i < data.length; i++) {
+
+      //카드론 캠페인 ( IR )  처음 한번만 조회
+      if(data[i].POPUP_ID == "IR_POP") {
+        if(dataMap.IR_CMP_NM.indexOf('장기카드대출(카드론)') != -1) {
+          goIrCampaignName = dataMap.IR_CMP_NM.replace("장기카드대출(카드론)","<span>장기카드대출(카드론)");
+          goIrCampaignName = goIrCampaignName.replace("이자율 ","이자율</span><em>");
+          if(dataMap.IR_CMP_NM.indexOf('할인') != -1) {
+            goIrCampaignName = goIrCampaignName.replace("할인","</em> 할인");
+          } else if(dataMap.IR_CMP_NM.indexOf('적용') != -1) {
+            goIrCampaignName = goIrCampaignName.replace("적용","</em> 적용");
+          } else {
+            goIrCampaignName += "</em>";
+          }
+        }
+        else if(goIrPayplanner == 'Y') {
+          goIrCampaignName = dataMap.IR_CMP_NM.replace("_"," ");
+          goIrCampaignName = "<span>"+goIrCampaignName;
+          if(dataMap.IR_CMP_NM.indexOf('등록 후') != -1) {
+            goIrCampaignName = goIrCampaignName.replace("등록 후 ","등록 후</span><em>");
+          } else if(dataMap.IR_CMP_NM.indexOf('이용시') != -1) {
+            goIrCampaignName = goIrCampaignName.replace("이용시 ","이용시</span><em>");
+          }
+          if(dataMap.IR_CMP_NM.indexOf('할인') != -1) {
+            goIrCampaignName = goIrCampaignName.replace("할인","</em> 할인 혜택");
+          } else if(dataMap.IR_CMP_NM.indexOf('적용') != -1) {
+            goIrCampaignName = goIrCampaignName.replace("적용","</em> 적용");
+          } else {
+            goIrCampaignName += "</em>";
+          }
+        }
+        else {
+          goIrCampaignName = "<span>" + dataMap.IR_CMP_NM + "</span>";
+        }
+
+        //if(dataMap.CRIF_MRKT_AG_YN == "Y") {
+          myPagePopUp_Html += '<li class="li">';
+          myPagePopUp_Html += '  <div class="text_box">';
+          myPagePopUp_Html += '    <h5 class="tit">' + goIrCampaignName + '</h5>';
+          myPagePopUp_Html += '    <p class="s_txt">' + goIrServiceLinkMSG + '</p>';
+          myPagePopUp_Html += '    <span class="s_txt02">' + plusDate(dataMap.IR_CMP_SDT) + ' ~ ' + plusDate(dataMap.IR_CMP_EDT) + '</span>';
+          myPagePopUp_Html += '    <ul class="btn_area">';
+          myPagePopUp_Html += '      <li>';
+          myPagePopUp_Html += '        <a href="javascript:void(0);" onclick="'+goIrServiceLinkURL2+'" class="btn_m btn_ty02">'+goIrServiceLinkButton+'</a>';
+          myPagePopUp_Html += '      </li>';
+          myPagePopUp_Html += '    </ul>';
+          myPagePopUp_Html += '  </div>';
+          myPagePopUp_Html += '</li>';
+          idx++;
+        //}
+      }
+      //현금서비스 캠페인 ( CR )  처음 한번만 조회
+      else if(data[i].POPUP_ID == "CR_POP") {
+        if(dataMap.CR_CMP_NM.indexOf('단기카드대출') != -1) {
+          goCrCampaignName = dataMap.CR_CMP_NM.replace("단기카드대출","<span>단기카드대출");
+          goCrCampaignName = goCrCampaignName.replace("이자율 ","이자율</span><em>");
+          if(dataMap.CR_CMP_NM.indexOf('할인') != -1) {
+            goCrCampaignName = goCrCampaignName.replace("할인","</em> 할인");
+          } else if(dataMap.CR_CMP_NM.indexOf('적용') != -1) {
+            goCrCampaignName = goCrCampaignName.replace("적용","</em> 적용");
+          } else {
+            goCrCampaignName += "</em>";
+          }
+        }
+        else if(goCrPayplanner == 'Y') {
+          goCrCampaignName = dataMap.CR_CMP_NM.replace("_"," ");
+          goCrCampaignName = "<span>"+goCrCampaignName;
+          if(dataMap.CR_CMP_NM.indexOf('등록 후') != -1) {
+            goCrCampaignName = goCrCampaignName.replace("등록 후 ","등록 후</span><em>");
+          } else if(dataMap.CR_CMP_NM.indexOf('이용시') != -1) {
+            goCrCampaignName = goCrCampaignName.replace("이용시 ","이용시</span><em>");
+          }
+          if(dataMap.CR_CMP_NM.indexOf('할인') != -1) {
+            goCrCampaignName = goCrCampaignName.replace("할인","</em> 할인 혜택");
+          } else if(dataMap.CR_CMP_NM.indexOf('적용') != -1) {
+            goCrCampaignName = goCrCampaignName.replace("적용","</em> 적용");
+          } else {
+            goCrCampaignName += "</em>";
+          }
+        }
+        else {
+          goCrCampaignName = "<span>" + dataMap.CR_CMP_NM + "</span>";
+        }
+
+        //if(dataMap.CRIF_MRKT_AG_YN == "Y") {
+          myPagePopUp_Html += '<li class="li">';
+          myPagePopUp_Html += '  <div class="text_box">';
+          myPagePopUp_Html += '    <h5 class="tit">' + goCrCampaignName + '</h5>';
+          myPagePopUp_Html += '    <p class="s_txt">' + goCrServiceLinkMSG + '</p>';
+          myPagePopUp_Html += '    <span class="s_txt02">' + plusDate(dataMap.CR_CMP_SDT) + ' ~ ' + plusDate(dataMap.CR_CMP_EDT) + '</span>';
+          myPagePopUp_Html += '    <ul class="btn_area">';
+           myPagePopUp_Html += '      <li>';
+          myPagePopUp_Html += '        <a href="javascript:void(0);" onclick="'+goCrServiceLinkURL2+'" class="btn_m btn_ty02">'+goCrServiceLinkButton+'</a>';
+          myPagePopUp_Html += '      </li>';
+          myPagePopUp_Html += '    </ul>';
+          myPagePopUp_Html += '  </div>';
+          myPagePopUp_Html += '</li>';
+          idx++;
+        //}
+      }
+      else {
+        myPagePopUp_Html += '<li class="li">';
+        myPagePopUp_Html += '  <div class="text_box">'+data[i].PSTS_CN+'</div>';
+        myPagePopUp_Html += '</li>';
+        idx++;
+
+        if(data[i].POPUP_ID.indexOf('EC201001320352') != -1 || data[i].POPUP_ID.indexOf('EC201001320353') != -1 || data[i].POPUP_ID.indexOf('EC201001320354') != -1 || data[i].POPUP_ID.indexOf('EC201001320351') != -1) {
+          myPopTitle = "안내드립니다";
+        }
+      }
+    }
+
+    myPagePopUp_Html += '        </ul>';
+
+    myPagePopUp_Html += '        <div class="pagn_area">';
+    myPagePopUp_Html += '          <div class="pagn_s"></div>';
+    myPagePopUp_Html += '        </div>';
+    myPagePopUp_Html += '      </div>';
+    myPagePopUp_Html += '      <a href="#" class="swiper-button-prev">이전 슬라이드 보기</a>';
+    myPagePopUp_Html += '      <a href="#" class="swiper-button-next">다음 슬라이드 보기</a>';
+    myPagePopUp_Html += '    </article>';
+
+    myPagePopUp_Html += '    <div class="benefit_spec_today">';
+    myPagePopUp_Html += '      <div class="ez-checkbox "><input type="checkbox" class="ez-hide" id="chk_today"></div>';
+    myPagePopUp_Html += '      <label for="chk_today">오늘 하루 다시 보지 않기</label>';
+    myPagePopUp_Html += '    </div>';
+    myPagePopUp_Html += '  </div>';
+
+    myPagePopUp_Html += '  <button onclick="TodayPopupClose(\'pagePopUp_Html\', \'no\');return false;" class="pop01_close btn_pop_close">닫기</button>';
+    myPagePopUp_Html += '</div>';
+
+    //팝업HTML조회결과 저장
+    jQuery("#pagePopUp_Html").html(myPagePopUp_Html);
+    jQuery("#pagePopUp_Html h2").html(myPopTitle);
+
+    formTemp();
+
+    //변수 초기화
+    myPagePopUp_Html = "";
+
+    if("" == getCookie("pagePopUp_Html")) {
+      if(idx > 0 && myPopPosition != "main") {
+        jQuery('#pagePopUp_Html').popup('show');
+        jQuery('.benefit_spec_slide').myBenefitSlide();
+      }
+    }
+  }
+
+  // 장기카드 이자율 할인 대상 배너노출
+  if(isIR) {
+    if(myPopPosition == "main") {
+      jQuery("#mc_cash_area_login").find("dt").addClass("ty02")
+      .html('<em class="after">카드론 이자율 할인 대상</em><strong>“고객님께서는 장기카드대출 이자율 할인 대상자이십니다.”</strong><a href="javascript:void(0);" onclick="'+goIrServiceLinkURL_Main +'">자세히 보기</a>');
+    }
+    else {
+      jQuery(".mypage_main_data .bank").html(
+        jQuery(".mypage_main_data .bank").html()+
+        '<a href="javascript:void(0);" onclick="'+goIrServiceLinkURL2+'" class="btn_link"><strong><span class="blind">장기카드대출</span>이자율 할인 대상자</strong></a>'
+      );
+    }
+  }
+  // 단기카드 이자율 할인 대상 배너노출
+  else if(isCR) {
+    if(myPopPosition == "main") {
+      jQuery("#mc_cash_area_login").find("dt").addClass("ty02")
+      .html('<em class="after">현금서비스 할인 대상</em><strong>“고객님께서는 단기카드대출 이자율 할인 대상자이십니다.”</strong><a href="javascript:void(0);" onclick="' +goCrServiceLinkURL_Main +'">자세히 보기</a>');
+    }
+    else {
+      jQuery(".mypage_main_data .bank").html(
+        jQuery(".mypage_main_data .bank").html()+
+        '<a class="btn_link ty02 btn_pop" href="javascript:void(0);" onclick="jQuery(\'#MyPagePop01\').popup(\'show\');">'+
+        '<strong><span class="blind">단기카드대출</span>이자율 할인 대상자</strong>'
+      );
+      var isCR_name = "";
+      var isCR_name2 = "";
+
+      if(dataMap.CR_CMP_NM.indexOf('단기카드대출') != -1) {
+        if(dataMap.CR_CMP_NM.indexOf('연이자율') != -1) {
+          isCR_name = dataMap.CR_CMP_NM.replace("연이자율","<br><span class='t_point'>연이자율");
+          isCR_name2 = dataMap.CR_CMP_NM.replace("연이자율"," <span class='t_point02'>연이자율");
+        }
+        else if(dataMap.CR_CMP_NM.indexOf('이자율') != -1) {
+          isCR_name = dataMap.CR_CMP_NM.replace("이자율","<br><span class='t_point'>이자율");
+          isCR_name2 = dataMap.CR_CMP_NM.replace("이자율"," <span class='t_point02'>이자율");
+        }
+        isCR_name += "</span>";
+        isCR_name2 += "</span>";
+      } else {
+        isCR_name = dataMap.CR_CMP_NM;
+        isCR_name2 = dataMap.CR_CMP_NM;
+      }
+
+      jQuery("#MyPagePop01 .w_tit").html(isCR_name);
+      jQuery("#MyPagePop01 .s_txt").html("행사기간 : "+plusDate(dataMap.CR_CMP_SDT)+" ~ "+plusDate(dataMap.CR_CMP_EDT));
+      jQuery("#MyPagePop01 .btn_ty02").html(goCrServiceLinkButton);
+      jQuery("#MyPagePop01 .btn_ty02").attr("onclick", goCrServiceLinkURL2);
+
+      jQuery("#MyPageEventIsCR").find("ul").html('');
+      jQuery("#MyPageEventIsCR").find("ul").append(
+        jQuery("<li/>", { class : 'blt2' }).append(
+          jQuery("<strong/>", { html: isCR_name2, class : 't_txt' })
+        ).append(" ("+plusDate(dataMap.CR_CMP_SDT)+" ~ "+plusDate(dataMap.CR_CMP_EDT)+")")
+      );
+    }
+  }
+
+  getMySpecialEvent();
+  return;
+
+} catch(e) { } }//end callBackCheckPopupRank
+
+getMySpecialEvent = function() {
+  var reqMap = { targetMethod : "getClnSpcMrtYn" }
+  executeAction("OCM90000000M.ajax", reqMap, callBackClnSpcMrtYn, AjaxOption);
+}
+callBackClnSpcMrtYn = function(dataMap) { try {
+  spider.extJS.loadingLayer.close();
+  if(dataMap.RESPONSE_MESSAGE != undefined && dataMap.RESPONSE_MESSAGE != null) {
+    return;
+  }
+  else {
+
+    if(dataMap.CLN_SPC_MRT_YN == "Y") {
+      if(myPopPosition == "main") {
+        jQuery("#mc_cash_area_login").find("dt").addClass("ty02")
+        .html('<em class="after">카드론 이자율 할인 대상</em><strong>“고객님께서는 장기카드대출 특별금리 대상자이십니다.”</strong><a href="OPF10050000M.web?schID=ops&mID=OPF10050000M">자세히 보기</a>');
+      }
+      else {
+        var myBtn = jQuery(".mypage_main_data .bank").find(".btn_link");
+        if(myBtn.find('strong').html() == '<span class="blind">장기카드대출</span>이자율 할인 대상자') {
+          myBtn.find('strong').html('<span class="blind">장기카드대출</span>특별금리 대상자');
+          myBtn.removeAttr('onclick');
+          myBtn.attr('onclick', 'goMenuLink(\'OPF10050000M.web?schID=ops&mID=OPF10050000M\');');
+        }
+        else {
+          jQuery(".mypage_main_data .bank").html(
+            jQuery(".mypage_main_data .bank").html()+
+            '<a href="javascript:void(0);" onclick="goMenuLink(\'OPF10050000M.web?schID=ops&mID=OPF10050000M\');" class="btn_link btn_pop"><strong><span class="blind">장기카드대출</span>특별금리 대상자</strong></a>'
+          );
+        }
+      }
+    }else if(dataMap.CLN_SPC_MRT_YN == "C") {
+      if(!jQuery("#mc_cash_area_login").find("dt").hasClass("ty02")){
+        jQuery("#mc_cash_area_login").find("dt").addClass("ty02")
+        .html('<em class="after">다른 대출 알아보기</em><strong>“다른 대출 알아보기”</strong><a href="OPF10050004N.web?schID=pcd&mID=OPF10050004N">자세히 보기</a>');
+      }
+      jQuery("#mc_cash_area_login").find("dd").find("li").eq(1).find("p").find("a").attr("onclick","goMenuLink('OPF10050000M.web?schID=pcd&mID=OPF10050000M')");
+    }
+  }
+
+} catch(e) { } }//end callBackClnSpcMrtYn
+
+function TodayPopupClose(name, value) {
+  if(jQuery("input:checkbox[id='chk_today']").is(":checked")) {
+    var date = new Date();
+    date.setSeconds(60);
+    date.setMinutes(60);
+    date.setHours(24);
+    document.cookie = name + "=" + value + "; expires=" + date.toGMTString() + "; path=/";
+  }
+  jQuery('#pagePopUp_Html').popup('hide');
+}
+
+function WeekPopupClose(name, value) {
+  if(jQuery("input:checkbox[id='chk_today']").is(":checked")) {
+    var date = new Date();
+    date.setSeconds(60);
+    date.setMinutes(60);
+    date.setHours(168);
+    document.cookie = name + "=" + value + "; expires=" + date.toGMTString() + "; path=/";
+  }
+  jQuery('#pagePopUp_Html').popup('hide');
+}
+ 
+function formTemp(){
+  jQuery(function($){
+    if($("input[type='checkbox']").length > 0){
+      $("input[type='checkbox']").ezMark(); //checkbox
+    }
+    if($("input[type='radio']").length > 0){
+      $("input[type='radio']").ezMark(); //radio
+    }
+
+    $("input[type='checkbox'], input[type='radio']").focusin(function(){
+      $(this).parent().addClass('ez_focus');
+    });
+    $("input[type='checkbox'], input[type='radio']").focusout(function(){
+      $(this).parent().removeClass('ez_focus');
+    });
+    $('.ez-radio div input, .ez-checkbox div input').unwrap();
+    $('.radio_box label em, .radio_box02 label em, .radio_box03 label em').remove();
+    $('.radio_box label, .radio_box02 label, .radio_box03 label').append('<em></em>');
+
+    $("input[type='checkbox']").each(function(){
+      if($(this).hasClass('hint_chk')){
+        $(this).parent().addClass('hint_chk');
+      }
+    });
+  });
+}
+
+function makeDate(date){
+	//yyyyMMdd -> 년 월 일
+	var year = Number(date.substring(0,4));
+	var month = Number(date.substring(4,6));
+	var day =  Number(date.substring(6,8));
+	
+	return year+"년 "+month+"월 "+day+"일";
+}
+
+
+function appFinDsc(tp){
+	 var reqMap = { 
+	 	targetMethod : "appFinDsc" 
+	 	,TP : tp
+	 }
+  executeAction("OCM90000000M.ajax", reqMap, callBackAppFinDsc, AjaxOption);
+}
+
+function callBackAppFinDsc (dataMap){
+	
+  if(dataMap.RESPONSE_MESSAGE != undefined && dataMap.RESPONSE_MESSAGE != null) {
+	extExceptionAlert(dataMap);
+  return;
+  }else{
+  	  	
+  	i18nExtAlert("정상적으로 행사 참여가 완료되었습니다."); 
+  	
+  	if(dataMap.TP == "STM"){
+  		if(goCrPayplanner == 'Y') {
+  			goMenuLink('OPF70000000M.web?schID=pcd&mID=OPF70000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc');
+  		} else {
+  			TodayPopupClose('pagePopUp_Html', 'no');
+  		}
+  	}else if(dataMap.TP == "LTM"){
+  		if(goIrPayplanner == 'Y') {
+  			goMenuLink('OPF70000000M.web?schID=pcd&mID=OPF70000000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc');
+  		} else {
+  			goMenuLink('OPF10050000M.web?schID=pcd&mID=OPF10050000M&bansrc=MYPAGEbfpop&ban_nm=FNC_cashdc');
+  		}
+  	}
+  }
+  
+}

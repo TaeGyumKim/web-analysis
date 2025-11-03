@@ -1,0 +1,530 @@
+@charset "utf-8"; 
+
+#HANA_WRAP_DIV {position:relative; width:1200px; min-width:1200px; min-height:100%; margin:0 auto; padding-right:60px; background:url(../img/common/bg_sub.gif) repeat-y 0 0; overflow:hidden;}
+#HANA_HEAD_DIV {position:relative; float:left; width:300px;}
+#HANA_HEAD_DIV h1 {width:100%; height:70px; margin:0 auto;  text-align:center;}
+#HANA_HEAD_DIV h1 a {display:block; width:200px; text-indent:-9999px; background:url(../img/common/logo_sub.png) no-repeat 50% 50%;margin:0 auto;height:36px;padding-top:34px;}
+#HANA_HEAD_DIV h2 {height:88px; padding-top:34px;}
+#HANA_HEAD_DIV h2 span {display:block; height:60px; margin:0 auto; text-indent:-9999px; overflow:hidden;}
+
+
+/* gnb */
+#gnb {position:relative; z-index:20;}
+#gnb .menu {overflow:hidden;}
+#gnb .menu dd {float:left; width:84px;}
+#gnb .menu dd a {display:block; height:26px; padding-top:10px; border-top:1px solid #dcdcdc; border-left:1px solid #dcdcdc; border-bottom:1px solid #dcdcdc; background-color:#f9f9f6; text-align:center;}
+#gnb .menu dd a span {display:block; width:28px; height:20px; margin:0 auto; background:url(../img/common/sp_gnb.png) no-repeat; text-indent:-9999px; overflow:hidden;}
+#gnb .menu dd a span.spBanking {background-position:2px 0;}
+#gnb .menu dd a span.spMall {background-position:-50px 0;}
+#gnb .menu dd a span.spMember {width:43px; background-position:-100px 0;}
+#gnb .menu dd.on a {border-bottom:1px solid #fff; background-color:#fff;}
+#gnb .menu dd.on span.spBanking {background-position:2px -25px;}
+#gnb .menu dd.on span.spMall {background-position:-50px -25px;}
+#gnb .menu dd.on span.spMember {background-position:-100px -25px;}
+#gnb .menu dd a:hover, #gnb .menu dd a:active,#gnb .menu dd a:focus {border-bottom:1px solid #fff; background-color:#fff;}
+#gnb .menu dd a:hover span.spBanking, #gnb .menu dd a:active span.spBanking, #gnb .menu dd a:focus span.spBanking {background-position:2px -25px; background-color:#fff;}
+#gnb .menu dd a:hover span.spMall, #gnb .menu dd a:active span.spMall , #gnb .menu dd a:focus span.spMall  {background-position:-50px -25px;}
+#gnb .menu dd a:hover span.spMember, #gnb .menu dd a:active span.spMember, #gnb .menu dd a:focus span.spMember {background-position:-100px -25px;}
+#gnb .smenu {position:absolute; right:0; top:0;}
+#gnb .smenu .menuView {position:relative; z-index:100; display:block; width:49px; height:38px; border:1px solid #dcdcdc; background-color:#f9f9f6;}
+#gnb .smenu .menuView.on {padding-bottom:1px; border-bottom:none; background-color:#fff;}
+#gnb .smenu .menuView.on span {background:url(../img/common/sp_gnb.png) no-repeat -150px -25px;}
+#gnb .smenu.on .menuView {padding-bottom:1px; border:1px solid #ababab; border-bottom:none; background-color:#fff;}
+#gnb .smenu.on .menuView span {display:block; width:16px; height:16px; margin:0 auto; background:url(../img/common/sp_gnb.png) no-repeat -150px -25px; text-indent:-9999px; overflow:hidden;}
+#gnb .smenu.on dl {min-height:220px; padding-top:10px; border:1px solid #ababab;}
+#gnb .menuView span {display:block; width:16px; height:16px; margin:0 auto; background:url(../img/common/sp_gnb.png) no-repeat -150px 0; text-indent:-9999px; overflow:hidden;}
+#gnb .smenu dl {position:absolute; top:37px; right:0; z-index:99; width:130px; height:0; background-color:#fff;overflow:hidden;}
+#gnb .smenu a {display:block; padding:10px 0 10px 18px; }
+#gnb .smenu a span {display:block; width:100px; height:15px; background:url(../img/common/sp_gnb.png) no-repeat; text-indent:-99999px;}
+#gnb .smenu a span.spCustomer {background-position:-200px 0;}
+#gnb .smenu a span.spGuide {background-position:-200px -25px;}
+#gnb .smenu a span.spHana {background-position:-200px -50px;}
+#gnb .smenu a span.spFund {background-position:-200px -100px;}
+#gnb .smenu a span.spGold {background-position:-200px -75px;}
+#gnb .smenu a span.spSmart {background-position:-200px -125px;}
+#gnb .smenu a:hover span.spCustomer, #gnb .smenu a:focus span.spCustomer, #gnb .smenu a:active span.spCustomer {background-position:-350px 0;}
+#gnb .smenu a:hover span.spGuide, #gnb .smenu a:focus span.spGuide, #gnb .smenu a:active span.spGuide {background-position:-350px -25px;}
+#gnb .smenu a:hover span.spHana, #gnb .smenu a:focus span.spHana, #gnb .smenu a:active span.spHana {background-position:-350px -50px;}
+#gnb .smenu a:hover span.spFund, #gnb .smenu a:focus span.spFund, #gnb .smenu a:active span.spFund {background-position:-350px -100px;}
+#gnb .smenu a:hover span.spGold, #gnb .smenu a:focus span.spGold, #gnb .smenu a:active span.spGold {background-position:-350px -75px;}
+#gnb .smenu a:hover span.spSmart, #gnb .smenu a:focus span.spSmart, #gnb .smenu a:active span.spSmart {background-position:-350px -125px;}
+
+/* lnb */
+#lnb {padding:24px 0 130px; margin:0 36px;}
+#lnb li {margin:0 -36px;}
+#lnb li a {display:block; padding:13px 0 13px 35px;font-family:NotoSans_Regular; font-size:21px; color:#3c3c3c; line-height:1; letter-spacing:-1.5px;}
+#lnb li a:hover, #lnb li a:focus, #lnb li a:active {text-decoration:none !important; color:#008485;}
+#lnb li.on > a {color:#008485;}
+
+/* 2016-10-14 GNB LNB 교체 시작 */
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV h1 a {display: block;margin: 0 auto;text-indent: -9999px;background: url(../img/common/logo_kebhana.png) no-repeat 50% 50%;width: 100%;height: 100%;padding-top:30px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV h2 {height:45px;padding-top:25px;padding-bottom:10px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV h2.banking span {width:100%; background:url(../img/common/tit_lnbImg.png) no-repeat 50% 0;}/*뱅킹*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV h2.mall span {width:100%; background:url(../img/common/tit_lnbImg.png) no-repeat 50% -100px;}/*상품*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV h2.myhana span {width:100%; background:url(../img/common/tit_lnbImg.png) no-repeat 50% -800px;}/*마이하나*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV h2.certify span {width:100%; background:url(../img/common/tit_lnbImg.png) no-repeat 50% -900px;}/*인증센터*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV h2.bank span {width:100%; background:url(../img/common/tit_lnbImg.png) no-repeat 50% -1100px;}/*뱅킹관리*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV h2.prevent span {width:100%; background:url(../img/common/tit_lnbImg.png) no-repeat 50% -1000px;}/*보안센터*/
+
+#HANA_WRAP_DIV.banking #HANA_CONTENTS_DIV {width:753px; padding-left:24px !important;}
+#HANA_WRAP_DIV.banking #HANA_CONTENTS_DIV .locate {text-align:left; margin-top:0px; width:800px; margin-left:-24px}
+#HANA_WRAP_DIV.banking #HANA_CONTENTS_DIV .pageSet {right:-24px;}
+#HANA_WRAP_DIV.banking #HANA_CONTENTS_DIV #bankMenu {display:none;}
+#HANA_WRAP_DIV.banking #HANA_CONTENTS_DIV h4 {margin:0; padding-bottom:39px; font-family:NotoSans_Regular; font-size:0.975; color:#3c3c3c; line-height:1; font-weight:normal; letter-spacing:-.75px;}
+
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV #lnb {padding-top:18px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .moreMenu #lnb {margin-top:10px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .moreMenu #lnb.login {border-top:0px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV #lnbBanking #lnb {margin-top:10px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV #lnbBanking .layerSet + #lnb {margin-top:50px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV #lnb li a {padding: 10px 35px 10px 35px;line-height: 1.2;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV #lnbBanking #lnb li a {padding-right:60px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV #lnb li.lnbRoll a {background:url(../img/common/icon_lnbRoll.png) no-repeat 258px 18px;}
+
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout {height:auto;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout.banking {width:100%; background:url(../img/common/tit_bgImg.png) no-repeat 50% 0;}/*뱅킹*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout.mall {width:100%; background:url(../img/common/tit_bgImg.png) no-repeat 50% 150px;}/*상품*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout.myhana {width:100%; background:url(../img/common/tit_bgImg.png) no-repeat 50% 1200px;}/*마이하나*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout.certify {width:100%; background:url(../img/common/tit_bgImg.png) no-repeat 50% 1350px;}/*인증센터*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout.bank {width:100%; background:url(../img/common/tit_bgImg.png) no-repeat 50% 1500px;}/*뱅킹관리*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout.prevent {width:100%; background:url(../img/common/tit_bgImg.png) no-repeat 50% 1000px;}/*보안센터*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout p {text-align:center;padding-top:80px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout p a {display:inline-block;margin: 0 3px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout p a.btn_lnb_certifyCenter span {display:block;width:110px;height:38px;text-indent:-9999px;background:url(../img/common/btn_lnb_certifyCenter.png) no-repeat 0 0;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_logout p a.btn_lnb_login span {display:block;width:110px;height:38px;text-indent:-9999px;background:url(../img/common/btn_lnb_login.png) no-repeat 0 0;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login {position:relative;height:110px;border-bottom:1px solid #e1e1e1;margin-top: 10px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login div.priviteInfo {}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login div.priviteChoice {}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login div {text-align:center;}
+
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo {position:relative;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo button {font-size:19px;font-family:NotoSans_Regular;vertical-align:middle;color:#000;line-height:20px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo button:hover {text-decoration:underline;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo span.custInfo_btn {display:none;width:131px;height:33px;background:url(../img/common/bg_custInfo.png) no-repeat 0 100%; position:absolute;top:-36px;left:41%;margin-left:-85px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo span.custInfo_btn a {display:inline-block;width:62px;text-align:center;padding-top:6px;font-size:12px;font-family:'돋움', doutm,'굴림',gulim,sans-serif;color: #2c2c2c;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo span.custInfo_btn.on {display:block;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo span.time {font-family:NotoSans_Regular;font-size:17px;line-height:20px;color:#008485;vertical-align: middle;margin-left:10px;margin-right: 4px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_logoutTime {background:url(../img/common/btn_logoutTime.png) no-repeat 0 0;width:28px;height:19px;margin-top:1px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_logoutTime span {display:block;text-indent:-9999px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo p {font-size:11px;color:#6e6e6e;margin-top:10px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo_etc {margin-top: 25px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo_etc span {font-family:NotoSans_Regular;font-size:14px;color:#444;letter-spacing:-1px;padding:0 9px 0 7px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .setNation {display: inline-block;vertical-align: -1px;margin-right: 10px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .noneSet {display: inline-block;vertical-align:-2px;margin-right:8px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .noneSet a {font-family:NotoSans_Regular;font-size:11px;color:#008485;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo_etc .setNation span {font-family:Dotum;font-size:11px;color:#444;letter-spacing:0;padding:0;vertical-align:bottom;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo_etc .setNation span.initiol {letter-spacing:-1px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .custInfo_etc .noneSet .flagTxt  {font-family:NotoSans_DL;padding:0;font-size:12px;color:#008485;text-decoration:underline;background:url(../img/common/noneSet_more.gif) no-repeat right 50%;width:51px;display:inline-block;text-align:left;padding:0;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login div .flag {vertical-align: middle;margin-right:2px;width:19px;height:11px;line-height:14px;display:inline-block;padding:0;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login div .flag i {display:inline-block;width:19px;height:11px;background:url(../img/common/icon_flag_none.png) no-repeat;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login div .flag.usd i {background:url(../img/common/icon_flag_usd.png) no-repeat;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_phishing {background:url(../img/common/btn_log_phishing.gif) no-repeat;width:77px;height: 13px;margin-right: 15px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_certifyCenter {background:url(../img/common/btn_log_certify.gif) no-repeat;width:79px;height: 14px;margin-right: 8px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_logout {background:url(../img/common/btn_log_logout.gif) no-repeat;width: 47px;height: 14px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_login {background:url(../img/common/btn_log_login.gif) no-repeat;width: 35px;height: 14px;}
+/*#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_certifyCenter span {background:url(../img/common/btn_log_certify.gif) no-repeat right 4px;}*/
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_phishing span {text-indent:-9999px;display:block;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_certifyCenter span {text-indent:-9999px;display:block;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_logout span {text-indent:-9999px;display:block;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .lnb_login .btn_login span {text-indent:-9999px;display:block;}
+
+/* // LNB 나의 뱅킹메뉴 설정 가이드 */
+.myBankingMenu {background-color:#f9f9fb; position:absolute;top:270px;left:1px;width:238px;padding:0 30px;border-top:1px solid #555555;border-bottom:1px solid #e1e1e1;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .myBankingMenu h2 {width:110px;height:21px;text-indent:0px;padding-top: 17px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .myBankingMenu h2 span {display:block;width:110px;height:21px;background:url('../img/common/bg_myBankingMenu.png') no-repeat 0 0;text-indent:-9999px;}
+#HANA_HEAD_DIV .myBankingMenu p.btn_guide {position:absolute;top:18px;right:85px;width:31px;border-right:1px solid #e1e1e1}
+#HANA_HEAD_DIV .myBankingMenu p.btn_set {position:absolute;top:18px;right:30px;width:45px;}
+#HANA_HEAD_DIV .myBankingMenu p.btn_guide button, #HANA_HEAD_DIV .myBankingMenu p.btn_set button {display:block;min-width:31px;height:16px;}
+#HANA_HEAD_DIV .myBankingMenu p.btn_guide button span, #HANA_HEAD_DIV .myBankingMenu p.btn_set button span {display:block;min-width:31px;text-indent:-9999px;}
+#HANA_HEAD_DIV .myBankingMenu p.btn_guide button span {background:url('../img/common/bg_myBankingMenu.png') no-repeat 0 -99px;}
+#HANA_HEAD_DIV .myBankingMenu p.btn_set button span {background:url('../img/common/bg_myBankingMenu.png') no-repeat 0 -200px; width:45px;height:18px}
+
+#HANA_HEAD_DIV .myBankingMenu .myBanking_guide {display:none;position:absolute;top:50px;left:0;width:298px;height:415px; background:#f9f9fb url('../img/common/txt_bg_myBanking_guide.png') no-repeat 35px 40px;z-index:3;border-top:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;}
+#HANA_HEAD_DIV .myBankingMenu.on .myBanking_guide {display:block;}
+#HANA_HEAD_DIV .myBanking_guide .myBanking_footer {margin-top:365px;line-height:24px;}
+#HANA_HEAD_DIV .myBanking_guide .myBanking_footer input {margin-left:38px;}
+#HANA_HEAD_DIV .myBanking_guide .myBanking_footer button {margin-left:80px;}
+#HANA_HEAD_DIV .myBanking_guide .myBanking_footer button span {display:block;padding:0px 11px;line-height:24px;background-color:#008485;color:#fff;}
+
+/* 메뉴 한 눈에 보기 */
+.gnbLocate {margin:25px 0 35px;height:50px;position:relative;}
+
+.gnbLocate h3 {position: relative;display: inline-block;z-index: 9;height: 50px;float: left;}
+.gnbLocate h3 button {display:block;width:100%;height:100%;}
+.gnbLocate h3 button span {display:block;text-indent:-9999px;}
+
+.gnbLocate h3.gnb_tab01 {position:absolute;top:0;left:0;width:110px;height:50px;background:url(../img/common/bg_menu_search.gif) no-repeat 0 0;}
+.gnbLocate h3.gnb_tab01:hover,.gnbLocate h3.gnb_tab01.on {background-position:-200px 0;}
+.gnbLocate h3.gnb_tab02 {position:absolute;top:0;left:110px;width:105px;height:50px;background:url(../img/common/bg_menu_search.gif) no-repeat 0 -100px;}
+.gnbLocate h3.gnb_tab02:hover,.gnbLocate h3.gnb_tab02.on {background-position:-200px -100px;}
+.gnbLocate h3.gnb_tab03 {position:absolute;top:0;left:215px;width:125px;height:50px;background:url(../img/common/bg_menu_search.gif) no-repeat 0 -200px;}
+.gnbLocate h3.gnb_tab03:hover,.gnbLocate h3.gnb_tab03.on {background-position:-200px -200px;}
+.gnbLocate h3.gnb_tab04 {position:absolute;top:0;left:340px;width:105px;height:50px;background:url(../img/common/bg_menu_search.gif) no-repeat 0 -300px;}
+.gnbLocate h3.gnb_tab04:hover,.gnbLocate h3.gnb_tab04.on {background-position:-200px -300px;}
+.gnbLocate h3.gnb_tab05 {position:absolute;top:0;left:445px;width:105px;height:50px;background:url(../img/common/bg_menu_search.gif) no-repeat 0 -400px;}
+.gnbLocate h3.gnb_tab05:hover,.gnbLocate h3.gnb_tab05.on {background-position:-200px -400px;}
+.gnbLocate h3.gnb_tab06 {position:absolute;top:0;right:51px;width:110px;height:50px;background:url(../img/common/bg_menu_search.gif) no-repeat 0 -500px;}
+.gnbLocate h3.gnb_tab06:hover,.gnbLocate h3.gnb_tab06.on {background-position:-200px -500px;}
+
+.gnbLocate .gnbList {position:absolute;top:50px;left:0;width:790px;height:0;border:5px solid #008485;border-top:none;background:#fff;overflow:hidden;z-index:99;display:none;}
+.gnbLocate .gnbList.open {display:block;height:615px;}
+.gnbLocate.on .menuClose {display:block;}
+
+.gnbLocate .gnbList .gnbDiv {position:absolute;top:40px;left:0;width:790px;height:535px;z-index:15;}
+.gnbLocate .gnbList ul {width:220px;min-height:535px;z-index:15;border-right:1px solid #ddd;}
+.gnbLocate .gnbList ul li a {display:block;font:normal 16px NotoSans_Dl;text-decoration:none;line-height:20px;letter-spacing:-1px;color:#000;}
+.gnbLocate .gnbList ul li a span {display:block;padding:7px 25px 7px 30px;font:normal 16px NotoSans_Dl;text-decoration:none;line-height:20px;letter-spacing:-1px;}
+.gnbLocate .gnbList ul li a:hover,.gnbLocate .gnbList ul li a span:hover,.gnbLocate .gnbList ul li a:focus,.gnbLocate .gnbList ul li a span:focus {text-decoration:none !important;}
+.gnbLocate .gnbList ul li a.tab span {background:url(../img/common/bg_tab_off.png) no-repeat right center;color:#000;} 
+.gnbLocate .gnbList ul li ul {position:absolute;left:0;top:0;left:221px;display:none}
+.gnbLocate .gnbList ul li > a:hover, .gnbLocate .gnbList ul li > a:focus {background-color:#f4f4f4;}
+.gnbLocate .gnbList ul li.on > a {color:#008485;font:normal 16px NotoSans_Regular;line-height:20px;letter-spacing:-1px;background:#f4f4f4;}
+.gnbLocate .gnbList ul li.on > a.tab span {color:#008485;font:normal 16px NotoSans_Regular;line-height:20px;letter-spacing:-1px;background:#f4f4f4 url(../img/common/bg_tab_over.png) no-repeat right center;} 
+.gnbLocate .gnbList ul li.on > ul {display:block;}
+.gnbLocate .gnbList ul li ul li.on ul {display:block;}
+.gnbLocate .gnbList ul li ul li ul li.on a span {font-weight:bold;text-decoration:underline;}
+.gnbLocate .gnbList ul li ul li ul li.on a span:hover,.gnbLocate .gnbList ul li ul li ul li.on a span:focus {text-decoration:underline !important;}
+
+.gnbLocate .gnbStiemap {display:block;height:50px;position:relative;background:#008486;}
+.gnbLocate .gnbStiemap button {display:block;position:absolute;top:0;right:0;width:51px;height:50px;background:url(../img/common/bg_menu_search.gif) no-repeat 0 -600px;}
+.gnbLocate .gnbStiemap button span {display:block;text-indent:-9999px}
+
+.gnbLocate .menuClose {position:absolute;top:60px;right:12px;z-index:99;display:none;}
+.gnbLocate .menuClose button {display:block;width:25px;height:25px;background:#fff url(../img/common/bg_menu_search.gif) no-repeat -200px -600px;}
+.gnbLocate .menuClose button span {display:block;text-indent:-9999px;}
+
+.gnbLocate .gnbEvent {position:absolute;bottom:48px;right:19px;z-index:20;}
+.gnbLocate .gnbEvent .menuBg {width:290px;height:230px;background:url(../img/common/btnBg_hana.jpg) no-repeat 0 0;padding-left:10px;}
+.gnbLocate .gnbEvent .menuBg p.tit {height:90px;background:url(../img/common/tit_gnbEvent.jpg) no-repeat 0 bottom;text-indent:-9999px;}
+.gnbLocate .gnbEvent .menuBg p.con {height:50px;background:url(../img/common/con_gnbEvent.jpg) no-repeat 0 bottom;text-indent:-9999px;}
+.gnbLocate .gnbEvent .menuBg p.con + a.btnTxt {margin-top:35px;}
+.gnbLocate .gnbEvent .btnTxt span {text-decoration:underline;}
+.gnbLocate input {width:492px;height:30px;padding:10px;border: none;}
+
+/* 메뉴 한 눈에 보기 - 메뉴검색 */
+.wrap_menuSearch {}
+.wrap_menuSearch p.menuSearch_p {width:512px;height:50px;border:4px solid #2bb5b6;margin-top:60px;margin-left:100px;}
+.wrap_menuSearch .menuSearchResult {padding-top:12px}
+.wrap_menuSearch .menuSearchResult .favoriteMenu {margin-left:100px;}
+.wrap_menuSearch .menuSearchResult .favoriteMenu dl {zoom:1;}
+.wrap_menuSearch .menuSearchResult .favoriteMenu dl:after {content:"";display:block;clear:both;}
+.wrap_menuSearch .menuSearchResult .favoriteMenu dt, .wrap_menuSearch .menuSearchResult .favoriteMenu dd {float:left}
+.wrap_menuSearch .menuSearchResult .favoriteMenu dt span, .wrap_menuSearch .menuSearchResult .favoriteMenu dd span {display:block;padding-left:11px;}
+.wrap_menuSearch .menuSearchResult .favoriteMenu dt span {width:110px;height:18px;background:url(../img/common/tit_favoritMenu.gif) no-repeat 0 0;text-indent:-9999px;}
+.wrap_menuSearch .menuSearchResult .searchResult {margin-top:50px;padding:5px 8px 0px 25px;height:330px;}
+.wrap_menuSearch .menuSearchResult .searchResult p {font-size:14px;padding:11px 10px 10px 10px;}
+.wrap_menuSearch .menuSearchResult .menuGuide {color:#ee7b2e;font-size:12px;letter-spacing:-1px;padding:15px 0 0 30px;}
+
+/* location */
+.locateNew {margin-top:5px;}
+.locateNew p {font: normal 14px NotoSans_Dl;letter-spacing: -0.5px;}
+.locateNew span {padding: 0 5px 0 7px;font-size: 15px;color:#888;font-family:vernada;}
+.locateNew p strong {font-weight:normal;}
+/** 2016-10-14 GNB LNB 교체 종료 **/
+
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .viewBankMenu {margin-bottom:100px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .viewBankMenu button.setMenu {position: absolute;right: -49px;width: 150px;height: 30px;padding: 0;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .viewBankMenu button.setMenu span {background:url(../img/common/lnb_banking_menu.png) no-repeat 0 2px;width: 100%;height: 100%;text-indent: -9999px;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .viewBankMenu button.setMenu:hover {position: absolute;right: -49px;width: 150px;height: 30px;padding: 0;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .viewBankMenu button.setMenu:hover span,#HANA_HEAD_DIV .viewBankMenu button.setMenu:focus span,#HANA_HEAD_DIV .viewBankMenu button.setMenu:active span {background-position: 0 -46px;width: 100%;height: 100%;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .viewBankMenu button.setMenu.on {width: 150px;right: -49px;z-index: 100;}
+#HANA_WRAP_DIV.banking #HANA_HEAD_DIV .viewBankMenu button.setMenu.on span {background-position: 0 -46px;width: 100%;}
+
+.viewBankMenu {position:relative; margin:0 36px;}
+.viewBankMenu button span {display:block;height:25px; background:url(../img/common/sp_gnb.png) no-repeat; text-indent:-9999px;}
+.viewBankMenu button.setMenu {width:80px; padding:5px 0;}
+.viewBankMenu button.setMenu span {width:80px; height:21px; background-position:0 -750px;}
+.viewBankMenu button.setMenu:hover, .viewBankMenu button.setMenu:hover span, .viewBankMenu button.setMenu:focus, .viewBankMenu button.setMenu:focus span {background-position:0 -775px;}
+.viewBankMenu button.viewMenu {position:absolute; right:-2px; width:110px; padding:1px 0 5px;}
+.viewBankMenu button.viewMenu span {width:110px; height:25px; background-position:-250px -750px;}
+.viewBankMenu button.viewMenu:hover, .viewBankMenu button.viewMenu:focus, .viewBankMenu button.viewMenu:active {right:-48px; width:156px;}
+.viewBankMenu button.viewMenu:hover span, .viewBankMenu button.viewMenu:focus span, .viewBankMenu button.viewMenu:active span {width:156px; background-position:-250px -800px;}
+
+.addMenu {position:relative; margin:24px 36px 100px;}
+.addMenu button span {display:block; background:url(../img/common/sp_gnb.png) no-repeat; text-indent:-9999px;}
+.addMenu button.tipView {width:150px; margin-top:5px; padding:5px 0;}
+.addMenu button.tipView span {width:150px; height:16px; background-position:-100px -750px;}
+.addMenu button.tipView:hover span, .addMenu button.tipView:focus span, .addMenu button.tipView:active span {background-position:-100px -775px;}
+
+/* menu search */
+.menuSrchWrap {position:absolute; top:241px; z-index:10; width:227px; padding:0 35px;}
+.menuSrchWrap .menuSrch {width:228px; height:25px; padding:6px 0 5px; border:1px solid #fff; border-bottom:1px solid #d9d9d9;line-height:2;}
+.menuSrchWrap .srchBox {position:relative; width:230px;}
+.menuSrchWrap .srchBox.active .menuSrch, .menuSrchWrap .menuSrch.focus {width:219px; padding-left:9px; border:1px solid #d9d9d9;}
+.menuSrchWrap .srchBox.active button.btnMenuDell {display:block;}
+.menuSrchWrap .srchBox button {display:block; width:20px; height:20px;}
+.menuSrchWrap .srchBox button.btnMenuDell {position:absolute; top:9px; right:28px; display:none;}
+.menuSrchWrap .srchBox button.btnMenuSrch {position:absolute; top:9px; right:7px;}
+.menuSrchWrap .srchBox button span {display:block; width:16px; height:16px; background:url(../img/common/sp_menuSrch.png) no-repeat; text-indent:-9999px;}
+.menuSrchWrap .srchBox button.btnMenuDell span {background-position:4px 2px;}
+.menuSrchWrap .srchBox button.btnMenuSrch span {width:18px; background-position:2px -25px;}
+.menuSrchWrap .srchBox .atResultBox {display:none; width:100%; height:482px; padding-top:19px; background-color:#fff;}
+.menuSrchWrap .srchBox .atResultBox.active {display:block;}
+.menuSrchWrap .srchBox .atResultBox a {display:block; padding:9px 0 9px 5px; font-size:16px; font-family:NotoSans_Regular; letter-spacing:-1px;}
+.menuSrchWrap .srchBox .atResultBox a strong {color:#038386; font-weight:normal;}
+
+/* footer */
+#footer {position:relative;padding:0 10px 55px 35px}
+#footer .copyright {margin-top:20px}
+#footer .copyright a {display:block}
+#footer .copyright span {float:left;width:80px; height:11px; background:url(../img/common/footer_copyright.png) no-repeat 0 0;font-size:0;line-height:0}
+
+#footer .customerBox {font-size:12px;z-index:20}
+#footer .customerBox .guide {width:100%;height:19px}
+#footer .customerBox .guide li {margin-left:0}
+#footer .customerBox .guide li:first-child {padding-right:10px;background:url(../img/common/bg_line.gif) no-repeat right 4px;margin-right:7px}
+#footer .customerBox .guide li a {font-weight:bold;color:#555}
+#footer .customerBox li {float:left;margin-left:12px}
+#footer .customerBox li:first-child {margin-left:0}
+#footer .customerBox ul {float:none;margin:8px 0 5px}
+#footer .customerBox ul li {font-size:12px;}
+#footer .customerBox dl {width:100%}
+#footer .customerBox dl dt {float:left;color:#444;margin-right:6px}
+#footer .customerBox dl dd {float:none;margin:0 15px 3px 0;color:#666}
+#footer .customerBox .customer {width:100%;height:18px;margin:6px 0}
+#footer .customerBox .customer li {letter-spacing:-0.3px;margin-left:10px}
+#footer .customerBox .customer li:first-child {margin-left:0}
+#footer .customerBox .customer li strong {color:#444;font-weight:normal}
+#footer .customerBox .customer li.email{padding-left:20px;background:url(../img/common/bg_foot.png) no-repeat 0 -50px;letter-spacing:-1px}
+#footer p span.mark {width:40px;height:26px;margin:-8px 0 0 10px;background:url(../img/common/bg_foot.png) no-repeat 0 -100px;font-size:0;line-height:0}
+
+#container {position:relative; float:left; width:800px; padding:0 50px 100px 50px;}
+#container .memberInfo {position:relative; z-index:15; left:0; height:42px; padding-top:28px; font-size:12px; text-align:right;}
+.memberInfo .exchange {display:inline-block; padding-right:8px;}
+.memberInfo .exchange img {padding-right:7px; vertical-align:-1px;}
+.memberInfo .info {display:block; position:absolute; top:22px; left:0px; line-height:30px; text-align:left;}
+.memberInfo .info .name {position:relative; display:inline-block; font-family:NotoSans_Regular; font-size:18px; color:#3c3c3c; letter-spacing:-.25px; vertical-align:middle;}
+.memberInfo .info .name:hover {text-decoration:none;}
+.memberInfo .info .toolTip {display:none; position:absolute; left:0; top:33px; z-index:20; height:27px; width:66px; border:1px solid #dcdcdc; background-color:#fff; text-align:center; font-family:'돋움', doutm,'굴림',gulim,sans-serif; font-size:12px; color:#3c3c3c; line-height:2.4;}
+.memberInfo .info .name:hover .toolTip, .memberInfo .info .name:focus .toolTip, .memberInfo .info .name:active .toolTip {display:block;}
+.memberInfo .info .toolTip em {position:absolute; left:12px; top:-7px; width:11px; height:7px; background:url(../img/common/bg_toolTip.gif) no-repeat 0 0;}
+.memberInfo .info .time {padding-left:14px; color:#008485; vertical-align:middle;}
+.memberInfo .info .btnExt {margin-left:-4px; padding:2px 6px; color:#008485; vertical-align:middle;}
+.memberInfo .info .btnExt span {height:13px; border-bottom:1px solid #008485;}
+.memberInfo .info .btnLogout {height:20px; padding:0 10px; background:url(../img/common/bg_line01.gif) no-repeat 0 5px; vertical-align:middle; color:#3c3c3c; line-height:18px;}
+.memberInfo .info .login {height:20px; padding:0 10px; margin-left:-5px; font-family:NotoSans_Regular; font-size:18px; vertical-align:middle; color:#3c3c3c;}
+.memberInfo .info .login span {font-family:NotoSans_Regular; font-size:18px;}
+.memberInfo .info .login:hover, .memberInfo .info .login:focus, .memberInfo .info .login:active {color:#008485;}
+.memberInfo .linkCenter {display:inline-block;}
+.memberInfo .linkCenter span {background:url(../img/common/bg_line01.gif) no-repeat 0 50%;}
+.memberInfo .linkCenter span:first-child {background:none;}
+.memberInfo .linkCenter span a {display:inline-block; padding:1px 5px 1px 9px; color:#757575; vertical-align:middle;}
+
+
+#HANA_CONTENTS_DIV {position:relative; min-height:700px;}
+
+/* location */
+.locate {position:relative; z-index:10; height:38px; font-family:NotoSans_Regular; font-size:16px; letter-spacing:-.75px; line-height:18px; color:#757575;}
+.locate > li {position:relative; display:block; float:left; min-height:36px; padding:0 19px 0 25px; background:url(../img/common/icon_locate_arrow.gif) no-repeat 0 14px;}
+.locate li.home {width:22px; padding:0; background:none;}
+.locate li.home a {display:block; width:22px; height:36px; padding:0; background:url(../img/common/icon_home.png) no-repeat 0 8px; text-indent:-9999px;}
+.locate li.home a:hover, .locate li.home a:focus, .locate li.home a:active {background-position:0 -42px;}
+.locate li a {display:block; height:32px; padding:9px 17px 2px 0; background:url(../img/common/bul_arrow.png) no-repeat right 16px; font-family:NotoSans_Regular; }
+.locate li.home + li {padding-left:20px; background:none;}
+.locate li.on a {background-position:right -78px; color:#008485;}
+.locate li a:hover, .locate li a:focus, .locate li a:active {text-decoration:none;}
+.locate li strong {font-weight:normal; color:#3c3c3c;}
+.locate li .locateList {position:absolute; top:42px; left:6px; z-index:11; min-width:165px; width:auto; height:0; overflow:hidden;}
+.locate li:first-child .locateList {left:-17px;}
+.locate li.on .locateList {height:auto; padding:10px 0; background:#636471; overflow:visible;}
+.locate li .locateList a {display:block; height:auto; padding:9px 35px 8px 19px; background:none; color:#fff; font-size:15px; font-weight:normal; word-break:normal; white-space:nowrap;}
+.locate li .locateList a:hover, .locate li .locateList a:focus, .locate li .locateList a:active {background:#4d4e58; text-decoration:none !important;}
+.locate li .locateList a strong {font-weight:normal; color:#64d3c6;}
+.locate li .locateList a:hover strong, .locate li .locateList a:focus strong, .locate li .locateList a:active strong {color:#64d3c6;}
+
+.tipWrap { display:none; position:fixed; left:0; top:0; z-index:9999; width:100%; height:100%;}
+.tipWrap.on {display:block;}
+.tipWrap .tipImg {position:relative; z-index:100; width:100%; text-align:center; margin:0 auto;}
+.tipWrap .tipClose {position:absolute; top:0; z-index:110; width:100%; min-height:755px; height:100%;}
+.tipWrap .tipClose button {position:absolute; left:50%; bottom:10%; display:block; width:81px; height:80px; margin-left:-40px; background:url(../img/common/sp_close_tip.png) no-repeat 0 0; text-indent:-9999px;}
+.tipWrap .tipClose button:hover, .tipWrap .tipClose button:focus {background-position:0 -100px;}
+.tipWrap .tipDim {position:absolute; left:0; top:0; width:100%; height:100%; background:#000;opacity:0.746;-ms-filter:alpha(opacity=74.6);filter:alpha(opacity=74.6)}
+
+/* LNB 메뉴조건표 */
+.menuTable {margin:-95px 0 100px 35px}
+.menuTable button {display:block;height:20px;text-align:left;padding-left:20px;margin-top:7px;color:#444;background:url('../img/common/sp_gnb.png') no-repeat -250px -849px;cursor:pointer}
+.menuTable button:hover {text-decoration:underline}
+.menuTable button strong {font-weight:normal;color:#008485}
+
+
+/* 뱅킹메뉴 설정 */
+.layerSet {position: absolute;width:100%;height:100%;left:0;top:-9999px;z-index:99;display:none;}
+
+.layerSet.on {top:0;display:block}
+.bankSetLayer {position:absolute;width:720px;display:inline-block;background:#fff;top: 75px;left:50%;margin-left: 200px;padding:45px 40px;z-index:99;}
+#HANA_HEAD_DIV .bankSetLayer h1 {text-align:left !important}
+
+.layerSet .menuArea {zoom:1;margin-top:5px;}
+.layerSet .menuArea:after {content:"";display:block;clear:both;}
+.layerSet .menuArea > div {float:left;width:298px;}
+.layerSet .menuArea > div h2 {font:normal 21px/21px NotoSans_Dl, sans-serif;color:#3c3c3c;text-align:center;margin-bottom:22px;letter-spacing:-1px;padding:0 !important;height:auto !important;}
+
+.layerSet .menuArea > .menuListBox {background:url(../img/common/blt_bank_menu_arrow.gif) no-repeat right 50%;padding-right:71px;}
+.layerSet .menuArea > .myMenuBox {margin-left:31px;}
+.layerSet .menuArea > div > div {width:298px;height:343px;background:#fff;border:1px solid #e1e1e1;}
+.layerSet .menuArea > div > .menuList {overflow-y:auto;}
+.layerSet .menuArea > div > .myMenu > ul {background:#fff;}
+.layerSet .menuArea > div > .myMenu > p {font:normal 14px/16px NotoSans_Dl, sans-serif;text-align:center;color:#666;letter-spacing:-1px;margin-top:120px;}
+.layerSet .menuArea > div > .menuList > ul {padding:10px 0;}
+
+.layerSet .menuList ul li {display:block;position:relative;}
+.layerSet .menuList ul li ul {display:none;}
+.layerSet .menuList ul li button {position:absolute;top:4px;right:15px;}
+
+.layerSet .menuArea > div > .menuList > ul li a {display:block;font-family:NotoSans_Regular,sans-serif;letter-spacing:-1px;line-height: 30px;color:#444;}
+.layerSet .menuArea > div > .menuList > ul li a:hover {background-color:#f2f7fa;}
+.layerSet .menuArea > div > .menuList > ul li a:hover,.layerSet .menuArea > div > .menuList > ul li a:focus,.layerSet .menuArea > div > .menuList > ul li a:active {text-decoration:none !important;}
+.layerSet .menuArea > div > .menuList > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 24px 10px;background-repeat: no-repeat;padding-left:38px;font-size:16px;}
+.layerSet .menuArea > div > .menuList > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+.layerSet .menuArea > div > .menuList > ul > li a em {display:inline-block;text-indent:-9999px;}
+.layerSet .menuArea > div > .menuList a.onlyMenu {background-image:none;}
+.layerSet .menuArea > div > .menuList a.open {color:#008485;}
+
+/* 뱅킹메뉴 설정 메뉴목록 수정 20161026 */
+.layerSet .menuArea > div > .menuList > ul li span {display:block;font-family:NotoSans_Regular,sans-serif;letter-spacing:-1px;line-height: 30px;color:#444;}
+.layerSet .menuArea > div > .menuList > ul li span:hover{background-color:#f2f7fa;}
+.layerSet .menuArea > div > .menuList > ul li span:hover{text-decoration:none !important;}
+.layerSet .menuArea > div > .menuList span.onlyMenu {background-image:none;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > span {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 48px 10px;background-repeat: no-repeat;padding-left:62px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > span {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 72px 10px;background-repeat: no-repeat;padding-left:86px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > span.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+/* 뱅킹메뉴 설정 메뉴목록 수정 20161026 */
+
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 48px 10px;background-repeat: no-repeat;padding-left:62px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 44px 12px;background-repeat: no-repeat;}
+
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 72px 10px;background-repeat: no-repeat;padding-left:86px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > a {font-size:14px;color:#444;display:block;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li i {font-style:normal;width:135px;line-height:17px;display:inline-block;}
+
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a {background-position: 84px 10px;background-repeat: no-repeat;padding-left:98px;font-size:14px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a.open {background-position: 20px 12px;background-repeat: no-repeat;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a {font-size:14px;color:#444;display:block;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li i {font-style:normal;width:135px;line-height:17px;display:inline-block;}
+
+.layerSet .menuArea > div > .menuList > ul > li > ul > li button {float:right;width:44px;height:22px;background:url(../img/common/btn_list_add_on.gif) no-repeat right center;display:block;text-indent:-9999px;}
+.layerSet .menuArea > div > .menuList > ul > li > ul > li button.off {background:url(../img/common/btn_list_add_off.gif) no-repeat right center;}
+
+.layerSet .menuArea > div > .myMenu {background:#f9f9fb;overflow-y:auto;}
+.layerSet .menuArea > div > .myMenu .noMenu {display:none;}
+.layerSet .menuArea > div > .myMenu h3 {position:absolute;top:-9999px;width:0;height:0;font-size:0;line-height:0;overflow:hidden;}
+.layerSet .menuArea > div > .myMenu ul > li {position:relative;border-bottom:1px solid #e1e1e1;padding-left:40px;cursor:default;font:normal 14px/42px NotoSans_Dl, sans-serif;background:#fff;min-height: 23px;line-height: 20px;padding-top: 10px;padding-bottom: 9px;}
+.layerSet .menuArea > div > .myMenu ul > li a {font:normal 14px/42px NotoSans_Dl, sans-serif;color:#666;letter-spacing:-1px;cursor:default;line-height: 14px;}
+.layerSet .menuArea > div > .myMenu ul > li:hover {background:#f2f7fa;cursor:default;}
+.layerSet .menuArea > div > .myMenu ul > li:hover a {color:#008485;text-decoration:none !important;}
+.layerSet .menuArea > div > .myMenu ul.edit li > a {font:normal 15px/42px NotoSans_Regular, sans-serif;color:#444;}
+
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn {position:absolute;top:0;left:16px;width:15px;height:100%;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button {position:relative;width:15px;height:8px;text-indent:-9999px;display:block;vertical-align: middle;margin-top: 4px;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button:first-child {margin-top: 2px;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp {background:url(../img/common/btn_list_up.png) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp:hover {background:url(../img/common/btn_list_up_over.png) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown {background:url(../img/common/btn_list_down.png) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown:hover {background:url(../img/common/btn_list_down_over.png) no-repeat left top;}
+
+/* 뱅킹메뉴 설정 나만의 메뉴 수정 20161026 */
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp.disable{background:url(../img/common/btn_disabled_up.png) no-repeat left top;cursor:initial;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp.disable:hover{background:url(../img/common/btn_disabled_up.png) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown.disable{background:url(../img/common/btn_disabled_down.png) no-repeat left top;cursor:initial;}
+.layerSet .menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown.disable:hover{background:url(../img/common/btn_disabled_down.png) no-repeat left top;}
+/* 뱅킹메뉴 설정 나만의 메뉴 수정 20161026 */
+
+.layerSet .menuArea > div > .myMenu ul > li button {position:absolute;top:10px;display:block;text-indent:-9999px;}
+.layerSet .menuArea > div > .myMenu ul > li button.fix {right:10px;width:44px;height:22px;background:url(../img/common/btn_list_fix.gif) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li button.fixed {background:url(../img/common/btn_list_fixed.gif) no-repeat left top;}
+.layerSet .menuArea > div > .myMenu ul > li button.del {right:10px;width:44px;height:22px;background:url(../img/common/btn_list_del.gif) no-repeat left top;}
+
+.bankSetLayer .contNotice {width:640px;margin-top:45px;padding:30px; border:1px solid #ebebeb;}
+.bankSetLayer .contNotice .orderListDot {margin:0;}
+.bankSetLayer .contNotice .orderListDot li {color:#444;line-height:17px;background:url(../img/common/bul_dot.gif) no-repeat 0 6px !important;}
+
+.layerSet .btnWrapTop {position:absolute; width:auto; top:40px; right:40px;}
+.layerSet .btnWrapTop .btnClose {display:block; width:27px; height:27px; background:url(../img/common/btn_close_pop.gif) no-repeat 50% 50%; text-indent:-9999px;}
+
+.layerSet .btnBoxCenter {margin-top:40px;}
+.layerSet .btnCncl {display:inline-block; height:45px; min-width:110px; margin:0 5px; background:#fff; border:1px solid #d6d6d6;font-size:14px;font-weight:bold;color:#6f6f6f;letter-spacing:-0.5px;line-height:44px;text-align:center; vertical-align:middle;}
+.layerSet .btnCncl span {padding:0 19px;}
+.layerSet .btnCncl:hover, .btnCncl:focus {background:#fff;border:1px solid #d6d6d6;color:#6f6f6f;text-decoration:none; cursor:pointer;}
+
+.layerSet.on .dim {display:block;}
+.layerSet .dim {display:none; position:fixed;width:100%;height:100%;overflow:auto;top:0;left:0;background:#000;opacity:0.15;-ms-filter:alpha(opacity=15);filter:alpha(opacity=15)}
+
+.menuArea {zoom:1;margin-top:40px;}
+.menuArea:after {content:"";display:block;clear:both;}
+.menuArea > div {float:left;width:298px;}
+.menuArea > div h2 {font:normal 21px/21px NotoSans_Dl, sans-serif;color:#3c3c3c;text-align:center;margin-bottom:22px;letter-spacing:-1px;}
+
+.menuArea > .menuListBox {background:url(../img/common/blt_bank_menu_arrow.gif) no-repeat right 50%;padding-right:71px;}
+.menuArea > .myMenuBox {margin-left:31px;}
+.menuArea > div > div {width:298px;height:343px;background:#fff;border:1px solid #e1e1e1;}
+.menuArea > div > .menuList {overflow-y:auto;}
+.menuArea > div > .myMenu > ul {background:#fff;}
+.menuArea > div > .myMenu > p {font:normal 14px/16px NotoSans_Dl, sans-serif;text-align:center;color:#666;letter-spacing:-1px;margin-top:120px;}
+.menuArea > div > .menuList > ul {padding:10px 0;}
+
+.menuList ul li {display:block;position:relative;}
+.menuList ul li ul {display:none;}
+.menuList ul li button {position:absolute;top:4px;right:15px;}
+
+.menuArea > div > .menuList > ul li a {display:block;font-family:NotoSans_Regular,sans-serif;letter-spacing:-1px;line-height: 30px;color:#444;}
+.menuArea > div > .menuList > ul li a:hover {background-color:#f2f7fa;}
+.menuArea > div > .menuList > ul li a:hover,.menuArea > div > .menuList > ul li a:focus,.menuArea > div > .menuList > ul li a:active {text-decoration:none !important;}
+.menuArea > div > .menuList > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 24px 10px;background-repeat: no-repeat;padding-left:38px;font-size:16px;}
+.menuArea > div > .menuList > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+.menuArea > div > .menuList > ul > li a em {display:inline-block;text-indent:-9999px;}
+.menuArea > div > .menuList a.onlyMenu {background-image:none;}
+.menuArea > div > .menuList a.open {color:#008485;}
+
+.menuArea > div > .menuList > ul > li > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 48px 10px;background-repeat: no-repeat;padding-left:62px;font-size:14px;}
+.menuArea > div > .menuList > ul > li > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 44px 12px;background-repeat: no-repeat;}
+
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > a {background-image: url(../img/common/btn_list_arrow_off.gif);background-position: 72px 10px;background-repeat: no-repeat;padding-left:86px;font-size:14px;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > a.open {background-image: url(../img/common/btn_list_arrow_on.gif);background-position: 20px 12px;background-repeat: no-repeat;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > a {font-size:14px;color:#444;display:block;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li i {font-style:normal;width:135px;line-height:17px;display:inline-block;}
+
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a {background-position: 84px 10px;background-repeat: no-repeat;padding-left:98px;font-size:14px;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a.open {background-position: 20px 12px;background-repeat: no-repeat;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li > a {font-size:14px;color:#444;display:block;}
+.menuArea > div > .menuList > ul > li > ul > li > ul > li > ul > li i {font-style:normal;width:135px;line-height:17px;display:inline-block;}
+
+.menuArea > div > .menuList > ul > li > ul > li button {float:right;width:44px;height:22px;
+background:url(../img/common/btn_list_add_on.gif) no-repeat right center;display:block;text-indent:-9999px;}
+.menuArea > div > .menuList > ul > li > ul > li button.off {background:url(../img/common/btn_list_add_off.gif) no-repeat right center;}
+
+.menuArea > div > .myMenu {background:#f9f9fb;}
+.menuArea > div > .myMenu h3 {position:absolute;top:-9999px;width:0;height:0;font-size:0;line-height:0;overflow:hidden;}
+.menuArea > div > .myMenu ul > li {position:relative;border-bottom:1px solid #e1e1e1;padding-left:40px;}
+.menuArea > div > .myMenu ul > li a {font:normal 14px/42px NotoSans_Dl, sans-serif;color:#666;letter-spacing:-1px;}
+.menuArea > div > .myMenu ul > li:hover {background:#f2f7fa;cursor:pointer;}
+.menuArea > div > .myMenu ul > li:hover a {color:#008485;text-decoration:none !important;}
+.menuArea > div > .myMenu ul.edit a {font:normal 15px/42px NotoSans_Regular, sans-serif;color:#444;}
+
+.menuArea > div > .myMenu ul > li div.arrayBtn {position:absolute;top:0;left:16px;width:15px;height:100%;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button {position:relative;width:15px;height:8px;text-indent:-9999px;display:block;vertical-align: middle;margin-top: 4px;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button:first-child {margin-top: 2px;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp {background:url(../img/common/btn_list_up.png) no-repeat left top;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button.btnUp:hover {background:url(../img/common/btn_list_up_over.png) no-repeat left top;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown {background:url(../img/common/btn_list_down.png) no-repeat left top;}
+.menuArea > div > .myMenu ul > li div.arrayBtn button.btnDown:hover {background:url(../img/common/btn_list_down_over.png) no-repeat left top;}
+
+.menuArea > div > .myMenu ul > li button {position:absolute;top:10px;display:block;text-indent:-9999px;}
+.menuArea > div > .myMenu ul > li button.fix {right:64px;width:32px;height:22px;background:url(../img/common/btn_list_fix.gif) no-repeat left top;}
+.menuArea > div > .myMenu ul > li button.fixed {background:url(../img/common/btn_list_fixed.gif) no-repeat left top;}
+.menuArea > div > .myMenu ul > li button.del {right:15px;width:44px;height:22px;background:url(../img/common/btn_list_del.gif) no-repeat left top;}
+
+.bankSetLayer .contNotice {width:640px;margin-top:45px;padding:30px; border:1px solid #ebebeb;}
+.bankSetLayer .contNotice .orderListDot {margin:0;}
+.bankSetLayer .contNotice .orderListDot li {color:#444;line-height:17px;background:url(../img/common/bul_dot.gif) no-repeat 0 6px !important;}
+
+.layerSet .btnWrapTop {position:absolute; width:auto; top:40px; right:40px;}
+.layerSet .btnWrapTop .btnClose {display:block; width:27px; height:27px; background:url(../img/common/btn_close_pop.gif) no-repeat 50% 50%; text-indent:-9999px;}
+
+.btnBoxCenter {margin-top:40px;}
+.btnCncl {display:inline-block; height:45px; min-width:110px; margin:0 5px; background:#fff; border:1px solid #d6d6d6;font-size:14px;font-weight:bold;color:#6f6f6f;letter-spacing:-0.5px;line-height:44px;text-align:center; vertical-align:middle;}
+.btnCncl span {padding:0 19px;}
+.btnCncl:hover, .btnCncl:focus {background:#fff;border:1px solid #d6d6d6;color:#6f6f6f;text-decoration:none; cursor:pointer;}
+
+.layerSet.on .dim {display:block;}
+.dim {display:none; position:fixed;width:100%;height:100%;overflow:auto;top:0;left:0;background:#000;opacity:0.15;-ms-filter:alpha(opacity=15);filter:alpha(opacity=15)}

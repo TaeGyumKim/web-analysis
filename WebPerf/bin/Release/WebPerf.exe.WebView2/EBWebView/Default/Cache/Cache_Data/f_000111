@@ -1,0 +1,1587 @@
+var httpRequest = null;
+var popupConfirm_1 = false;
+var popupConfirm_2 = false;
+var returnUrl_back = null;
+
+
+/**
+ * @description : 결제일별 카드이용기간 레이어 팝업을 띄운다.
+ * @author		: Joseph.Hong
+ * @date		: 2013.02.15
+ */
+function settDueInfo(objSourceBtn) {
+	
+    var strUrl = "/jsp/include/settleDueInfo.jsp";
+    //영문웹 분기
+    if(fnIsEnLocale()){
+    	strUrl = "/jsp/include/settleDueInfo_EN.jsp";
+    }
+    var objData = null;
+    fnDoTransaction(strUrl, objData, function(strHTML){
+
+        layPop("settDueInfoNew", strHTML,objSourceBtn);
+    });
+}
+/*function settDueInfo() {	
+	layPop("settDueInfoNew");    
+}*/
+
+
+/**********************
+* Ajax호출함수
+* @param :  
+* @return :
+* @see
+************************/
+getXMLHttpRequest = function(){
+	if (window.ActiveXObject) {
+		try {
+			return new ActiveXObject("Msxml2.XMLHTTP");
+		} catch(e) {
+			try {
+				return new ActiveXObject("Microsoft.XMLHTTP");
+			} catch(e1) {
+				return null;
+			}
+		}
+	} else if (window.XMLHttpRequest) {
+		return new XMLHttpRequest();
+	} else {
+		return null;
+	}
+}
+/**********************
+* 세션연장 dummy페이지 호출 함수
+* @param : limitTime
+* @return :
+* @see
+************************/
+callDummyPage = function() {
+	httpRequest = getXMLHttpRequest();
+	httpRequest.onreadystatechange = viewMessage;
+	httpRequest.open("GET", _callDummyPage_str, true);
+	httpRequest.send(null);
+	_timerStart();
+	
+	//로그아웃 레이어 팝업을 닫는다
+	//popup.close("x-window-logout-alarm");
+	layPopClose("logoutBox");
+}
+
+/**********************
+* 세션 연장 dummy페이지 연장 성공했을 때 세션 타임을 다시
+* @param : limitTime
+* @return :
+* @see
+************************/
+viewMessage =function () {
+	if (httpRequest.readyState == 4) {
+		if (httpRequest.status == 200) {
+			//ajax호출이 성공하였을 때 세션타임을 연장시키고 팝업창을 닫음
+			_timerStart();
+			//popup.close("x-window-logout-alarm");
+			layPopClose("logoutBox");
+		} else {
+		}
+	}
+}
+/********
+* 세션 절단 
+* @param : limitTime
+* @return :
+* @see
+*********/
+callLogout = function() {
+	httpRequest = getXMLHttpRequest();
+	httpRequest.onreadystatechange = callBackLogout;
+	httpRequest.open("GET", _callLogout_str, true);
+	httpRequest.send(null);
+}
+
+callBackLogout =function () {
+	if (httpRequest.readyState == 4) {
+		if (httpRequest.status == 200) {
+			
+		} else {
+		}
+	}
+}
+
+/*********************
+ * 로그인 버튼을 클릭하였을 때 로그인 페이지로 감
+ ***********************/
+goLogin = function ()
+{
+	document.location.href = _loginPage_str;
+}
+/*********************
+ * 취소 페이지를 클릭하였을 때 메인페이지로 감
+ ***********************/
+goMain = function()
+{
+	document.location.href = _mainPage_str;
+}
+/**********************
+* 세션 타임아웃 타임설정함수
+* @param : limitTime
+* @return :
+* @see
+************************/
+_setSessionTimer = function ()
+{
+    _chkLoginTime = parseInt(_sessionLimitTime) + 1;
+
+    if(_chkTimerOn)
+    {
+    	clearTimeout(_chkTimerOn);
+    }
+}
+/**********************
+* 초를 분/초로 Display
+* @param : limitTime
+* @return : 분 초
+* @see
+************************/
+_setFormatMinSecond = function (_chkLoginTime) {
+ var Remain_minute = "";
+ var Remain_sec = "";
+ 
+ Remain_minute = Math.floor(_chkLoginTime / 60);
+ Remain_sec = Math.floor(_chkLoginTime % 60);
+ if(Remain_sec < 10)
+  //영문웹 분기
+  Remain_sec = "0"+Remain_sec + getLanChange("초", " Sec");
+ else
+  Remain_sec = Remain_sec + getLanChange("초", " Sec");
+ if(Remain_minute >= 0)
+  Remain_minute = Remain_minute + getLanChange("분", " Min ");
+ else
+  Remain_minute = "    ";
+ 
+ return Remain_minute+Remain_sec;
+}
+
+/**********************
+* 세션 타임아웃 실행함수
+* @param : limitTime
+* @return :
+* @see
+************************/
+_setSessionTimerOn = function () {
+	if(_chkLoginTime == 0) {
+		//진행 중일 때 뜨는 문구들 안보이게함
+		//jQuery("#process_01").css("display", "none");
+		//jQuery("#process_02").css("display", "none");
+		//jQuery("#process_03").css("display", "none");
+
+		//로그아웃 되기 직전 뜨는 문구들 표시
+		//jQuery("#logout_01").css("display", "inline");
+		//jQuery("#logout_02").css("display", "inline");
+		//jQuery("#logout_03").css("display", "inline");
+
+		//타이머를 클리어 하는 부분 추가함
+        if(_chkTimerOn) {
+        	clearTimeout(_chkTimerOn);
+        	//반드시 return false해야함(아니면 타이머가 계속 돌게 됨)
+        	//return false;
+        	layPopClose("logoutBox");
+        }
+        document.location.href = "/OCM000006M.web";
+    }
+    else {
+        _chkLoginTime -= 1;
+        var sst = document.getElementById('displaySessionTime');
+        if( sst != undefined && sst != null ) {
+            document.getElementById('displaySessionTime').innerHTML = _chkLoginTime ;
+        }
+        
+        if( document.getElementById('displayAllSessionTime') != null && document.getElementById('displayAllSessionTime') != "undefinded" ) {
+            document.getElementById('displayAllSessionTime').innerHTML = _setFormatMinSecond(_chkLoginTime);
+        }
+    
+		/* 60초가 남으면 팝업창이 뜨는 부분 */
+		if(_chkLoginTime == _popupOpenTime) {
+			//진행 중일 때 뜨는 문구들 보이게함
+			jQuery("#process_01").css("display", "inline");
+			jQuery("#process_02").css("display", "inline");
+			jQuery("#process_03").css("display", "inline");
+			
+			//로그아웃 되기 직전 뜨는 문구들 안보이게 함
+			jQuery("#logout_01").css("display", "none");
+			jQuery("#logout_02").css("display", "none");
+			jQuery("#logout_03").css("display", "none");
+
+			//timeout 팝업창 뜨는 부분
+			//if(jQuery("#logoutBox").length < 1) {
+			
+			var strUrl = "";
+			strUrl = "/jsp/cmn/overlay/logout_alert.jsp";
+			//영문웹 분기
+			if(fnIsEnLocale()){
+				strUrl = "/jsp/cmn/overlay/logout_alert_EN.jsp";
+			}
+			
+			var objData = null;
+			fnDoTransaction(strUrl, objData, function(strHTML){
+
+				layPop("logoutBox", strHTML);
+				jQuery("#logoutBox").focus();
+			});	
+			//}
+		}
+		clearTimeout(_chkTimerOn);
+		_chkTimerOn = setTimeout("_setSessionTimerOn()", 1000);
+    }
+}
+
+/**********************
+* 세션 타임아웃 실행함수
+* @param : limitTime
+* @return :
+* @see
+************************/
+_timerStart = function () {
+	/* 윈도우 팝업이거나 세션이 없을 때는 타이머를 실행하지 않음 */
+	if(opener == undefined && _checkLoginSession != 'null' ) {
+		_setSessionTimer();
+		_setSessionTimerOn();
+	}
+}
+
+
+/**
+* 로그인 레이어 추가 2010.01.05
+* 사용법
+* _doLoginLayer_public('/PP25000001D.web?schID=ncd&mID=PP25000001D&EVN_SEQ=38');
+*/
+_doLoginLayer_public = function(returnUrl, objSourceBtn) {
+
+	var strUrl = "/jsp/cmn/overlay/login_layer.jsp";
+	//영문웹 분기
+	if(fnIsEnLocale()){
+		strUrl = "/jsp/cmn/overlay/login_layer_EN.jsp";
+	}
+
+	var objData = null;
+	fnDoTransaction(strUrl, objData, function(strHTML){
+		layPop("login_public_layer", strHTML, objSourceBtn);
+			
+		jQuery("#USER_ID").val("");
+		jQuery("#PASSWORD").val("");
+		jQuery("#USER_SSN1").val("");	
+		jQuery("#USER_SSN2").val("");	
+		if(returnUrl != '' && returnUrl != undefined){		
+			jQuery("#LoginURI").val(returnUrl);
+			returnUrl_back = returnUrl;
+		}
+		jQuery("#login_public_layer").css("display", "inline");	 
+	});	
+};
+
+//닫기버튼
+_closeScreen_public = function() {	
+	document.getElementById('LoginlayerDiv_background').style.display = "none";
+	document.getElementById('iframe_processLoginLayer').style.display = "none";
+	document.getElementById('login_public_layer').innerHTML = "";
+	document.getElementById('login_public_layer').style.display="none";	
+};
+
+//ID PW 로그인
+_doSubmit1_public = function() {	
+	// 주민등록번호 초기화
+	jQuery("#USER_SSN1").val("");
+	jQuery("#USER_SSN2").val("");	
+	
+	var id = jQuery("#USER_ID").val();
+	var pw = jQuery("#PASSWORD").val();
+	
+	if((id == null || id == "") && (pw == null || pw == "")) {
+		//영문웹 분기
+		i18nExtAlert(getLanChange("[아이디] 필수 입력 사항입니다.", "[ID] This is a required field."), "", "", _fU_localeCode);
+		return false;
+	} else if(id == null || id == "" || id.length < 6 || id.length > 12) {	
+		//영문웹 분기
+		i18nExtAlert(getLanChange("[아이디] 입력을 6 ~ 12 자리로 해주십시오(LENGTH)", "[ID] Make your entry 6 to 12 digits in length (LENGTH)"), "", "", _fU_localeCode);
+		return false;
+	} else if(pw == null || pw == "" || pw.length < 6 || pw.length > 15) {
+		//영문웹 분기
+		i18nExtAlert(getLanChange("[비밀번호] 입력을 6 ~ 15 자리로 해주십시오(LENGTH)", "[Password] Make your entry 6 to 15 digits in length (LENGTH)"), "", "", _fU_localeCode);
+		return false;				
+	}
+	
+	document.getElementById('USER_ID').value = document.getElementById('USER_ID').value.toUpperCase();
+	
+	var nEncryptValue = nFilterEncrypted();
+	document.getElementById("_nFilterEncryptValue").value = nEncryptValue;
+	/*goMenuAjax('OCM000001M.web?_frame=no', null, document.forms['formLogin_public'], _callback_modify_layout, true, true);*/
+	
+	//영문웹 분기
+	if(fnIsEnLocale()){
+		ASTXgoMenuAjax(document.forms['formLogin_public'],"ECM000001M.web?_frame=no",'TRUE');
+	}else{
+		ASTXgoMenuAjax(document.forms['formLogin_public'],"OCM000001M.web?_frame=no",'TRUE');
+	}
+
+};
+
+/**********************
+* 간편회원가입 layer 띄우기
+* @param : limitTime
+* @return :
+************************/
+
+//간편회원가입 layer 띄우기
+_doSingUpLayer = function() {
+
+	document.getElementById('LoginlayerDiv_background').style.display = "block";
+	document.getElementById('iframe_processLoginLayer').style.display = "block";
+	document.getElementById('login_public_layer').innerHTML = "";
+	document.getElementById('login_public_layer').style.display="none";	
+
+	var width = 750;
+	var height = 800;
+	var positionObj = position_center(width, height);
+	document.getElementById('signup_public_layer').style.left = (positionObj.sw / 2) - width/2 + document.documentElement.scrollLeft;
+	document.getElementById('signup_public_layer').style.top = 10; //(positionObj.sh / 2) - height/2 + document.documentElement.scrollTop;
+//	document.getElementById('signup_public_layer').style.width = width;
+//	document.getElementById('signup_public_layer').style.height = height;
+	
+	var btn = "yes";
+	
+	var html_signup = "";
+	html_signup += "<div class='x-hidden x-window x-resizable-pinned' style='position:relative;display:block;visibility:visible;width:870px; top:0;left:0;'> ";
+	html_signup += "  <div class='x-window-tl'>     ";
+	html_signup += "    <div class='x-window-tr'>   ";
+	html_signup += "      <div class='x-window-tc'> ";
+	html_signup += "        <h1 class='x-window-header x-unselectable x-window-draggable'>  ";
+	html_signup += "          <div class='x-tool x-tool-close ' onclick='goSignUpLayerClose(); return false;'>&nbsp;</div> ";
+	html_signup += "          <span class='x-window-header-text'> <span class='poptit_txt'> ";
+	html_signup += "          </span> </span> </h1> ";
+	html_signup += "      </div>";
+	html_signup += "    </div>";
+	html_signup += "  </div>";
+	html_signup += "  <div id='x-window-main'>                                   ";
+	html_signup += "    <div class='x-window-ml'>                                                  ";
+	html_signup += "      <div class='x-window-mr'>                                                ";
+	html_signup += "        <div class='x-window-mc'>                                              ";
+	html_signup += "          <div class='x-window-body' style='width:800px; height:700px;'>       ";
+	html_signup += "<div style='background-color:#fff;width:800px;border:1px;'>";
+	html_signup += "<br />";
+	html_signup += "<h3 class='page_title'><img src='/img/before/individual/tit/tit_webmember_card.gif' alt='하나SK카드 간편 웹회원 가입' /></h3> ";
+	html_signup += " ";
+	html_signup += "<form id='form1' name='form1' method='POST'>                          ";
+	html_signup += "<input type='hidden' id='MBR_PN_V'     name='MBR_PN_V'>               ";
+	html_signup += "<input type='hidden' id='RL_OWR_RNM_NO' name='RL_OWR_RNM_NO'>         ";
+	html_signup += "<input type='hidden' id='idSignUpCheck'      name='idSignUpCheck'   value='N'>    ";
+	html_signup += "<input type='hidden' id='TARGET'       name='TARGET'    value=''>     ";	
+	html_signup += "                                                                      ";
+	html_signup += "<div id='divView00' style='display:block'>                            ";
+	html_signup += "	<h4 class='section_title'>실명확인</h4>                             ";
+	html_signup += "	<div class='table_v1'>                                              ";
+	html_signup += "	    <table summary='실명확인'>                                      ";
+	html_signup += "	     <caption>실명확인</caption>                                    ";
+	html_signup += "	     <colgroup>                                                     ";
+	html_signup += "	     <col style='width:130px;' />                                   ";
+	html_signup += "	     <col />                                                        ";
+	html_signup += "	     </colgroup>                                                    ";
+	html_signup += "	     <tbody>                                                        ";
+	html_signup += "	       <tr class='first'>                                           ";
+	html_signup += "	         <th width='27%' style='TEXT-ALIGN: left; padding-left:20px'>성명</th> ";
+	html_signup += "	         <td width='73%'><input type='text' name='MBR_PN' id='MBR_PN' value='' class='txt3' style='width:196px;' nullable='false' title='성명' onKeyDown='keyPressCheck(this)' onblur='keyPressCheck(this)'/></td> ";
+	html_signup += "	       </tr>                                                                  ";
+	html_signup += "	       <tr>                                                                   ";
+	html_signup += "	         <th style='TEXT-ALIGN: left; padding-left:20px'>주민등록번호</th>    ";
+	html_signup += "	         <td><input type='text' name='RL_OWR_RNM_NO1' id='RL_OWR_RNM_NO1' value='' class='txt4' maxlength='6' style='width:90px' nullable='false' onKeyDown='keyPressCheck(this)' onblur='keyPressCheck(this)' chartype=”onlynum” title='주민등록번호 앞자리' onKeyPress='if(event.keyCode == 13){ _doNameCheck(); }'/> -  ";
+	html_signup += "	             <input type='password' name='RL_OWR_RNM_NO2' id='RL_OWR_RNM_NO2' value='' class='txt4' maxlength='7' style='width:90px;' nullable='false' onKeyDown='keyPressCheck(this)' onblur='keyPressCheck(this)' chartype=”onlynum” title='주민등록번호 뒷자리' onKeyPress='if(event.keyCode == 13){ _doNameCheck(); }'/></td> ";
+	html_signup += "	          </tr>   ";
+	html_signup += "	        </tbody>  ";
+	html_signup += "	       </table>   ";
+	html_signup += "		<p style='padding:10px 0 0 0'></p> ";
+	html_signup += "		<span class='c-777'>* 개정 '주민등록법'에 의해 타인의 주민등록번호를 부정 사용하는 자는 3년 이하의 징역 또는 1천만원 이하의 벌금이 부과될 수</span><br/> ";
+	html_signup += "		<span class='c-777' style='padding-left:8px;'>있습니다. </span> ";
+	html_signup += "	   </div> ";
+	html_signup += "	    ";
+	html_signup += "	<div align='center' id='divNextBtn' style='display:'><a href='#none' onClick='_doNameCheck(); return false;'><input id='btnNext' type='image' src='/img/before/btn_confirm.gif' alt='확인' /></a></div> ";
+	html_signup += "	<br/>";
+	html_signup += "</div> ";
+	html_signup += "       ";
+	html_signup += "<%-- 실명확인이후 보여지는 영역 --%>  ";
+	html_signup += "<div id='divView01' style='display:none'> ";
+	html_signup += "	    ";
+	html_signup += "	<h4 class='section_title'>회원정보 입력</h4> ";
+	html_signup += "	<%-- 테이블 세로형 1단 --%>                  ";
+	html_signup += "	<div class='table_v1'>                       ";
+	html_signup += "	  <table summary='회원 정보'>                ";
+	html_signup += "	    <caption>회원 정보 입력표</caption>      ";
+	html_signup += "	    <colgroup>                               ";
+	html_signup += "	    <col style='width:82px;' />              ";
+	html_signup += "	    <col style='width:84px;' />              ";
+	html_signup += "	    <col style='width:194px;' />             ";
+	html_signup += "	    <col style='width:166px;' />             ";
+	html_signup += "	    <col />                                  ";
+	html_signup += "	    </colgroup>                              ";
+	html_signup += "	    <tbody>                                  ";
+	html_signup += "	      <tr class='first'>                     ";
+	html_signup += "	        <th width='27%' style='TEXT-ALIGN: left; padding-left:20px'>회원구분</th> ";
+	html_signup += "	        <td width='73%'><strong>개인회원</strong></td>                            ";
+	html_signup += "	      </tr>                                                                       ";
+	html_signup += "	      <tr>                                                                        ";
+	html_signup += "	        <th style='TEXT-ALIGN: left; padding-left:20px'>성명</th>                 ";
+	html_signup += "	        <td><div id='mbr_nm'></div></td>                                          ";
+	html_signup += "	      </tr>                                                                       ";
+	html_signup += "	      <tr>                                                                        ";
+	html_signup += "	        <th style='TEXT-ALIGN: left; padding-left:20px'>아이디 *</th>             ";
+	html_signup += "	        <td><input type='text' name='INPTL_USID' id='INPTL_USID' class='txt' style='width:200px;' chartype='engnum' minlength='6' maxlength='12' title='아이디'/><span class='tip'>&nbsp;(영문, 숫자조합 6~12자)</span>  ";
+	html_signup += "	        <a href='javascript:doIdSignUpCheck()'><img src='/img/before/individual/btn_over_confirm.gif' alt='중복확인' /></a></td> ";
+	html_signup += "	      </tr>";
+	html_signup += "	      <tr> ";
+	html_signup += "	        <th style='TEXT-ALIGN: left; padding-left:20px'>비밀번호 *</th> ";
+	html_signup += "	           <td><input type='password' name='PASSWORD' id='PASSWORD' class='txt' style='width:200px;' chartype='engnum' title='비밀번호' minlength='8' maxlength='15' /> <span class='tip'>&nbsp;(영문, 숫자조합 8~15자)</span></td> ";
+	html_signup += "	      </tr> ";
+	html_signup += "	      <tr>  ";
+	html_signup += "	        <th class='last' style='TEXT-ALIGN: left; padding-left:20px'>비밀번호 확인 *</th> ";
+	html_signup += "	           <td><input type='password' name='PASSWORD_CONFIRM' id='PASSWORD_CONFIRM' class='txt' style='width:200px;' chartype='engnum' minlength='8' maxlength='15' /> <span class='tip'>&nbsp;(확인을 위해 재입력해 주세요)</span></td> ";
+	html_signup += "	      </tr> ";
+	html_signup += "	    </tbody>";
+	html_signup += "	  </table>  ";
+	html_signup += "	</div>      ";
+	html_signup += "	<br/>       ";
+	html_signup += "	            ";
+	html_signup += "	<h4 class='section_title'>약관동의</h4>                     ";
+	html_signup += "	  <ul class='list3'>                                        ";
+	html_signup += "	    <li>약관 내용 확인 후 동의를 선택해 주세요!</li>        ";
+	html_signup += "	  </ul>                                                     ";
+	html_signup += "	<div class='table_v1'>                                      ";
+	html_signup += "	  <table summary='선택, 카드번호/카드명 항목을 제공합니다'> ";
+	html_signup += "	    <caption>약관동의</caption>                             ";
+	html_signup += "	    <colgroup>                                              ";
+	html_signup += "	    <col style='width:166px;' />                            ";
+	html_signup += "	    <col />                                                 ";
+	html_signup += "	    </colgroup>                                             ";
+	html_signup += "	    <thead>                                                 ";
+	html_signup += "	    </thead>                                                ";
+	html_signup += "	    <tbody>                                                 ";
+	html_signup += "	      <tr class='first'>                                    ";
+	html_signup += "	        <th width='27%' style='TEXT-ALIGN: left; padding-left:20px'>웹사이트 이용약관</th>                                                 ";
+	html_signup += "	        <td width='73%' class='last left' style='padding-left:15px;'>                                                                      ";
+	html_signup += "	        <input type='radio' name='agree1' id='agree11' value='Y' />동의함&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                    ";
+	html_signup += "	        <input type='radio' name='agree1' id='agree12' value='N' checked />동의안함&nbsp;&nbsp;                                            ";
+	html_signup += "	        <a href='#none' onClick='doclauseOpen_1(); return false;'><img src='/img/before/individual/btn_clause.gif' alt='약관전문보기' /></a></td> ";
+	html_signup += "	      </tr>                                                                                                                                ";
+	html_signup += "	      <tr>                                                                                                                                 ";
+	html_signup += "	        <th style='TEXT-ALIGN: left; padding-left:20px'>개인정보 수집 및 이용약관</th>                                                     ";
+	html_signup += "	        <td class='last left' style='padding-left:15px;'>                                                                                  ";
+	html_signup += "	        <input type='radio' name='agree2' id='agree21' value='Y' />동의함&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                    ";
+	html_signup += "	        <input type='radio' name='agree2' id='agree22' value='N' checked />동의안함&nbsp;&nbsp;                                            ";
+	html_signup += "	        <a href='#none' onClick='doclauseOpen_2(); return false;'><img src='/img/before/individual/btn_clause.gif' alt='약관전문보기' /></a></td> ";
+	html_signup += "	      </tr>                             ";
+	html_signup += "	    </tbody>                            ";
+	html_signup += "	  </table>                              ";
+	html_signup += "	</div>                                  ";
+	html_signup += "	<br/>                                   ";
+	html_signup += "	                                        ";
+	html_signup += "	                                        ";
+	html_signup += "	<h4 class='section_title'>본인확인</h4> ";
+	html_signup += "	<div class='table_v1'>                  ";
+	html_signup += "	  <table summary='본인확인'>            ";
+	html_signup += "	    <caption>본인확인</caption>         ";
+	html_signup += "	    <colgroup>                          ";
+	html_signup += "	    <col style='width:166px;' />        ";
+	html_signup += "	    <col />                             ";
+	html_signup += "	    </colgroup>                         ";
+	html_signup += "	    <thead>                             ";
+	html_signup += "	    </thead>                            ";
+	html_signup += "	    <tbody>                             ";
+	html_signup += "	      <tr class='first'>                ";
+	html_signup += "	        <th width='27%' style='TEXT-ALIGN: left; padding-left:20px'>인증방법</th>  ";
+	html_signup += "	        <td width='73%' class='last left' style='padding-left:15px;'> ";
+	html_signup += "	        <input type='radio' name='authChoice' id='authChoice' value='C' checked  /> 카드인증&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ";
+	html_signup += "	           <input type='radio' name='authChoice' id='authChoice' value='I'  /> 공인인증</td>	             ";
+	html_signup += "	      </tr> ";
+	html_signup += "	    </tbody>";
+	html_signup += "	  </table>  ";
+	html_signup += "	</div>      ";
+	html_signup += "	            ";
+	html_signup += "	<div align='center'> <a href='#none' onclick='chkPwd(); return false;'><img src='/img/before/btn/btn_webmember.gif' alt='웹회원 가입'  /></a> </div> ";
+	html_signup += "       ";
+	html_signup += "</div> ";
+	html_signup += "       ";
+	html_signup += "<div id='divView02_Success' style='display:none'> ";
+	html_signup += "	<div align='center'><img src='/img/before/individual/webmembership_success.gif' alt='완료' /></div> ";
+	html_signup += "	<br/> ";
+	html_signup += "	<div align='center'> <a href='#none' onclick='goLoginLayerOpen(\""+btn+"\"); return false;'><img src='/img/before/btn/btn_login3.gif' alt='로그인'  /></a> </div> ";
+	html_signup += "</div>  ";
+	html_signup += "</form> ";
+	html_signup += "  </div></div></div></div></div>             ";
+	html_signup += "        ";
+	html_signup += "  <div class='x-window-bl x-panel-nofooter'> ";
+	html_signup += "    <div class='x-window-br'>                ";
+	html_signup += "      <div class='x-window-bc'> </div>       ";
+	html_signup += "    </div>                                   ";
+	html_signup += "  </div>                                     ";
+	html_signup += "  </div></div>             ";
+	html_signup += "        ";
+	html_signup += "<%-- 웹사이트 이용약관  layer--%> ";
+	html_signup += "<div class='x-hidden x-window x-resizable-pinned' style='position:relative;display:none;visibility:visible;width:610px; top:0;left:0;'> ";
+	html_signup += "  <div class='x-window-tl'>     ";
+	html_signup += "    <div class='x-window-tr'>   ";
+	html_signup += "      <div class='x-window-tc'> ";
+	html_signup += "        <h1 class='x-window-header x-unselectable x-window-draggable'>         ";
+	html_signup += "          <div class='x-tool x-tool-close '>&nbsp;</div>                       ";
+	html_signup += "          <span class='x-window-header-text'> <span class='poptit_txt'>        ";
+	html_signup += "          <!-- 타이틀 -->                                                      ";
+	html_signup += "          </span> </span> </h1>                                                ";
+	html_signup += "      </div>                                                                   ";
+	html_signup += "    </div>                                                                     ";
+	html_signup += "  </div>                                                                       ";
+	html_signup += "  <div id='x-window-bwrap' class='x-hidden'>                                   ";
+	html_signup += "    <div class='x-window-ml'>                                                  ";
+	html_signup += "      <div class='x-window-mr'>                                                ";
+	html_signup += "        <div class='x-window-mc'>                                              ";
+	html_signup += "          <div class='x-window-body' style='width:530px; height:280px;'>       ";
+	html_signup += "            <div style='text-align:left; color:#666; margin:7px 4px 7px 4px; '>";
+	html_signup += "              <h4 class='section_title'>웹사이트 이용약관</h4>                 ";
+	html_signup += "              <div class='wrap_agreement_content01'>                           ";
+	html_signup += "                <div class='agreement_content'> 하나SK카드 웹회원 규약(2010.06.14))<br />  ";
+	html_signup += "                  제 1 조 (목 적) <br /> ";
+	html_signup += "                  이 약관은 하나SK카드(주)(이하 '회사'라 합니다)가 인터넷상에서 제공하는 서비스의 이용조건 및 절차에 관한 기본사항을 정하는데 목적이 있습니다. <br /> ";
+	html_signup += "                  제 2 조 (용어정의) <br /> ";
+	html_signup += "                  이 약관에서 사용하는 용어의 정의는 다음과 같습니다. <br /> ";
+	html_signup += "                  ① '서비스'라 함은 회사의 홈페이지 및 회사가 직접 운영하는 인터넷사이트 등에서 제공하는 인터넷상의 서비스(무선 인터넷서비스 포함)를 말합니다. <br /> ";
+	html_signup += "                  ② “이용자”라 함은 사이트에 접속하여 이 약관에 따라 서비스 주체가 제공하는 서비스를 받는 회원 및 비회원을 말합니다. <br /> ";
+	html_signup += "                  ③ '웹회원'(이하 '회원'이라 합니다)이라 함은 회사가 운영하는 인터넷사이트에서 제공하는 서비스를 이용하기 위해 필요한 회원아이디와 웹비밀번호를 정하는 등 소정의 절차를 거쳐 회사와 서비스 이용계약을 체결하고 서비스 이용약관에 따라 서비스를 제공받는 자를 말합니다. <br /> ";
+	html_signup += "                  ④ “운영자”라 함은 서비스의 전반적인 관리와 원활한 운영을 위하여 회사가 선정한 자를 말합니다. <br /> ";
+	html_signup += "                  ⑤ “회원아이디'라 함은 회원식별과 회원의 서비스 이용을 위하여 회원 본인이 설정하며 회사가 정하는 일정한 기준에 의해 표기된 인식문자를 말합니다. <br /> ";
+	html_signup += "                  ⑥ '웹비밀번호'라 함은 회원의 비밀보호 및 회원 본인임을 확인하고 서비스에 제공되는 각종 정보의 보안을 위해 회원자신이 설정하며 회사가 정하는 일정한 기준에 의해 표기한 암호문자를 말합니다. <br /> ";
+	html_signup += "                  제 3 조 (약관의 적용) <br /> ";
+	html_signup += "                  ① 이 약관은 서비스를 이용하고자 하는 모든 회원에 대하여 그 효력을 발생합니다. 단, 사이트별 서비스 이용에 대하여는 해당 사이트의 별도 이용 약관과 함께 그 효력을 발생합니다. <br /> ";
+	html_signup += "                  ② 이 약관의 내용은 서비스 화면에 게시하거나 기타의 방법으로 회원에게 공시하고, 이에 동의한 회원이 서비스에 가입함으로써 효력이 발생합니다. <br /> ";
+	html_signup += "                  ③ 회사는 필요하다고 인정되는 경우 이 약관을 변경할 수 있으며, 약관이 변경된 경우에는 지체 없이 제2항과 같은 방법으로 공시합니다. 다만, 이용자의 권리 또는 의무에 관한 중요한 규정의 변경은 최소한 7일전에 공시합니다. <br /> ";
+	html_signup += "                  ④ 이용자는 변경된 약관 사항에 동의하지 않으면 서비스 이용을 중단하고 이용 계약을 해지할 수 있습니다. <br /> ";
+	html_signup += "                  ⑤ 이 약관에 명시되지 않은 사항 및 각 사이트별 해당 서비스에 대해서는 전자거래기본법, 정보통신망 이용촉진 및 정보보호에 관한 법률 등 관계법령, 해당 서비스별 관련법령 및 회사가 정한 서비스의 세부이용지침 등의 규정에 의합니다. <br /> ";
+	html_signup += "                  제 4 조 (서비스의 내용) <br /> ";
+	html_signup += "                  회사는 회원에게 회사가 자체 개발하는 서비스, 타 업체와 협력 개발한 서비스, 타 업체가 개발한 서비스 및 기타 회사에서 별도로 정하는 각종 서비스 등을 제공합니다. 단, 회사의 사정상 각 서비스별로 제공일정 및 제공방법이 변경되거나 지연 혹은 미제공 될 수도 있습니다. <br /> ";
+	html_signup += "                  제 5 조 (서비스의 이용 계약의 성립) <br /> ";
+	html_signup += "                  ① 서비스 이용계약은 회원이 되고자 하는 자가 회사의 웹회원 이용약관에 동의하고 정해진 가입 양식에 회원정보(회원아이디, 웹비밀번호, 이름, 주민등록번호, 전화번호, 기타 회사가 필요하다고 인정하는 사항 등)를 기입하고 '등록' 버튼을 누르면 회사가 이에 대해 승낙함으로써 성립됩니다. <br /> ";
+	html_signup += "                  ② 회원에 가입하는 자는 회사가 요구하는 개인신상정보를 성실히 제공하여야 합니다. <br /> ";
+	html_signup += "                  ③ 회사는 회원아이디와 웹비밀번호를 접수 받아 이를 관리하고 서비스 이용시에 회원아이디, 웹비밀번호 및 카드회원의 경우 신용카드 비밀번호 등을 요구할 수 있습니다. <br /> ";
+	html_signup += "                  ④ 회사는 회원의 이익을 보호하기 위하여 회사가 제공하는 특정 서비스에 있어서, 회원이 여타 서비스 상의 회원아이디 및 웹비밀번호와 달리 구성하도록 요구할 수 있습니다. 이 경우 회원이 이를 따르지 않음으로 인하여 발생하게 될 회원의 제반 손해에 대하여 회사는 책임을 지지 않습니다. <br /> ";
+	html_signup += "                  제 6 조 (회원가입 및 이용신청) <br /> ";
+	html_signup += "                  이용 신청은 서비스의 이용자 등록 화면에서 고객이 다음 사항을 가입신청 양식에 기록하는 방식으로 행합니다. <br /> ";
+	html_signup += "                  ① 개인 웹회원 <br />                           ";                
+	html_signup += "                  1. 성명 및 주민번호<br />                       ";
+	html_signup += "                  2. 회원아이디 <br />                            ";
+	html_signup += "                  3. 웹비밀번호 <br />                            ";
+	html_signup += "                  ② 기업 웹회원인 경우 <br />                    ";
+	html_signup += "                  1. 총괄관리자 <br />                            ";
+	html_signup += "                  1) 사업자등록번호 <br />                        ";
+	html_signup += "                  2) 기업번호<br />                               ";
+	html_signup += "                  3) 법인번호<br />                               ";
+	html_signup += "                  4) 회원아이디<br />                             ";
+	html_signup += "                  5) 웹비밀번호<br />                             ";
+	html_signup += "                  2. 카드사용자(공용카드)<br />                   ";
+	html_signup += "                  1) 사업자등록번호<br />                         ";
+	html_signup += "                  2) 카드번호/유효기간/CVV<br />                  ";
+	html_signup += "                  3) 회원아이디<br />                             ";
+	html_signup += "                  4) 웹비밀번호<br />                             ";
+	html_signup += "                  2. 카드사용자(지정카드/개인용 법인카드)<br />   ";
+	html_signup += "                  1) 사업자등록번호<br />                         ";
+	html_signup += "                  2) 성명 및 주민번호 <br />                      ";
+	html_signup += "                  3) 회원아이디<br />                             ";
+	html_signup += "                  4) 웹비밀번호 <br />                            ";
+	html_signup += "                  ③ 가맹점 회원인 경우 <br />                    ";
+	html_signup += "                  1) 성명 및 주민번호<br />                       ";
+	html_signup += "                  2) 사업자번호<br />                             ";
+	html_signup += "                  3) 입금계좌번호<br />                           ";
+	html_signup += "                  4) 회원아이디<br />                             ";
+	html_signup += "                  5) 웹비밀번호<br />                             ";
+	html_signup += "                  제 7 조 (이용 신청의 승낙) <br />               ";
+	html_signup += "                  ① 회사는 제6조에서 정한 사항을 정확히 기재하여 이용 신청한 고객에 대하여 서비스 이용 신청을 승낙합니다. <br /> ";
+	html_signup += "                  ② 회사는 다음 각 호에 해당하는 이용 신청에 대하여는 승낙을 유보할 수 있습니다. <br />                          ";
+	html_signup += "                  1. 기술상 서비스 제공이 불가능한 경우 <br />                                                                    ";
+	html_signup += "                  2. 보안상 문제가 있다고 판단되는 경우 <br />                                                                    ";
+	html_signup += "                  3. 기타 사유로 이용 승낙이 곤란 한 경우 <br />                                                                  ";
+	html_signup += "                  제 8 조 (승낙의 제한) <br />                                                                                    ";
+	html_signup += "                  ① 회사는 다음 각 호에 해당하는 신청에 대하여는 승낙을 하지 않을 수 있습니다. 인터넷 회원(공통) <br />          ";
+	html_signup += "                  1) 이름이 실명이 아닌경우<br />                                                                                 ";
+	html_signup += "                  2) 다른 사람의 명의를 사용하여 신청하는 경우<br />                                                              ";
+	html_signup += "                  3) 이용 신청 시 필요내용을 허위로 기재하여 신청한 경우<br />                                                    ";
+	html_signup += "                  4) 사회의 안녕질서 또는 미풍양속을 저해할 목적으로 신청한 경우 <br />                                           ";
+	html_signup += "                  5) 기타 회사가 정한 이용신청요건에 미비 되었을 경우<br />                                                       ";
+	html_signup += "                  ② 회원의 자격에 따라 서비스 이용의 일부가 제한될 수 있으며, 각 사이트의 별도 이용계약 체결여부에 따라 회원 자격 및 서비스 이용 범위가 변동될 수 있습니다. <br /> ";
+	html_signup += "                  ③ 각 사이트별 서비스 내용에 따라 회원아이디, 웹비밀번호 외의 별도 인증방식(예:공인인증서, CVC번호, 카드비밀번호 등)을 통해 서비스 이용을 제한할 수 있습니다. <br /> ";
+	html_signup += "                  제 9 조 (각종 정보의 제공 및 광고성 정보) <br /> ";
+	html_signup += "                  ① 회사는 회원에게 회사의 다양한 상품/서비스(커뮤니티, 교육, 인터넷쇼핑, 통신판매, 여행, 보험 등) 및 각종 행사, 생활정보 등의 소개와 안내를 서신우편물, 전화, Fax, E-Mail 등을 통해 제공할 수 있습니다. <br /> ";
+	html_signup += "                  ② 회원은 회사 및 회사의 제휴업체가 정보통신망 이용촉진 및 정보보호에 관한 법률 제50조 제2항에 따라 회원의 전화, Fax 또는 E-Mail 등을 통하여 광고성 정보를 전송하는데 동의합니다. <br /> ";
+	html_signup += "                  ③ 회원의 개인정보는 관련법률이 정하는 바에 따라 엄격히 관리되며, 회원은 원하지 않는 경우 회사가 제공하는 서비스 정보 또는 광고성 정보의 수신을 거부할 수 있습니다. <br /> ";
+	html_signup += "                  제 10 조 (서비스의 제공 및 제한) <br /> ";
+	html_signup += "                  ① 회사는 회원의 이용 신청을 승낙한 때부터 서비스를 개시합니다. 단, 일부 서비스의 경우에는 지정된 일자부터 서비스를 개시합니다. <br /> ";
+	html_signup += "                  ② 회사의 업무상 또는 기술상의 장애로 인하여 서비스를 개시하지 못하는 경우에는 사이트에 공시하거나 회원에게 이를 통지합니다. <br /> ";
+	html_signup += "                  ③ 서비스의 이용은 연중무휴 1일 24시간을 원칙으로 합니다. 다만, 회사의 업무 상이나 기술상의 이유로 서비스가 일지 중지될 수 있고, 또한 운영 상의 목적으로 회사가 정한 기간에는 서비스가 일시 중지될 수 있습니다. 이러한 경우 회사는 사전 또는 사후에 이를 공지합니다. <br /> ";
+	html_signup += "                  ④ 회사는 서비스를 일정범위로 분할하여 각 범위별로 이용 가능한 시간을 별도로 정할 수 있으며 이 경우 그 내용을 공지합니다. <br /> ";
+	html_signup += "                  제 11 조 (회사의 의무) <br /> ";
+	html_signup += "                  ① 회사는 서비스 제공과 관련하여 알고 있는 회원의 신상정보를 본인의 승낙 없이 제3자에게 누설, 배포하지 않습니다. 단, 관계법령에 의한 수사상의 목적으로 관계 기관으로부터 요구 받은 경우나 정보통신윤리위원회의 요청이 있는 경우 등 법률의 규정에 따른 적법한 절차에 의한 경우에는 그러하지 않습니다. <br /> ";
+	html_signup += "                  ② 제1항의 범위 내에서, 회사는 업무와 관련하여 회원의 사전 동의 없이 회원 전체 또는 일부의 개인정보에 관한 통계자료를 작성하여 이를 사용할 수 있고, 이를 위하여 회원의 컴퓨터에 쿠키를 전송할 수 있습니다. 이 경우 회원은 쿠키의 수신을 거부하거나 쿠키의 수신에 대하여 경고하도록 사용하는 컴퓨터의 브라우저의 설정을 변경할 수 있으며, 쿠키의 설정 변경에 의해 서비스 이용이 변경되는 것은 회원의 책임입니다. <br /> ";
+	html_signup += "                  ③ 회사는 서비스와 관련한 회원의 불만사항이 접수되는 경우 이를 신속하게 처리하여야 하며, 신속한 처리가 곤란한 경우 그 사유와 처리 일정을 서비스 화면에 게재하거나 e-mail 등을 통하여 동 회원에게 통지합니다. <br /> ";
+	html_signup += "                  ④ 회사가 제공하는 서비스로 인하여 회원에게 손해가 발생한 경우 그러한 손해가 회사의 고의나 중과실에 기해 발생한 경우에 한하여 회사에서 책임을 부담하며, 그 책임의 범위는 통상손해에 한합니다. <br /> ";
+	html_signup += "                  ⑤ 회사는 정보통신망 이용촉진 및 정보보호에 관한 법률, 통신비밀보호법 등 서비스의 운영, 유지와 관련 있는 법규를 준수합니다. <br /> ";
+	html_signup += "                  제 12 조 (회원의 의무) <br />                                                                                                      ";
+	html_signup += "                  ① 회원은 서비스를 이용할 때 다음 각 호의 행위를 하여서는 아니 됩니다. <br />                                                      ";
+	html_signup += "                  1. 이용 신청 또는 변경 시 허위 사실을 기재하거나, 다른 회원의 회원아이디 및 비밀번호를 도용, 부정하게 사용하는 행위 <br />         ";
+	html_signup += "                  2. 회사의 서비스 정보를 이용하여 얻은 정보를 회사의 사전 승낙 없이 복제 또는 유통시키거나 상업적으로 이용하는 행위 <br />          ";
+	html_signup += "                  3. 타인의 명예를 손상시키거나 불이익을 주는 행위 <br />                                                                            ";
+	html_signup += "                  4. 게시판 등에 음란물을 게재하거나 음란사이트를 연결(링크)하는 행위 <br />                                                         ";
+	html_signup += "                  5. 회사의 저작권, 제3자의 저작권 등 기타 권리를 침해하는 행위 <br />                                                               ";
+	html_signup += "                  6. 공공질서 및 미풍양속에 위반되는 내용의 정보, 문장, 도형, 음성 등을 타인에게 유포하는 행위 <br />                                ";
+	html_signup += "                  7. 서비스 운영을 고의로 방해하거나 서비스의 안정적 운영을 방해할 수 있는 정보 및 수신자의 명시적인 수신거부의사에 반하여 광고성 정보를 전송하는 행위 <br /> ";
+	html_signup += "                  8. 타인으로 가장하는 행위 및 타인과의 관계를 허위로 명시하는 행위 <br />";
+	html_signup += "                  9. 다른 회원의 개인정보를 수집, 저장, 공개하는 행위 <br />              ";
+	html_signup += "                  10. 자기 또는 타인에게 재산상의 이익을 주거나 타인에게 손해를 가할 목적으로 허위의 정보를 유통시키는 행위 <br /> ";
+	html_signup += "                  11. 재물을 걸고 도박하거나 사행행위를 하는 행위 <br />                                                           ";
+	html_signup += "                  12. 윤락행위를 알선하거나 음행을 매개하는 내용의 정보를 유통시키는 행위 <br />                                   ";
+	html_signup += "                  13. 수치심이나 혐오감 또는 공포심을 일으키는 말이나 음향, 글이나 화상 또는 영상을 계속하여 상대방에게 도달하게 하여 상대방의 일상적 생활을 방해하는 행위 <br /> ";
+	html_signup += "                  14. 서비스에 게시된 정보를 변경하는 행위 <br /> ";
+	html_signup += "                  15. 회사의 직원이나 운영자를 가장하거나 사칭하여 또는 타인의 명의를 도용하여 글을 게시하거나 메일을 발송하는 행위 <br /> ";
+	html_signup += "                  16. 컴퓨터 소프트웨어, 하드웨어, 전기통신 장비의 정상적인 가동을 방해, 파괴할 목적으로 고안된 소프트웨어 바이러스, 기타 다른 컴퓨터 코드, 파일, 프로그램을 포함하고 있는 자료를 게시하거나 e-mail으로 발송하는 행위 <br /> ";
+	html_signup += "                  17. 스토킹(stalking) 등 다른 회원을 괴롭히는 행위 <br /> ";
+	html_signup += "                  18. 기타 불법적이거나 부당한 행위 <br />                 ";
+	html_signup += "                  19. 범죄와 결부된다고 객관적으로 인정되는 행위 <br />    ";
+	html_signup += "                  20. 기타 관계법령에 위배되는 행위 <br />                 ";
+	html_signup += "                  ② 회원은 관계 법령, 본 약관의 규정, 이용안내 및 서비스상에 공지한 주의사항, 회사가 통지하는 사항 등을 준수하여야 하며, 기타 회사의 업무에 방해되는 행위를 하여서는 아니 됩니다. <br /> ";
+	html_signup += "                  ③ 회원은 회사에서 공식적으로 인정한 경우를 제외하고는 서비스를 이용하여 상품을 판매하는 영업 활동을 할 수 없으며 특히 해킹, 광고를 통한 수익, 음란사이트를 통한 상업행위, 상용소프트웨어 불법배포 등을 할 수 없습니다. 이를 위반하여 발생한 영업 활동의 결과 및 손실, 관계기관에 의한 구속 등 법적 조치 등에 관해서는 회사가 책임을 지지 않으며, 회원은 이와 같은 행위와 관련하여 회사에 대하여 손해배상 의무를 집니다. <br /> ";
+	html_signup += "                  ④ 회원은 서비스 이용을 위해 등록할 경우 현재의 사실과 일치하는 완전한 정보(이하 '등록정보')를 제공하여야 합니다. <br /> ";
+	html_signup += "                  ⑤ 회원은 등록정보에 변경사항이 발생할 경우 즉시 갱신하여야 합니다. 회원이 제공한 등록정보 및 갱신한 등록정보가 부정확할 경우, 기타 회원이 본 조 제1항에 명시된 행위를 한 경우에 회사는 본 서비스 약관 제13조에 의해 회원의 서비스 이용을 제한 또는 중지할 수 있습니다. <br /> ";
+	html_signup += "                  ⑥ 회원아이디와 웹비밀번호 관리에 관한 일체의 책임은 회원 본인에게 있습니다. 회원에게 부여된 회원아이디와 웹비밀번호를 제3자에게 대여 또는 양도하거나 이와 유사한 행위를 하여서는 아니 되며, 회원아이디와 웹비밀번호의 관리소홀, 부정사용에 의하여 발생하는 모든 결과에 대한 책임은 회원 본인에게 있습니다. <br /> ";
+	html_signup += "                  ⑦ 회원은 자신의 회원아이디가 부정하게 사용된 경우에 즉시 자신의 웹비밀번호를 변경하고 그 사실을 회사에 통보하여야 합니다. <br />                         ";
+	html_signup += "                  ⑧ 회원은 본인의 신상관련 사항이 변경되었을 때는 인터넷을 통하여 수정하거나 유선으로 지체없이 회사에 통지하여야 합니다. <br />                            ";
+	html_signup += "                  ⑨ 회원은 회사의 사전승낙 없이 서비스를 이용하여 영업활동을 할 수 없으며, 그 영업 활동으로 인한 결과에 대하여 회사는 책임을 지지 아니합니다. <br />       ";
+	html_signup += "                  ⑩ 회원은 이 약관 및 관계법령에서 규정한 사항과 서비스 이용안내 또는 주의사항을 성실히 준수하여야 합니다. <br />                                          ";
+	html_signup += "                  ⑪ 회원은 내용별로 회사가 서비스 공지사항에 게시하거나 별도로 공지한 이용 제한사항을 준수하여야 합니다. <br />                                            ";
+	html_signup += "                  ⑫ 회원은 회사의 사전동의 없이 서비스의 이용권한, 기타 이용 계약상 지위를 타인에게 양도, 증여할 수 없으며, 이를 담보로 제공할 수 없습니다. <br />         ";
+	html_signup += "                  제 13 조 (계약해지 및 이용제한) <br />                                                                                                                    ";
+	html_signup += "                  ① 회원이 서비스 이용계약을 해지하고자 할 경우에는 본인이 사이트 상에서 또는 회사가 정한 별도의 이용방법으로 회사에 회원탈퇴 신청을 하여야 합니다. <br /> ";
+	html_signup += "                  ② 회사는 회원이 제12조에 규정한 회원의 의무를 이행하지 않을 경우 사전 통지 없이 즉시 이용계약을 해지하거나 또는 서비스 이용을 중지할 수 있습니다. <br /> ";
+	html_signup += "                  ③ 회사는 회원이 이용계약을 체결하여 회원아이디와 웹비밀번호를 부여 받은 후에라도 회원의 자격에 따른 서비스 이용을 제한할 수 있습니다. <br />             ";
+	html_signup += "                  ④ 회사는 회원이 회원 가입 후 6개월 동안 서비스 사용 이력이 없는 회원에 대해 이용 계약을 해지할 수 있습니다. <br />                                       ";
+	html_signup += "                  ⑤ 본 조 제2항 및 제3항의 회사 조치에 대하여 회원은 회사가 정한 절차에 따라 이의신청을 할 수 있습니다. <br />                                             ";
+	html_signup += "                  ⑥ 본 조 제5항의 이의가 정당하다고 회사가 인정하는 경우, 회사는 즉시 서비스의 이용을 재개합니다. <br />                                                   ";
+	html_signup += "                  제 14 조 (서비스의 변경 및 중지) <br />                                                                                                                   ";
+	html_signup += "                  ① 회사는 변경될 서비스의 내용 및 제공일자를 제24조 제1항 및 제2항에서 정한 방법으로 회원에게 통지하고 서비스를 변경하여 제공할 수 있습니다. <br />       ";
+	html_signup += "                  ② 회사는 다음 각 호에 해당하는 경우 서비스의 전부 또는 일부를 제한하거나 중지할 수 있습니다. <br />                                                      ";
+	html_signup += "                  1. 서비스용 정보통신설비의 보수ㆍ교체 및 고장, 통신의 두절 등으로 인한 부득이한 경우 <br />                                                               ";
+	html_signup += "                  2. 정전, 제반 설비의 장애 또는 이용량의 폭주 등으로 정상적인 서비스 이용에 지장이 있는 경우 <br />                                                        ";
+	html_signup += "                  3. 서비스 제공업자와의 계약 종료 등과 같은 회사의 제반 사정으로 서비스를 유지할 수 없는 경우 <br />                                                       ";
+	html_signup += "                  4. 기타 천재지변, 국가비상사태 등 불가항력적 사유가 있는 경우 <br />                                                                                      ";
+	html_signup += "                  ③ 제2항에 의한 서비스 중단의 경우에는 회사가 제24조 제1항 및 제2항에서 정한 방법으로 이용자에게 통지합니다. 다만, 회사가 통제할 수 없는 사유로 인한 서비스의 중단 (운영자의 고의, 과실이 없는 디스크 장애, 시스템 다운 등)으로 인하여 사전 통지가 불가능한 경우에는 그러하지 아니합니다. <br /> ";
+	html_signup += "                  ④ 회사는 서비스의 변경, 중지로 발생하는 문제에 대해서는 어떠한 책임도 지지 않습니다. <br /> ";
+	html_signup += "                  제 15 조 (게시물 또는 내용물의 삭제) <br /> ";
+	html_signup += "                  ① 회사는 서비스를 제공하는 인터넷사이트의 원활한 관리ㆍ감독을 위하여 필요한 경우, 게시되는 내용물에 대해 추가ㆍ수정ㆍ삭제할 수 있으며, 회원에게 별도 통지 없이 서비스의 개편 및 내용의 추가ㆍ수정ㆍ삭제를 할 수 있습니다. <br /> ";
+	html_signup += "                  ② 회사는 회원이 게시하거나 전달하는 서비스 내의 모든 내용물(회원간 전달 포함)이 다음 각 호의 경우에 해당한다고 판단되는 경우 사전통지 없이 삭제할 수 있으며, 이에 대해 회사는 어떠한 책임도 지지 않습니다. <br /> ";
+	html_signup += "                  1. 회사, 다른 회원 또는 제3자를 비방하거나 중상모략으로 명예를 손상시키는 내용인 경우 <br /> ";
+	html_signup += "                  2. 공공질서 및 미풍양속에 위반되는 내용의 정보, 문장, 도형 등의 유포에 해당하는 경우 <br />  ";
+	html_signup += "                  3. 범죄적 행위에 결부된다고 인정되는 내용인 경우 <br />                                      ";
+	html_signup += "                  4. 회사의 저작권, 제3자의 저작권 등 기타 권리를 침해하는 내용인 경우 <br />                  ";
+	html_signup += "                  5. 제2항 소정의 세부이용지침을 통하여 회사에서 규정한 게시기간을 초과한 경우 <br />          ";
+	html_signup += "                  6. 회사에서 제공하는 서비스와 관련 없는 내용인 경우 <br />                                   ";
+	html_signup += "                  7. 불필요하거나 승인되지 않은 광고, 판촉물을 게재하는 경우 <br />                            ";
+	html_signup += "                  8. 기타 관계 법령 및 회사의 지침 등에 위반된다고 판단되는 경우 <br />                        ";
+	html_signup += "                  ③ 회사는 게시물에 관련된 세부 이용지침을 별도로 정하여 시행할 수 있으며, 회원은 그 지침에 따라 각종 게시물(회원간 전달 포함)을 등록하거나 삭제하여야 합니다 <br /> ";
+	html_signup += "                  ④ 회원은 개인적인 이익을 위해 회사에 게시물의 추가적 게재 등의 요구를 할 수 없습니다. <br />";
+	html_signup += "                  제 16 조 (링크) <br />                                                                       ";
+	html_signup += "                  회사는 회원에게 다른 회사의 웹사이트 또는 자료에 대한 링크를 제공할 수 있습니다. 회사는 그러한 사이트 및 자료에 대한 아무런 통제권이 없으므로, 회원은 회사가 그와 같은 외부 사이트나 자료의 유용성에 대해 책임이 없으며, 그러한 사이트나 자료에 대한, 또는 그로부터 이용 가능한 내용, 광고, 제품이나 재료에 대해 회사가 아무런 보증도 하지 않고, 그에 대해 책임이 없음을 인정하고 이에 동의합니다. 또한, 회원은 그러한 사이트나 자료에 대한, 또는 그를 통하여 이용 가능한 내용, 상품 또는 서비스를 이용하거나 이를 신뢰함으로 인해, 또는 이와 관련하여 야기되거나 야기되었다고 주장되는 어떠한 손해나 손실에 대하여 회사가 직접적 또는 간접적으로 책임을 지지 않음을 인정하고 이에 동의합니다. <br /> ";
+	html_signup += "                  제 17 조 (면책) <br /> ";
+	html_signup += "                  ① 회사는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다. <br /> ";
+	html_signup += "                  ② 회사는 회원의 귀책사유로 인한 서비스의 이용장애에 대하여 책임을 지지않습니다. <br /> ";
+	html_signup += "                  ③ 회사는 회원이 서비스를 이용하여 기대하는 수익을 상실한 것에 대하여 책임을 지지 않으며 그 밖에 서비스를 통하여 얻은 자료로 인한 손해 등에 대하여도 책임을 지지않습니다. 회사는 회원이 사이트에 게재한 정보ㆍ자료ㆍ사실의 신뢰도 및 정확성 등 내용에 대하여는 책임을 지지 않습니다. <br /> ";
+	html_signup += "                  ④ 회사는 회원 상호간 또는 회원과 제3자 상호간에 서비스를 매개로 발생한 분쟁에 대해서는 개입할 의무가 없으며 이로 인한 손해를 배상할 책임도 없습니다. <br /> ";
+	html_signup += "                  제 18 조 (저작권 귀속 및 이용 제한) <br /> ";
+	html_signup += "                  ① 회원이 서비스 내에 게시한 게시물(회원간 전달 포함)의 저작권은 회원이 소유하며 회사는 서비스 내에 이를 게시할 수 있는 권리를 갖습니다. <br /> ";
+	html_signup += "                  ② 회사는 게시한 회원의 동의 없이 게시물을 다른 목적으로 사용할 수 없습니다. <br /> ";
+	html_signup += "                  ③ 회사는 회원이 서비스 내에 게시한 게시물이 타인의 저작권, 프로그램 저작권 등을 침해하더라도 이에 대한 민, 형사상의 책임을 부담하지 않습니다. 만일 회원이 타인의 저작권, 프로그램저작권 등을 침해하였음을 이유로 회사가 타인으로부터 손해배상청구 등 이의 제기를 받은 경우 회원은 회사의 면책을 위하여 노력하여야 하며, 회사가 면책되지 못한 경우 회원은 그로 인해 회사에 발생한 모든 손해를 부담하여야 합니다. ";
+	html_signup += "                   ";
+	html_signup += "                  ④ 회사는 회원이 해지하거나 적법한 사유로 해지 된 경우 해당 회원이 게시하였던 게시물을 삭제할 수 있습니다. <br /> ";
+	html_signup += "                  ⑤ 회사가 작성한 저작물에 대한 저작권은 회사에 귀속합니다. <br /> ";
+	html_signup += "                  ⑥ 회원은 서비스를 이용하여 얻은 정보를 가공, 판매하는 행위 등 서비스에 게재된 자료를 영리목적으로 이용하거나 제3자에게 이용하게 할 수 없으며, 게시물에 대한 저작권 침해는 관계 법령의 적용을 받습니다. <br /> ";
+	html_signup += "                  제 19 조 (정보수집 관련) <br /> ";
+	html_signup += "                  ① 회사는 회원의 정보 수집 시 회원관리에 필요한 최소한의 정보를 수집합니다. 다음 사항을 필수사항으로 하며 그 외 사항은 선택사항으로 합니다. <br /> ";
+	html_signup += "                  1. 성명 <br />                    ";
+	html_signup += "                  2. 주민등록번호 <br />            ";
+	html_signup += "                  3. 회원아이디 <br />              ";
+	html_signup += "                  4. 웹비밀번호 <br />              ";
+	html_signup += "                  5. e-mail 주소 <br />             ";
+	html_signup += "                  6. 카드 비밀번호<br />            ";
+	html_signup += "                  7. 주소 및 전화번호 <br />        ";
+	html_signup += "                  ② 정보의 수집 및 이용목적 <br /> ";
+	html_signup += "                  1. 회사가 개인정보를 수집 및 이용하는 목적은 다음과 같습니다. <br /> ";
+	html_signup += "                  - 성명, 회원아이디, 온라인 웹비밀번호, 주민등록번호, 카드관련 정보 : 회원가입시 본인 확인 및 서비스 이용에 따른 본인 식별 절차에 이용<br />                                              ";
+	html_signup += "                  - 이메일주소, 전화번호 : 고지사항 전달, 본인 의사확인, 불만 처리 등 원활한 의소소통 경로의 확보 및 새로운 서비스/신상품, 이벤트 정보 등에 대한 안내 <br />                               ";
+	html_signup += "                  - 카드 관련 정보, 은행계좌정보 : 금융서비스, 유료서비스 및 쇼핑몰 이용시 대금결제 <br />                                                                                                 ";
+	html_signup += "                  - 주소, 전화번호 : 청구서, 경품 발송을 위한 배송지 정보 <br />                                                                                                                           ";
+	html_signup += "                  - 그 외 선택항목 : 개인 맞춤서비스를 제공하기 위한 자료 <br />                                                                                                                           ";
+	html_signup += "                  2. 단, 이용자의 기본적 인권 침해의 우려가 있는 민감한 개인정보(인종 및 민족, 사상 및 신조, 출신지 및 본적지, 정치적 성향 및 범죄기록, 건강상태 및 성생활 등)는 수집하지 않습니다. <br /> ";
+	html_signup += "                  ③ 제공된 회원정보는 해당 회원의 동의 없이 본래 목적 외의 용도로 이용하거나 제3자에게 제공할 수 없으며, 이에 대한 모든 책임은 회사가 집니다. 다만, 다음의 경우에는 예외로 합니다. <br /> ";
+	html_signup += "                  1. 상품배송(사은품, 쇼핑몰 상품구매)과 관련하여 배송업체에게 배송에 필요한 최소한의 이용자의 정보(성명, 주소, 전화번호)를 알려주는 경우 <br />                                           ";
+	html_signup += "                  2. 통계작성, 학술연구 또는 시장조사를 위하여 필요한 경우로서 특정 개인을 식별할 수 없는 형태로 제공하는 경우 <br />                                                                      ";
+	html_signup += "                  ④ 회원은 언제든지 회사가 가지고 있는 자신의 개인정보에 대해 열람, 오류정정 및 동의철회를 요구할 수 있으며 회사는 이에 대해 지체없이 필요한 조치를 취할 의무를 집니다 <br />             ";
+	html_signup += "                  ⑤ 회사는 개인정보의 수집 목적을 달성한 때에는 당해 회원정보를 지체없이 파기합니다. <br />                                                                                               ";
+	html_signup += "                  제 20 조 (이용약관의 효력 및 변경) <br />                                                                                                                                                ";
+	html_signup += "                  ① 이 약관은 서비스를 이용하고자 하는 모든 회원에 대하여 그 효력을 발생합니다. 단, 사이트별 서비스 이용에 대하여는 해당 사이트의 별도 이용 약관과 함께 그 효력을 발생합니다. <br />      ";
+	html_signup += "                  ② 이 약관의 내용은 서비스 화면에 게시하거나 기타의 방법으로 회원에게 공시하고, 이에 동의한 회원이 서비스에 가입함으로써 효력이 발생합니다. <br />                                       ";
+	html_signup += "                  ③ 회사는 필요하다고 인정되는 경우 이 약관을 변경할 수 있으며, 약관이 변경된 경우에는 지체 없이 제2항과 같은 방법으로 공시합니다. 다만, 이용자의 권리 또는 의무에 관한 중요한 규정의 변경은 최소한 7일전에 공시합니다. <br /> ";
+	html_signup += "                  ④ 이용자는 변경된 약관 사항에 동의하지 않으면 서비스 이용을 중단하고 이용 계약을 해지할 수 있습니다. <br /> ";
+	html_signup += "                  ⑤ 회사가 작성한 저작물에 대한 저작권은 회사에 귀속합니다. <br /> ";
+	html_signup += "                  ⑥ 회원은 서비스를 이용하여 얻은 정보를 가공, 판매하는 행위 등 서비스에 게재된 자료를 영리목적으로 이용하거나 제3자에게 이용하게 할 수 없으며, 게시물에 대한 저작권 침해는 관계 법령의 적용을 받습니다. <br /> ";
+	html_signup += "                  제 21 조 (약관위반시 책임) <br /> ";
+	html_signup += "                  ① 회원이 본 약관의 규정을 위반함으로 인하여 회사에 손해가 발생하게 되는 경우, 이 약관을 위반한 회원은 회사에 발생하는 모든 손해를 배상하여야 합니다. <br /> ";
+	html_signup += "                  ② 회원이 서비스를 이용함에 있어 행한 불법행위나 본 약관 위반행위로 인하여 회사가 당해 회원 이외의 제3자로부터 손해배상 청구 또는 소송을 비롯한 각종 이의제기를 받는 경우 당해 회원은 자신의 책임과 비용으로 회사를 면책 시켜야 하며, 회사가 면책되지 못한 경우 당해 회원은 그로 인하여 회사에 발생한 모든 손해를 배상하여야 합니다. <br /> ";
+	html_signup += "                  제 22 조 (약관 외 준칙) <br /> ";
+	html_signup += "                  이 약관에 명시되지 아니한 사항이나 약관의 해석에 관하여는 관계법령 또는 상관례에 따릅니다.<br />                                         ";
+	html_signup += "                  제 23 조 (관할 법원) <br />                                                                                                              ";
+	html_signup += "                  ① 서비스 이용과 관련하여 회사와 회원 사이에 분쟁이 발생한 경우, 회사와 회원은 분쟁의 해결을 위해 성실히 협의합니다. <br />              ";
+	html_signup += "                  ② 본 조 제1항의 협의에서도 분쟁이 해결되지 않을 경우 양 당사자는 민사소송법상의 관할법원에 소를 제기할 수 있습니다. <br />              ";
+	html_signup += "                  제 24 조 (회원에 대한 통지) <br />                                                                                                       ";
+	html_signup += "                  ① 회원에 대한 통지를 하는 경우 회사는 회원이 등록한 e-mail 주소 등으로 할 수 있습니다. <br />                                           ";
+	html_signup += "                  ② 회사는 불특정 다수 회원에 대한 통지의 경우 각 사이트 등에 게시함으로써 개별 통지에 갈음할 수 있습니다. <br />                         ";
+	html_signup += "                  제 25 조 (계약 사항의 변경) <br />                                                                                                       ";
+	html_signup += "                  회원은 이용 신청 시 기재한 사항이 변경되었을 경우 회사가 정한 별도의 이용 방법으로 정해진 양식 및 방법에 의하여 수정하여야 합니다. <br />";
+	html_signup += "                  부칙<br /> ";
+	html_signup += "                  1. 이 약관은 2010년 6월 14일부터 시행됩니다. </div> ";
+	html_signup += "                <br />                       ";
+	html_signup += "              </div>                         ";
+	html_signup += "            </div>                           ";
+	html_signup += "            <br class='clear' />             ";
+	html_signup += "          </div>                             ";
+	html_signup += "        </div>                               ";
+	html_signup += "      </div>                                 ";
+	html_signup += "    </div>                                   ";
+	html_signup += "  </div>                                     ";
+	html_signup += "  <div class='x-window-bl x-panel-nofooter'> ";
+	html_signup += "    <div class='x-window-br'>                ";
+	html_signup += "      <div class='x-window-bc'> </div>       ";
+	html_signup += "    </div>                                   ";
+	html_signup += "  </div>                                     ";
+	html_signup += "</div>                                       ";
+	html_signup += "                                             ";
+	html_signup += "<%-- 개인신용수집 및 이용약관 layer  --%>    ";
+	html_signup += "<div class='x-hidden x-window x-resizable-pinned' style='position:relative;display:none;visibility:visible;width:610px; top:0;left:0;'> ";
+	html_signup += "  <div class='x-window-tl'>                  ";
+	html_signup += "    <div class='x-window-tr'>                ";
+	html_signup += "      <div class='x-window-tc'>              ";
+	html_signup += "        <h1 class='x-window-header x-unselectable x-window-draggable'>          ";
+	html_signup += "          <div class='x-tool x-tool-close '>&nbsp;</div>                        ";
+	html_signup += "          <span class='x-window-header-text'> <span class='poptit_txt'>         ";
+	html_signup += "          <!-- 타이틀 -->                                                       ";
+	html_signup += "          </span> </span> </h1>                                                 ";
+	html_signup += "      </div>                                                                    ";
+	html_signup += "    </div>                                                                      ";
+	html_signup += "  </div>                                                                        ";
+	html_signup += "  <div id='x-window-bwrap2' class='x-hidden'>                                   ";
+	html_signup += "    <div class='x-window-ml'>                                                   ";
+	html_signup += "      <div class='x-window-mr'>                                                 ";
+	html_signup += "        <div class='x-window-mc'>                                               ";
+	html_signup += "          <div class='x-window-body' style='width:530px; height:280px;'>        ";
+	html_signup += "            <div style='text-align:left; color:#666; margin:7px 4px 7px 4px; '> ";
+	html_signup += "              <h4 class='section_title'>개인정보 수집 및 이용약관</h4>          ";
+	html_signup += "              <div class='wrap_agreement_content01'>                            ";
+	html_signup += "                <div class='agreement_content'>                                 ";
+	html_signup += "                  <ul>                                                          ";
+	html_signup += "                    <li>1.개인정보 수집 및 이용목적<br />                       ";
+	html_signup += "                      - 회원제 서비스 이용에 따른 본인여부 식별(확인)<br />     ";
+	html_signup += "                      - 이메일청구서 발송, 고지사항 전달, 본인 의사 확인, SMS문자서비스 가입 확인, 불만 처리 등 원활한 의사소통 경로의 확보, 새로운 서비스, 신상품이나 이벤트정보 등 최신정보의 안내 <br /> ";
+	html_signup += "                      - 청구서, 경품 배송에 대한 정확한 배송지의 확보 <br />     ";
+	html_signup += "                      - 통계학적 분석(이용자의 연령별, 성별, 지역별 통계분석 등)<br />  ";
+	html_signup += "                      - 개인맞춤서비스 제공 </li>        ";
+	html_signup += "                    <br />                               ";
+	html_signup += "                    <br />                               ";
+	html_signup += "                    <li>2. 수집하는 개인정보 항목 <br /> ";
+	html_signup += "                      - 성명, 주민번호 , 카드번호, 카드비밀번호, 카드유효기간,아이디, 비밀번호, 비밀번호힌트 질문과 답변, 전화번호, 핸드폰번호, 이메일주소, 주소, 사업자등록번호, 문자알림서비스(SMS) 이용여부, E-mail수신여부 선택, 스마트폰 여부 선택 등</li> ";
+	html_signup += "                    <br />                                ";
+	html_signup += "                    <br />                                ";
+	html_signup += "                    <li>3. 보유 및 이용기간<br />         ";
+	html_signup += "                      회사는 「개인정보의 수집 및 이용목적」 이 달성되면 지체 없이 파기됩니다. 단, 고객으로부터 사전에 동의를 받은 경우 또는 상법 등 관련법규에 의하여 보존할 필요성이 있는 다음의 경우에는 개인정보를 일정기간 보유합니다.<br /> ";
+	html_signup += "                      - 회사는 고객이 탈회하거나, 고객을 제명하는 경우 권리남용, 악용방지, 권리침해/명예훼손 분쟁 및 수사협조 의뢰에 대비하여 이용계약 해지일로부터 5년 동안 개인정보를 보존합니다.<br /> ";
+	html_signup += "                      - 회사는 다음의 정보에 대해서 명시한 기간 동안 보존합니다.<br /> ";
+	html_signup += "                      · 계약 또는 청약철회 등에 관한 기록 : 5년 <br />          ";
+	html_signup += "                      · 대금결제 및 재화등의 공급에 관한 기록 : 5년 <br />      ";
+	html_signup += "                      · 소비자의 불만 또는 분쟁처리에 관한 기록 : 3년 <br />    ";
+	html_signup += "                      · 기타 고객의 동의를 받은 경우 : 동의를 받은 기간까지</li>";
+	html_signup += "                  </ul>                       ";
+	html_signup += "                </div>                        ";
+	html_signup += "              </div>                          ";
+	html_signup += "            </div>                            ";
+	html_signup += "            <br class='clear' />              ";
+	html_signup += "          </div>                              ";
+	html_signup += "        </div>                                ";
+	html_signup += "      </div>                                  ";
+	html_signup += "    </div>                                    ";
+	html_signup += "  </div>                                      ";
+	html_signup += "  <div class='x-window-bl x-panel-nofooter'>  ";
+	html_signup += "    <div class='x-window-br'>                 ";
+	html_signup += "      <div class='x-window-bc'> </div>        ";
+	html_signup += "    </div>                                    ";
+	html_signup += "  </div>                                      ";
+	html_signup += "</div>                                        ";
+	html_signup += "                                              ";
+	html_signup += "<div id='x-window-dlg' class='x-hidden'>      ";
+	html_signup += "  <div class='x-window-body'>                 ";
+	html_signup += "	<div class='pop_content' style='width:570px; padding-top:0;'> ";
+	html_signup += " ";
+	html_signup += "    <form name='form2' id='form2' method='POST'> ";
+	html_signup += "    <div style='margin:0 0 20px 0;'><img src='/img/before/individual/tit_auth_card.gif' alt='본인확인(카드인증)' /></div> ";
+	html_signup += " ";
+	html_signup += "    <div class='table_v1'>                   ";
+	html_signup += "        <table summary='본인확인'>           ";
+	html_signup += "            <caption>본인확인</caption>      ";
+	html_signup += "            <colgroup>                       ";
+	html_signup += "                <col style='width:200px;' /> ";
+	html_signup += "                <col />                      ";
+	html_signup += "            </colgroup>                      ";
+	html_signup += "            <tbody>                          ";
+	html_signup += "                <tr class='first'>           ";
+	html_signup += "                    <th><label for='card_number'>카드번호</label></th> ";
+	html_signup += "                    <td><input type='text' name='CDNO1' id='CDNO1' class='txt' maxlength='4' chartype='onlynum' nextfocus='CDNO2' minLength='4' maxlength='4' nullable='false' value=''  style='width:57px;' />         ";
+	html_signup += "                        <input type='password' name='CDNO2' id='CDNO2' class='txt' maxlength='4' chartype='onlynum' nextfocus='CDNO3' minLength='4' maxlength='4' nullable='false' value='' style='width:57px;' />      ";
+	html_signup += "                        <input type='password' name='CDNO3' id='CDNO3' class='txt' maxlength='4' chartype='onlynum' nextfocus='CDNO4' minLength='4' maxlength='4' nullable='false' value='' style='width:57px;' />      ";
+	html_signup += "                        <input type='text' name='CDNO4' id='CDNO4' class='txt' maxlength='4' chartype='onlynum' nextfocus='유효기간월' minLength='4' maxlength='4' nullable='false' value='' style='width:57px;' /></td>";
+	html_signup += "                </tr> ";
+	html_signup += "                <tr>  ";
+	html_signup += "                    <th><label for='card_date'>유효일자</label></th> ";
+	html_signup += "                    <td><input type='text' id='VLMM' name='VLMM' class='txt' maxlength='2' value='' style='width:38px;' /> 월        ";
+	html_signup += "                        20<input type='text' id='VLYY' name='VLYY' class='txt' maxlength='2' value='' style='width:38px;' /> 년</td> ";
+	html_signup += "                </tr> ";
+	html_signup += "                <tr>  ";
+	html_signup += "                    <th><label for='cvv'>CVV번호</label></th> ";
+	html_signup += "                    <td><input type='password' id='CVV_VDT_V' name='CVV_VDT_V' maxlength='3' value='' class='txt' style='width:57px;' /> ";
+	html_signup += "                        <a href='javascript:openCvvInfo()'><img src='/img/before/individual/btn_about_cvv.gif' alt='CVV번호란?' /></a></td>     ";
+	html_signup += "                </tr>            ";
+	html_signup += "                <tr class='last'>";
+	html_signup += "                    <th><label for='card_password'>카드 비밀번호</label></th> ";
+	html_signup += "                    <td><input type='password'id='CD_PSWD' name='CD_PSWD' class='txt' enc='on' datatype='n' minLength='4' maxlength='4' nullable='false' chartype='onlynum' style='width:57px;' /> <span class='tip'>(4자리)</span></td> ";
+	html_signup += "                </tr>        ";
+	html_signup += "            </tbody>         ";
+	html_signup += "        </table>             ";
+	html_signup += "    </div>                   ";
+	html_signup += "                             ";
+	html_signup += "    <div class='btn_inquiry'>";
+	html_signup += "        <a href='#none' onclick='doCertification_signUp(); return false;'> ";
+	html_signup += "        <img  src='/img/before/btn_complete.gif' alt='완료' /></a></div> ";
+	html_signup += "        <%-- 테이블 세로형 1단 끝 --%> ";
+	html_signup += "    </form> ";
+	html_signup += " ";
+	html_signup += "    </div></div> ";
+	html_signup += "  </div></div> ";
+
+	document.getElementById('signup_public_layer').style.display="block";	
+	document.getElementById('signup_public_layer').innerHTML = html_signup;
+
+}
+
+// 공인인증서 로그인
+_doSubmit2_public = function() {
+	submitStateFalse(document.forms['formLogin_public']);
+	var f1 = document.getElementById("formLogin_public");
+	
+	// ID,PW 초기화
+	document.getElementById('USER_ID').value = "";	
+	document.getElementById('PASSWORD').value = "";
+	
+	var us1 = document.getElementById("USER_SSN1");
+	var us2 = document.getElementById("USER_SSN2");
+	document.forms['formLogin_public'].process = "false";
+	with(f1){
+
+		var psnno = us1.value + "" + us2.value;
+		if (psnno == null || psnno == "" || psnno.length != 13) {
+		    i18nExtAlert(validatePsn_str1);
+		    return  false;
+		} else {
+			
+		    /*  영문숫자가 아닌것이 있으면: false; */
+		    var numreg = /[^a-zA-Z0-9]/g;
+		    if ( numreg.test(psnno) )/* 영문숫자 아닌 값이 있는지 체크, 공백,영문,한글,특수기호 모두 체크 */
+		    {
+		        i18nExtAlert(validatePsn_str1);
+		        return false;
+		    }
+		}
+	    /*goMenuAjax('OCM000001P.web?_frame=no', null, document.forms['formLogin_public'], _callback_modify_layout, true, true);*/
+		//영문웹 분기
+		if(fnIsEnLocale()){
+			ASTXgoMenuAjax(document.forms['formLogin_public'],"ECM000001M.web?_frame=no",'TRUE');
+		}else{
+			ASTXgoMenuAjax(document.forms['formLogin_public'],"OCM000001M.web?_frame=no",'TRUE');
+		}
+		
+	}
+};
+
+//화면상 보이는 layout을 없애기 위해
+_callback_modify_layout = function(dataMap) {
+	if(document.getElementById('errControl_layer').style.display != 'block') {
+		document.getElementById('login_public_layer').style.display="none";	
+		//document.getElementById('wrap_header').style.display="none";	
+		//document.getElementById('wrap_contents').style.display="none";	
+		//document.getElementById('wrap_footer').style.display="none";	
+	} else {
+		/* 2015.11.12 최종권
+		 * [SR-151104-DEV-036] 팝업 로그인 오류시 페이지 비활성화 수정 요청
+		 * 수정내용 : 로그인팝업에서 오류발생시 활성화된 투명배경 때문에 오류 팝업창을 닫을수 없다.
+		 * \resources\js\design.js 의 공통 function 호출
+		 */
+		//opacityHide();
+		layPopClose('login_public_layer');
+	}
+}
+
+_doLoginLayer = function(myUrl) {
+
+	// 이니텍 모듈 적용
+	//document.all._initechModule.src="/shttp/install/index.jsp";
+	//_sign(document.getElementById('formLogin'), myUrl);
+
+    // E2E 적용
+    // [OpenWeb] 노현석 솔루선 적용 작업 0217 구 E2E 모듈 삭제();
+	
+	//jsload("/js/cmn/bottom.js");	
+
+	document.getElementById('LoginlayerDiv_background').style.display = "block";
+	document.getElementById('LoginlayerDiv_background').style.left = "0";
+	document.getElementById('LoginlayerDiv_background').style.top = "0";
+	document.getElementById('LoginlayerDiv_background').style.width = document.documentElement.scrollWidth;
+	document.getElementById('LoginlayerDiv_background').style.height = document.documentElement.scrollHeight;   
+	document.getElementById('iframe_processLoginLayer').style.display = "block";
+	document.getElementById('iframe_processLoginLayer').style.width = document.documentElement.scrollWidth;
+	document.getElementById('iframe_processLoginLayer').style.height = document.documentElement.scrollHeight;
+	
+	var width = 500;
+	var height = 380;
+	var positionObj = position_center(width, height);
+    document.getElementById('total').style.left = (positionObj.sw / 2) - width/2 + document.documentElement.scrollLeft;
+    document.getElementById('total').style.top = (positionObj.sh / 2) - height/2 + document.documentElement.scrollTop;
+    
+	document.getElementById('USER_ID').value = "";
+	document.getElementById('PASSWORD').value = "";
+	document.getElementById('USER_SSN1').value = "";
+	document.getElementById('USER_SSN2').value = "";	
+	document.getElementById('total').style.display = "block";
+};
+
+// 이니텍 모듈
+_sign = function(frm, myUrl) {
+	var xml = null;
+	var plainText = null;
+	try {
+		xml = new ActiveXObject("Msxml2.XMLHTTP.3.0");
+	} catch(e) {
+		xml = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	var postData = "test=111";
+	xml.open("POST", "/shttp/ping?1234", false);
+	xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+	xml.send(postData);
+	if(xml.Status == 200) {
+//		var txt = xml.responseText;
+//		alert("response text : "+txt);
+	} else if(xml.Status == 201) {
+//		xml.open("POST", "/shttp/install/index.html", false);
+//		xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+//		xml.send(postData);
+//		alert("fail Http Status : " + xml.Status);
+//		return false;
+		location.replace("/hscroute.jsp?goURL=/shttp/install/index.jsp?url="+myUrl);		
+	} else {
+//		alert("fail Http Status : " + xml.Status);
+//		return false;
+		location.replace("/hscroute.jsp?goURL=/shttp/install/index.jsp?url="+myUrl);
+	}
+	return true;
+};
+
+// 닫기버튼
+_closeScreen = function() {
+	document.getElementById('USER_ID').value = "";
+	document.getElementById('PASSWORD').value = "";
+	document.getElementById('USER_SSN1').value = "";
+	document.getElementById('USER_SSN2').value = "";	
+	document.getElementById('LoginlayerDiv_background').style.display = "none";
+	document.getElementById('iframe_processLoginLayer').style.display = "none";	
+    document.getElementById('total').style.display="none";	   
+};
+
+// 라디오버튼
+_selectLogin = function(value) {	
+	
+	// ID PW 로그인의 경우
+	if(value == '0') {
+
+		document.getElementById('USER_SSN1').value = "";
+		document.getElementById('USER_SSN2').value = "";
+		/*document.getElementById('idpwImg').src = "/img/before/individual/txt_main_login.gif";
+		document.getElementById('juminImg').src = "/img/before/individual/txt_main_login2.gif";*/
+				
+		/*jQuery("#idpwInput").find(".pLoginBox").show();*/		
+		/*jQuery("#juminInput").find(".certiBoxLog").hide();*/
+		document.getElementById('idpwInput').style.display = "block";
+		document.getElementById('juminInput').style.display = "none";
+		
+		
+	// 공인인증서의 경우
+	} else if(value == '1') {
+
+		document.getElementById('USER_ID').value = "";
+		document.getElementById('PASSWORD').value = "";
+		/*document.getElementById('idpwImg').src = "/img/before/individual/txt_main_login_off.gif";
+		document.getElementById('juminImg').src = "/img/before/individual/txt_main_login2_on.gif";*/		
+		/*jQuery("#idpwInput").find(".pLoginBox").hide();
+		jQuery("#juminInput").find(".certiBoxLog").show();*/
+		document.getElementById('idpwInput').style.display = "none";
+		document.getElementById('juminInput').style.display = "block";
+	}
+};
+
+// ID PW 로그인
+_doSubmit1 = function() {
+
+	// 주민등록번호 초기화
+	document.getElementById('USER_SSN1').value = "";
+	document.getElementById('USER_SSN2').value = "";	
+
+	var id = document.getElementById('USER_ID').value.toUpperCase();
+	var pw = document.getElementById('PASSWORD').value;
+
+	if((id == null || id == "") && (pw == null || pw == "")) {
+		i18nExtAlert("[아이디] 필수 입력 사항입니다.");
+		return false;
+	} else if(id == null || id == "" || id.length < 6 || id.length > 12) {			
+		i18nExtAlert("[아이디] 입력을 6 ~ 12 자리로 해주십시오(LENGTH)");
+		return false;
+	} else if(pw == null || pw == "" || pw.length < 6 || pw.length > 15) {
+		i18nExtAlert("[비밀번호] 입력을 6 ~ 15 자리로 해주십시오(LENGTH)");
+		return false;				
+	}
+	
+	document.getElementById('USER_ID').value = document.getElementById('USER_ID').value.toUpperCase();
+    goMenuAjax('CM000001M.web?_frame=no', null, document.forms['formLogin'], null, true, true);
+};
+
+// 공인인증서 로그인
+_doSubmit2 = function() {
+	submitStateFalse(document.forms['formLogin']);
+	var f1 = document.getElementById("formLogin");
+	
+	// ID,PW 초기화
+	document.getElementById('USER_ID').value = "";	
+	document.getElementById('PASSWORD').value = "";
+	
+	var us1 = document.getElementById("USER_SSN1");
+	var us2 = document.getElementById("USER_SSN2");
+	document.forms['formLogin'].process = "false";
+	with(f1){
+
+		var psnno = us1.value + "" + us2.value;
+		if (psnno == null || psnno == "" || psnno.length != 13) {
+		    i18nExtAlert(validatePsn_str1);
+		    return  false;
+		} else {
+			
+		    /*  영문숫자가 아닌것이 있으면: false; */
+		    var numreg = /[^a-zA-Z0-9]/g;
+		    if ( numreg.test(psnno) )/* 영문숫자 아닌 값이 있는지 체크, 공백,영문,한글,특수기호 모두 체크 */
+		    {
+		        i18nExtAlert(validatePsn_str1);
+		        return false;
+		    }
+		}
+	    goMenuAjax('CM000001P.web?_frame=no', null, document.forms['formLogin'], null, true, true);
+	}
+};
+
+/**
+* <pre>
+* desc   : 공인인증서 안내 띄운다(공통 함수로 적용)
+* </pre>
+* @type    function
+* @access  public
+* @author  Joseph.Hong
+* @date		2013.02.20
+*/
+CertificationLayer = function(objSourceBtn){
+
+    //var strUrl = "/jsp/cmn/layer/certificationLayer.jsp";
+	var strUrl = "/jsp/cmn/overlay/certificationLayer.jsp";
+	//영문웹 분기
+	if(fnIsEnLocale()) strUrl = "/jsp/cmn/overlay/certificationLayer_EN.jsp";
+    var objData = null;
+    fnDoTransaction(strUrl, objData, function(strHTML){
+        
+        //같은 창이 여러개 뜨는 경우를 방지하기 위해, 동일한 창을 삭제후 띄우는 방식을 추가함.
+        //jQuery(".opacityWrap:first").remove();
+        //jQuery("#certifiInfo").remove();
+        
+        layPop("certifiInfo", strHTML, objSourceBtn);
+    });
+    
+};
+
+/**
+* <pre>
+* desc   : CVV 레이어 띄운다(공통 함수로 적용)
+* </pre>
+* @type    function
+* @access  public
+* @author  Joseph.Hong
+* @date		2013.02.20
+*/
+
+openCVVLayer = function(objSourceBtn) {
+	
+	//removeOverlapDiv('x-window-CVV');
+	//popup.openDialog('x-window-CVV', 540, 530, false);
+	var strUrl = "/jsp/cmn/overlay/cvvLayer.jsp";
+	//영문웹 분기
+	if(fnIsEnLocale()) strUrl = "/jsp/cmn/overlay/cvvLayer_EN.jsp";
+	var objData = null;
+	fnDoTransaction(strUrl, objData, function(strHTML){
+	        
+	        //같은 창이 여러개 뜨는 경우를 방지하기 위해, 동일한 창을 삭제후 띄우는 방식을 추가함.
+	        //jQuery(".opacityWrap:first").remove();
+	        //jQuery("#x-window-cvv").remove();
+	        
+	        layPop("x-window-cvv", strHTML, objSourceBtn);
+	    });
+	    
+}
+
+
+//실명인증
+_doNameCheck = function() {
+	var f = document.getElementById("form1");
+	
+	var RL_OWR_RNM_NO1    = document.getElementById("RL_OWR_RNM_NO1").value.trim();
+    var RL_OWR_RNM_NO2    = document.getElementById("RL_OWR_RNM_NO2").value.trim();
+    var MBR_PN = document.getElementById("MBR_PN").value.trim();
+
+    if ( "" == MBR_PN ) {
+    	//영문웹 분기
+        i18nExtAlert(getLanChange("[ 알림 ] 성명을 입력하세요.", "[Notification] Enter your name."), "", "", _fU_localeCode);
+        return;
+    }else if ( isNaN(RL_OWR_RNM_NO1) || isNaN(RL_OWR_RNM_NO2) ) {
+    	//영문웹 분기
+        i18nExtAlert(getLanChange("[ 알림 ] 주민등록번호는 숫자로 입력하세요", "[Notification] Enter your resident registration number."), "", "", _fU_localeCode);
+        return;
+    }else if ( 6 != RL_OWR_RNM_NO1.length || 7 != RL_OWR_RNM_NO2.length ) {
+    	//영문웹 분기
+        i18nExtAlert(getLanChange("[ 알림 ] 주민등록번호를 확인하세요.", "Check your resident registration number."), "", "", _fU_localeCode);
+        return;
+    }
+    
+	AjaxOption.encription = false;
+	var reqMap = {
+		targetMethod : "doNameCheck",
+		MBR_PN : MBR_PN,
+		RL_OWR_RNM_NO1 : RL_OWR_RNM_NO1,
+		RL_OWR_RNM_NO2 : RL_OWR_RNM_NO2
+	}
+	_doCheck();
+// 실명인증로직 임시로 막음
+//	executeAction("OPM30000000D.ajax", eval(reqMap) , callbackDoNameCheck, AjaxOption);
+}
+
+callbackDoNameCheck = function(dataMap){
+	if(dataMap.RESPONSE_MESSAGE != null || dataMap.RESPONSE_MESSAGE != undefined){
+    	i18nExtAlert(dataMap.RESPONSE_MESSAGE);
+    } else {
+    	_doCheck();
+    }
+}
+
+
+// 기존 고객 확인, 원장 이름 비교
+_doCheck = function(){
+	var f = document.getElementById("form1");
+
+	var MBR_PN			= f.MBR_PN.value;
+	var RL_OWR_RNM_NO1	= f.RL_OWR_RNM_NO1.value;
+	var RL_OWR_RNM_NO2	= f.RL_OWR_RNM_NO2.value;
+
+//    if(!initExtValidationCheck(f)) {
+//         return false;
+//    }
+
+    AjaxOption.encription = true;
+    var reqMap = {
+    		TARGET 	: "tgetConfirmMem",
+    		MBR_PN			: MBR_PN,
+    		RL_OWR_RNM_NO1	: RL_OWR_RNM_NO1,
+    		RL_OWR_RNM_NO2	: RL_OWR_RNM_NO2
+    }
+
+    document.getElementById("MBR_PN_V").value = MBR_PN;
+//    document.getElementById("RL_OWR_RNM_NO").value = RL_OWR_RNM_NO1+RL_OWR_RNM_NO2;
+    
+    executeAction("OPM00000010C.ajax", eval(reqMap), call_DoCheck, AjaxOption);
+}
+
+// doCheck 콜백
+call_DoCheck = function (dataMap){
+	if(dataMap.RESPONSE_MESSAGE != undefined && dataMap.RESPONSE_MESSAGE != null) {
+		// 에러 메시지 출력 하기
+	    extExceptionAlert(dataMap);
+	    // 에러 메시지 출력 후 스크립트 종료
+		return;
+	}
+	
+	if(dataMap.IS_MEM){
+		i18nExtConfirm("이미 가입된 정보 입니다. 로그인 페이지로 이동하시겠습니까?", "알림", goLoginLayerOpen);
+		return;
+	}
+
+	if(!dataMap.IS_CARD_VALID){
+		i18nExtAlert("보유카드가 존재 하지 않습니다. 확인 하시고 가입 하여 주세요", "알림", goLoginLayerOpen);
+		return;
+	}
+
+	if(dataMap.IS_NAME_VALID == "N"){
+		i18nExtAlert("카드회원정보의 이름과 입력한 이름이 동일하지 않거나 카드회원정보가 존재 하지 않습니다.\n확인 하시고 가입 하여 주세요");
+		return;
+	}
+    if(document.getElementById("divView01") != null)
+        document.getElementById("divView01").style.display = "block";
+
+    document.getElementById("divNextBtn").style.display = "none";
+    document.getElementById("RL_OWR_RNM_NO").value = dataMap.RL_OWR_RNM_NO;
+    /* 포티파이검출 라인으로 삭제처리하였음 꼭 형상버젼 확인할것 */
+}
+
+goLoginLayerOpen = function(btn){
+    if(btn=='yes' || btn=='예'){ 
+
+    	document.getElementById('LoginlayerDiv_background').style.display = "none";
+    	document.getElementById('iframe_processLoginLayer').style.display = "none";
+    	document.getElementById('signup_public_layer').innerHTML = "";
+    	document.getElementById('signup_public_layer').style.display = "none";
+
+	    _doLoginLayer_public(returnUrl_back);
+    }
+}
+
+//닫기버튼
+goSignUpLayerClose = function(){
+	document.getElementById('LoginlayerDiv_background').style.display = "none";
+	document.getElementById('iframe_processLoginLayer').style.display = "none";
+	document.getElementById('signup_public_layer').innerHTML = "";
+	document.getElementById('signup_public_layer').style.display = "none";
+}
+
+//다음 버튼 활성화 및 value 값 체크
+keyPressCheck = function(){
+
+	var f	= document.getElementById("form1");
+
+	var mbrPnObj		= document.getElementById("MBR_PN");
+	var rrno1Obj		= document.getElementById("RL_OWR_RNM_NO1");
+	var rrno2Obj		= document.getElementById("RL_OWR_RNM_NO2");
+
+	var isFull		= false;
+
+	if(mbrPnObj.value == "" || rrno1Obj.value == "" ||
+			rrno2Obj.value == ""){
+		isFull	= false;
+	}
+	else{
+		isFull	= true;
+	}
+
+	var img	= document.getElementById("btnNext");
+	
+	if(isFull){
+		img.src = "/img/before/btn_next1_01.gif";
+	}else{
+		img.src = "/img/before/btn_next.gif";
+	}	
+}
+
+// 아이디 중복확인 AJAX
+doIdSignUpCheck = function (){
+    var f = document.getElementById("form1");
+
+    var _INPTL_USID = f.INPTL_USID.value;
+    
+    var numreg = /[^a-zA-Z0-9]/g;
+    if ( numreg.test(_INPTL_USID) )/* 영문숫자 아닌 값이 있는지 체크, 공백,영문,한글,특수기호 모두 체크 */
+    {
+        i18nExtAlert("아이디는 영문 혹은 영문,숫자 혼합 이어야 합니다.");
+        return;
+    }
+
+    if(!isNaN(_INPTL_USID)){
+        i18nExtAlert("아이디는 영문 혹은 영문,숫자 혼합 이어야 합니다.");
+        return;
+    }
+
+    if(_INPTL_USID.length < 6 || _INPTL_USID.length > 12){
+        i18nExtAlert("아이디는 입력을 6 ~ 12 자리로 해주십시오");
+        return;
+    }
+
+    if(_INPTL_USID == ""){
+        i18nExtAlert("아이디를 입력하여 주세요");
+        f.INPTL_USID.focus();
+        return;
+    }
+
+    AjaxOption.encription = true;
+    var reqMap = {
+            TARGET : "tgetCheckId",
+            INPTL_USID : _INPTL_USID  // 검색 아이디
+            
+    }
+    executeAction("OPM00000010C.ajax", eval(reqMap), IdSignUpCheckCallBack, AjaxOption);      
+}
+
+// 아이디 중복확인 콜백
+IdSignUpCheckCallBack = function(dataMap){
+
+    if(dataMap.RESPONSE_MESSAGE != undefined && dataMap.RESPONSE_MESSAGE != null) {
+        // 에러 메시지 출력 하기
+        extExceptionAlert(dataMap);
+        // 에러 메시지 출력 후 스크립트 종료
+        return;
+    }
+    var f = document.getElementById("form1");
+
+    // 사용가능한 아이디 라면
+    if(dataMap.recordCount == 0){
+        i18nExtAlert("사용가능한 아이디 입니다");
+        f.idSignUpCheck.value = "Y";
+    }else{
+        i18nExtAlert("이미 사용중인 아이디 입니다.");
+        f.idSignUpCheck.value = "N";
+    }
+}
+
+// validation 체크 & 비밀번호 제약 체크 AJAX
+chkPwd = function() {
+    var f = document.getElementById("form1");
+
+    //validation 체크
+	if(f.idSignUpCheck.value=="N"){
+	    i18nExtAlert("아이디 중복확인후 실행해 주십시요.");
+	    return;
+	}
+    if(f.PASSWORD.value == ""){
+        i18nExtAlert("비밀번호를 입력하여 주세요");
+        return;
+    }
+    var numreg = /[^a-zA-Z0-9]/g;
+    if ( numreg.test(f.PASSWORD.value) )/* 영문숫자 아닌 값이 있는지 체크, 공백,영문,한글,특수기호 모두 체크 */
+    {
+        i18nExtAlert("비밀번호는 영문 혹은 영문,숫자 혼합 이어야 합니다.");
+        return;
+    }
+    if(f.PASSWORD.value != f.PASSWORD_CONFIRM.value){
+        i18nExtAlert("비밀번호와 비밀번호 확인이  일치하지 않습니다.");
+        return;
+    }
+
+	// 웹사이트 이용약관
+	for(var i=0; i<f.agree1.length; i++){
+	    if(f.agree1[i].checked){
+	        if(f.agree1[i].value == "N"){
+	            i18nExtAlert("웹사이트 이용약관에 동의해 주십시요.");
+	            return;
+	        }
+	    }
+	}
+	// 개인 신용정보 등의 취급방침
+	for(var i=0; i<f.agree2.length; i++){
+	    if(f.agree2[i].checked){
+	        if(f.agree2[i].value == "N"){
+	            i18nExtAlert("개인신용정보 등의 취급방침에 동의해 주십시요.");
+	            return;
+	        }
+	    }
+	}
+    if(!popupConfirm_1){
+        i18nExtAlert("웹사이트 이용약관  전문보기 실행해 주십시요.");
+        return;
+    }
+    if(!popupConfirm_2){
+        i18nExtAlert("개인신용수집 및 이용약관  전문보기 실행해 주십시요.");
+        return;
+    }else{
+        AjaxOption.encription = false;
+        var reqMap = {
+            targetMethod : "getCertificationCardMessage",
+            INPTL_USID      : f.INPTL_USID.value,
+            CST_ID          : f.RL_OWR_RNM_NO.value,
+            PASSWORD        : f.PASSWORD.value
+        }
+        executeAction("OPM15000001D.ajax", eval(reqMap) ,callBackChkPwd, AjaxOption);
+    }
+    
+}
+
+// 비밀번호 제약 체크 콜백
+callBackChkPwd = function(dataMap){
+
+    if(dataMap.RESPONSE_MESSAGE != undefined && dataMap.RESPONSE_MESSAGE != null) {
+        // 에러 메시지 출력 하기
+        extExceptionAlert(dataMap);
+        // 에러 메시지 출력 후 스크립트 종료
+        return;
+    }
+    _doSubmit_signUp();  //실행
+}
+
+
+
+_doSubmit_signUp = function (){
+    var f = document.getElementById("form1");
+
+    for(var i=0; i<f.authChoice.length; i++){
+        if(f.authChoice[i].checked){
+            // 카드 인증
+            if(f.authChoice[i].value == "C"){
+
+                popup.openDialog('x-window-dlg', 650, 300, true, 0, 30);
+            }
+            // 공인 인증
+            else {
+                //f.spiderSubmit();
+                document.getElementById("TARGET").value = "tgetInsertMem";
+                goMenuAjax('PM00000010P.web?_frame=no', null, f, doJoinSubmitCallBack, true, true);
+            }
+        }
+    }
+}
+
+//웹회원가입실행
+doJoinSubmit = function() {
+    var f = document.getElementById("form1");
+    popup.close('x-window-dlg');
+
+    AjaxOption.encription = false;
+    var reqMap = {
+        TARGET          :  "tgetInsertMem",
+        INPTL_USID      : f.INPTL_USID.value,
+        MBR_PN          : f.MBR_PN_V.value,
+        RL_OWR_RNM_NO   : f.RL_OWR_RNM_NO.value
+    }
+    executeAction("OPM00000010C.ajax", eval(reqMap), doJoinSubmitCallBack, AjaxOption);
+}
+//웹회원가입실행 콜백
+doJoinSubmitCallBack = function(dataMap){
+
+    if(dataMap.RESPONSE_MESSAGE != undefined && dataMap.RESPONSE_MESSAGE != null) {
+        // 에러 메시지 출력 하기
+        extExceptionAlert(dataMap);
+        // 에러 메시지 출력 후 스크립트 종료
+        return;
+    }
+    alert("완료");
+    //완료페이지
+    document.getElementById("divView00").style.display = "none";
+    document.getElementById("divView01").style.display = "none";
+    document.getElementById("divView02_Success").style.display = "block";
+            
+}
+
+
+doclauseOpen_1 = function() {
+    popupConfirm_1 = true;
+	popup.openDialog('x-window-bwrap', 610, 300, true, 0, 30);
+}
+doclauseOpen_2 = function() {
+    popupConfirm_2 = true;
+    popup.openDialog('x-window-bwrap2', 610, 300, true, 0, 30);
+}
+
+
+//카드인증  버튼 클릭시 처리 된다.
+doCertification_signUp = function() {
+
+    var f = document.getElementById("form2");
+    var strCDNO1 = f.CDNO1.value;
+    var strCDNO2 = f.CDNO2.value;
+    var strCDNO3 = f.CDNO3.value;
+    var strCDNO4 = f.CDNO4.value;
+
+    if(strCDNO1.trim() == "") {
+        i18nExtAlert("카드번호는 필수입니다.");
+        f.CDNO1.focus();
+        return;
+    }
+    if(strCDNO2.trim() == "") {
+        i18nExtAlert("카드번호는 필수입니다.");
+        f.CDNO2.focus();
+        return;
+    }
+    if(strCDNO3.trim() == "") {
+        i18nExtAlert("카드번호는 필수입니다.");
+        f.CDNO3.focus();
+        return;
+    }
+    if(strCDNO4.trim() == "") {
+        i18nExtAlert("카드번호는 필수입니다.");
+        f.CDNO4.focus();
+        return;
+    }
+    if(f.VLMM.value.trim() == "") {
+        i18nExtAlert("유효기간 월은 필수입니다.");
+        f.VLMM.focus();
+        return;
+    }
+    if(f.VLYY.value.trim() == "") {
+        i18nExtAlert("유효기간 년도는 필수입니다.");
+        f.VLYY.focus();
+        return;
+    }
+    if(f.CVV_VDT_V.value.trim() == "") {
+        i18nExtAlert("CVV번호는 필수입니다.");
+        f.CVV_VDT_V.focus();
+        return;
+    }
+    if(f.CD_PSWD.value.trim() == "") {
+        i18nExtAlert("카드비밀번호는 필수입니다.");
+        f.CD_PSWD.focus();
+        return;
+    }
+    if(!doValidityPeriod("VLYY", "VLMM")){
+        i18nExtAlert("유효기간을 확인해 주십시오.");
+        return;
+    }
+    var CD_PSWD   = f.CD_PSWD.value;
+    var CVV_VDT_V = f.CVV_VDT_V.value;
+    var VLYM      = f.VLYY.value+f.VLMM.value;
+
+    AjaxOption.encription = true;
+    var reqMap = {
+            TARGET : "tgetValidCard",
+            CD_PSWD : CD_PSWD,
+            CDNO1 : strCDNO1,
+            CDNO2 : strCDNO2,
+            CDNO3 : strCDNO3,
+            CDNO4 : strCDNO4,
+            CVV_VDT_V : CVV_VDT_V,
+            VLYM : VLYM
+    }
+    executeAction("OPM00000001D.ajax", reqMap, doCertificationSignUpCallBack, AjaxOption);
+}
+
+// 카드인증 콜백 함수
+doCertificationSignUpCallBack = function(dataMap) {
+
+    if(dataMap.RESPONSE_MESSAGE != undefined && dataMap.RESPONSE_MESSAGE != null) {
+
+        if(dataMap.ERROR_CODE == "BQMI00044"){
+            i18nExtAlert("입력하신 카드정보를 찾을 수 없습니다. ("+dataMap.RESPONSE_MESSAGE+")");
+        }else{
+            extExceptionAlert(dataMap);
+        }
+        // 에러 메시지 출력 후 스크립트 종료
+        return;
+    }
+    doJoinSubmit();
+
+}

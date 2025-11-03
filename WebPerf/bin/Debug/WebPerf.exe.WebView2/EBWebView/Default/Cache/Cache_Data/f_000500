@@ -1,0 +1,329 @@
+var mainEventslide = `
+<div class="autoplay">
+	<button class="play">
+		<span>재생</span>
+	</button>
+	<button class="stop">
+		<span>정지</span>
+	</button>
+	<span class="slide_num">
+		<b></b>/
+		<i></i>
+	</span>
+</div>
+<div class="slide-cont slides">  
+    <!-- [220551] 11월 하나데이  -->
+    <div class="ca-cont">
+        <div class="bg-cont">
+            <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_slide_1516804.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+            <div class="text-cont">
+                <i>이벤트</i>
+                <p style="font-weight: 800;">11월 1일 하나데이<br>100% 당첨 뽑기</p>
+                <span>하나머니, 커피, 카카오 상품권 2만원
+                    <br>매월 1일 ★ 알림 받고 놓치지 마세요!
+                </span>
+                <div class="m-btn">
+                    <a title="자세히보기" href="/cont/news/news02/1516804_115431.jsp">자세히보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [220551] 11월 하나데이  -->
+    <!-- [220277] 런드리고 이벤트 -->
+    <div class="ca-cont">
+        <div class="bg-cont">
+            <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_slide_1512372.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+            <div class="text-cont">
+                <i>놀이터</i>
+                <p style="font-weight: 800;">왠지 빨래하기 귀찮은날<span style="font-size: 38px; line-height: 1.26; color: #000; letter-spacing: -8.5px; font-family: 'NotoSans_Bold' !important;">&middot;&middot;&middot;</span><br />세탁 대신해 드릴게요</p>
+                <span>#무료배송 #신규고객5,000P</span>
+                <div class="m-btn">
+                    <a title="자세히보기" href="/cont/news/news02/1512372_115431.jsp">자세히보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [220277] 런드리고 이벤트 -->
+    <!-- [220105] IRP 입금 이벤트 -->
+    <div class="ca-cont">
+        <div class="bg-cont">
+            <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_slide_1510427.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+            <div class="text-cont">
+                <i>이벤트</i>
+                <p style="font-weight: 800;">IRP에 입금하고<br>세금 Down 연금 Up!</p>
+                <span>연말정산 준비하고,<br>푸짐한 사은품 받으세요!</span>
+                <div class="m-btn">
+                    <a title="자세히보기" href="/cont/news/news02/1510427_115431.jsp">자세히보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [220105] IRP 입금 이벤트 -->
+    <!-- [220165] 농구Play -->
+    <div class="ca-cont">
+        <div class="bg-cont">
+            <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_basketball_slide.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+            <div class="text-cont">
+                <i>스포츠</i>
+                <p style="font-weight: 800;">하나원큐 농구Play<br>슛! 버저비터 게임</p>
+                <span>매월 슛! 성공할 때마다<br>우대금리! 응모권! 원큐볼! 100% 지급</span>
+                <div class="m-btn">
+                    <a title="자세히보기" href="/cont/basketballplay.jsp">자세히보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [220165] 농구Play -->
+    <!-- [220071] 달달 무슨 달 이벤트 -->
+    <!-- <div class="ca-cont">
+        <div class="bg-cont">
+            <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_slide_1512288.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+            <div class="text-cont">
+                <i>이벤트</i>
+                <p style="font-weight: 800;">추석맞이 달달 무슨 달~<br>매일 달라지는 게임운!</p>
+                <span>응모권 모아 원하는 선물 PICK<br>#로봇청소기 #고프로 #상품권</span>
+                <div class="m-btn">
+                    <a title="자세히보기" href="/cont/news/news02/1512288_115431.jsp">자세히보기</a>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- [220071] 달달 무슨 달 이벤트 -->
+    <!-- [220113] 머니클락 퍼즐 이벤트 -->
+    <div class="ca-cont">
+        <div class="bg-cont">
+            <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1510870_main_banner.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+            <div class="text-cont">
+                <i>이벤트</i>
+                <p style="font-weight: 800;">돈나와라 머니클락<br>마지막 퍼즐을 찾아라</p>
+                <span>퍼즐 조각 찾아 완성하면<br>총 777분께 당첨 행운이!</span>
+                <div class="m-btn">
+                    <a title="자세히보기" href="/cont/news/news02/1510870_115431.jsp">자세히보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [220113] 머니클락 퍼즐 이벤트 -->
+
+    <!-- [219283] 슬기로운금융생활ox게임  -->
+    <div class="ca-cont">
+        <div class="bg-cont">
+            <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1510569_main_banner.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+            <div class="text-cont">
+                <i>이벤트</i>
+                <p style="font-weight: 800;">매일매일 OX게임하고<br />100% 랜덤 캐시 받자!
+                        </p>
+                <span>최대 1만 캐시 받고 금융상식 UP!
+                        <br />OX게임 알림 받고 놓치지 마세요!
+                </span>
+                <div class="m-btn">
+                    <a title="자세히보기" href="/cont/news/news02/1510569_115431.jsp">자세히보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [219283] 슬기로운금융생활ox게임  -->
+    <!-- [218745] 하나원큐 놀이터 內 신규손님 특화 이벤트 (~12.31까지)-->
+    <!-- <div class="ca-cont">
+        <div class="bg-cont">
+        <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1509526_main_banner.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+        <div class="text-cont">
+            <i>놀이터</i>
+            <p style="font-weight: 800;">쉿~ 하나원큐 첫 손님만!<br>100% 캐시 당첨</p>
+            <span>놀이터에서 미끄럼틀 타면<br>100% 당첨 캐시, 숨어있는 선물도?</span>
+            <div class="m-btn">
+            <a title="자세히보기" href="/cont/news/news02/1509526_115431.jsp">자세히보기</a>
+            </div>
+        </div>
+        </div>
+    </div> -->
+    <!-- [218745] 하나원큐 놀이터 內 신규손님 특화 이벤트 -->
+
+     <!-- [219136] 4대연금 이벤트 ~2025.12.19까지 -->
+    <!-- <div class="ca-cont">
+        <div class="bg-cont">
+        <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1509407_main_banner_250708.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+        <div class="text-cont">
+            <i>이벤트</i>
+            <p style="font-weight: 800;">연금은 하나은행으로~<br>최대 6만원 혜택</p>
+            <span>5만원 캐시백+1만원 상품권<br>#국민 #공무원 #사학 #군인</span>
+            <div class="m-btn">
+            <a title="자세히보기" href="/cont/news/news02/1509407_115431.jsp">자세히보기</a>
+            </div>
+        </div>
+        </div>
+    </div> -->
+    <!-- // [219136] 4대연금 이벤트 -->
+    <!-- 청소연구소 제휴 이벤트 [S]  ~26.04.31 까지-->
+    <!-- <div class="ca-cont">
+        <div class="bg-cont">
+        <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1507622_main_slide.png" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+        <div class="text-cont">
+            <i>이벤트</i>
+            <p style="font-weight: 800;">최대 5만원<br>청소 쿠폰 4종팩 받기</p>
+            <span>하나원큐 놀이터에서 쿠폰 쏜다<br>100% 당첨 행운</span>
+            <div class="m-btn">
+            <a title="자세히보기" href="/cont/news/news02/1507622_115431.jsp">자세히보기</a>
+            </div>
+        </div>
+        </div>
+    </div> -->
+    <!-- // 청소연구소 제휴 이벤트 [E] -->
+    <!-- [219830] 9월 추석 송편 이벤트 10.13까지로 이벤트종료-->
+    <!-- <div class="ca-cont">
+        <div class="bg-cont">
+            <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1509980_main_banner.jpg" aria-hidden="true" />
+        </div>
+        <div class="text-wrap">
+            <div class="text-cont">
+                <i>이벤트</i>
+                <p style="font-weight: 800;">추석 송편 빚고<br>매주 용돈 뽑기</p>
+                <span>100% 당첨 추석 용돈 받으세요</span>
+                <div class="m-btn">
+                    <a title="자세히보기" href="/cont/news/news02/1509980_115431.jsp">자세히보기</a>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- [219830] 9월 추석 송편 이벤트 -->
+</div>
+
+<div class="allslide">
+	<button class="allslide_btn">
+		<span>레이어팝업으로 슬라이드 전체보기</span>
+	</button>
+</div>`;
+// =================================================== 이벤트 슬팝영역 시작 ===============================
+var mainEventslidePopup = `
+<div class="allslide-bg"></div>
+<div class="allslide-inner">
+	<a style="position:absolute;left:-50000px;" href="javascript:void(0)" class="focus-on">포커스 레이어팝업으로</a>
+	<div class="slide-list">
+        <!-- 전체팝업 3개 배너 [S] -->
+		<div class="line-align">      
+            <!-- [220551] 11월 하나데이 이벤트 -->   
+            <a title="이벤트 자세히보기" href="/cont/news/news02/1516804_115431.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_thum_1516804.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>11월 1일 하나데이 100% 당첨 뽑기</p>
+                    <span>하나머니, 커피, 카카오 상품권 2만원 ★ 알림 받고 놓치지 마세요!</span>
+                </div>
+            </a> 
+            <!--// [220551] 11월 하나데이 이벤트 -->
+             <!-- [220277] 런드리고 이벤트 -->   
+             <a title="이벤트 자세히보기" href="/cont/news/news02/1512372_115431.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_thum_1512372.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>왠지 빨래하기 귀찮은날..세탁 대신해 드릴게요</p>
+                    <span>#무료배송 #신규고객 5,000P</span>
+                </div>
+            </a> 
+            <!--// [220277] 런드리고 이벤트 -->   
+            <!-- [220105] IRP 입금 이벤트 -->   
+            <a title="이벤트 자세히보기" href="/cont/news/news02/1510427_115431.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_thum_1510427.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>IRP에 입금하고 세금 Down 연금 Up!</p>
+                    <span>연말정산 준비하고, 푸짐한 사은품 받으세요!</span>
+                </div>
+            </a> 
+            <!--// [220105] IRP 입금 이벤트 -->
+             
+        </div>
+        <div class="line-align">
+            <!-- [220165] 농구Play -->   
+            <a title="이벤트 자세히보기" href="/cont/basketballplay.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/main_basketball_thum.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>하나원큐 농구Play 슛! 버저비터 게임</p>
+                    <span>매월 슛! 성공할 때마다우대금리! 응모권! 원큐볼! 100% 지급</span>
+                </div>
+            </a> 
+            <!--// [220165] 농구Play -->  
+             <!-- [220113] 머니클락 퍼즐 이벤트 -->
+             <a title="이벤트 자세히보기" href="/cont/news/news02/1510870_115431.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1510870_main_thum.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>돈나와라 머니클락 마지막 퍼즐을 찾아라</p>
+                    <span>퍼즐 조각 찾아 완성하면 총 777분께 당첨 행운이!</span>
+                </div>
+            </a> 
+            <!-- //[220113] 머니클락 퍼즐 이벤트 -->
+            
+            <!-- [219283] 슬기로운금융생활ox게임 -->   
+            <a title="이벤트 자세히보기" href="/cont/news/news02/1510569_115431.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1510569_main_thum.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>매일매일 OX게임하고<br />100% 랜덤 캐시 받자!
+                    </p>
+                    <span>최대 1만 캐시 받고 금융상식 UP!
+                            <br />OX게임 알림 받고 놓치지 마세요!
+                    </span>
+                </div>
+            </a> 
+            <!--// [219283] 슬기로운금융생활ox게임 -->
+            <!-- [218745] 하나원큐 놀이터 內 신규손님 특화 이벤트 ~2025.12.31까지-->
+            <!-- <a title="이벤트 자세히보기" href="/cont/news/news02/1509526_115431.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1509526_main_thum.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>쉿~ 하나원큐 첫 손님만!<br>100% 캐시 당첨</p>
+                    <span>놀이터에서 미끄럼틀 타면<br>100% 당첨 캐시, 숨어있는 선물도?</span>            
+                </div>
+            </a> -->
+            <!-- [218745] 하나원큐 놀이터 內 신규손님 특화 이벤트 -->
+            
+            <!-- [219136] 4대연금 이벤트 ~2025.12.19까지 -->
+            <!-- <a title="이벤트 자세히보기" href="/cont/news/news02/1509407_115431.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1509407_main_thum_250708.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>연금은 하나은행으로~<br>최대 6만원 혜택</p>
+                    <span>5만원 캐시백+1만원 상품권<br>#국민 #공무원 #사학 #군인</span>
+                </div>
+            </a> -->
+            <!-- // [219136] 4대연금 이벤트 --> 
+            <!-- 청소연구소 제휴 이벤트 [S]  ~26.04.31 까지-->
+			<!-- <a title="이벤트 자세히보기" href="/cont/news/news02/1507622_115431.jsp">
+				<img alt="" src="${pb_img_root}cont/common/img/newmain2021/1507622_main_thum.png" aria-hidden="true" />
+				<div class="hid">
+					<p>최대 5만원<br>청소 쿠폰 4종팩 받기</p>
+					<span>하나원큐 놀이터에서 쿠폰 쏜다<br>100% 당첨 행운</span>
+				</div>
+			</a> -->
+            <!-- // 청소연구소 제휴 이벤트 [E] -->  
+            <!-- [219830] 9월 추석 송편 이벤트 (이벤트 종료 ~10.13)-->   
+            <!-- <a title="이벤트 자세히보기" href="/cont/news/news02/1509980_115431.jsp">
+                <img alt="" src="${pb_img_root}cont/common/img/newmain2021/1509980_main_thum.png" aria-hidden="true" />
+                <div class="hid">
+                    <p>추석 송편 빋고 매주 용돈 뽑기</p>
+                    <span>100% 당첨 추석 용돈 받으세요</span>
+                </div>
+            </a>  -->
+            <!--// [219830] 9월 추석 송편 이벤트 -->   
+		</div>
+	</div>
+	<div class="popup_close_bg">
+		<a href="javascript:void(0)" class="popup_close" title="슬라이드 전체보기 닫기">
+			<img src="${pb_img_root}cont/common/img/newmain2021/icon_close_slide.png" alt="슬라이드 전체보기 닫기" />
+		</a>
+	</div>
+</div>`;

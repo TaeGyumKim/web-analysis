@@ -1,0 +1,756 @@
+/*****************************************************************************
+ * 파일명 : spider-ajax.js
+ * 작성일 : 2010. 03. 31
+ * 설   명 : Ajax통신을 위한 Utility js, prototype.js include 후 사용한다.
+ * Dependency  : prototype.js , ext-base.js , ext-all.js
+ * 메세지효과를 위하여 ExtJs 아래 정의 되어야 합니다.
+ * ===========================================================================
+ * 변경이력:
+ * DATE				AUTHOR		DESCRIPTION
+ * ---------------------------------------------------------------------------
+ * 변경 이력은 이곳에 추가 합니다.
+ *****************************************************************************/
+var shttp_status_map = new Hash();
+//로그인 레이어 팝업에서 로그인 에러시에 화면을 상단으로 가지않게 하기위함
+var top_posion_bool = false;
+
+//암호화 오류 정의
+shttp_status_map[900] = "암호화 오류|암호화 세션이 초기화 되었습니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[901] = "암호화 오류|암호화된 Master Secret 이 도착하지 않았습니다. 네트워크 환경을 확인하세요.";
+shttp_status_map[902] = "암호화 오류|암호화된 Master Secret 을 복호화 하는 도중 오류가 발생했습니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[903] = "암호화 오류|보안 시퀀스가 존재하지 않아 페이지를 표시할 수 없습니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[904] = "암호화 오류|보안 시퀀스가 일치하지 않아 페이지를 표시할 수 없습니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[905] = "암호화 오류|서버에서 메시지 복호화 도중 오류가 발생했습니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[906] = "암호화 오류|요청하고자 하는 데이터의 길이가 한계치를 넘어섰습니다. 파일 업로드를 시도 중이라면 용량이 작은 파일을 업로드 하세요.";
+shttp_status_map[907] = "암호화 오류|메시지 복호화를 위한 Cipher-Parity 헤더가 도착하지 않았습니다. 네트워크 환경을 확인하세요.";
+shttp_status_map[908] = "암호화 오류|잘못된 파라메터 입력입니다. 네트워크 환경을 확인하세요.";
+shttp_status_map[909] = "암호화 오류|서버에 등록되지 않은 호스트 주소 입니다. 올바른 도메인을 사용하세요.";
+shttp_status_map[910] = "암호화 오류|보안 세션과 WAS 세션의 동기화 확인에 실패했습니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[911] = "암호화 오류|인증서 목록에 존재하지 않는 호스트 입니다. 올바른 도메인을 사용하세요.";
+
+//공인인증 오류 정의
+shttp_status_map[921] = "공인인증 오류|인증서 정책이 존재하지 않는 페이지 입니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[922] = "공인인증 오류|인증서 제출이 필요한 페이지 입니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[923] = "공인인증 오류|올바른 형식의 인증서가 아닙니다. X.509 표준 인증서만 사용 가능합니다.";
+shttp_status_map[924] = "공인인증 오류|개인키 소유여부 확인을 위한 서명 데이터가 들어오지 않았습니다. 네트워크 환경을 확인하세요.";
+shttp_status_map[925] = "공인인증 오류|개인키 소유여부 확인(서명 검증)에 실패했습니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[926] = "공인인증 오류|인증서 본인 확인에 필요한 VID Random 값이 들어오지 않았습니다. 네트워크 환경을 확인하세요.";
+shttp_status_map[927] = "공인인증 오류|인증서 본인 확인 기능을 제공하지 않는 인증서 입니다. 인증서를 재발급 받아 사용하십시오.";
+shttp_status_map[928] = "공인인증 오류|인증서 본인 확인에 실패했습니다. 본인 주민번호(또는 사업자번호)와 일치하는 인증서만 사용 가능합니다.";
+shttp_status_map[929] = "공인인증 오류|낮은 버전의 인증서는 허용하지 않습니다. 인증서를 재발급 받아 사용하십시오.";
+shttp_status_map[930] = "공인인증 오류|인증서가 아직 유효하지 않습니다. 잠시 후 이용하시기 바랍니다.";
+shttp_status_map[931] = "공인인증 오류|인증서가 만료되어 더 이상 사용할 수 없습니다. 인증서를 재발급 받아 사용하십시오.";
+shttp_status_map[932] = "공인인증 오류|신뢰된 인증기관(CA) 에서 발급한 인증서가 아닙니다. 관리자에게 문의하세요.";
+shttp_status_map[933] = "공인인증 오류|인증서 서명 검증에 실패했습니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[934] = "공인인증 오류|인증서 경로 검증에 실패했습니다. 인증서를 재발급 받아 사용하십시오.";
+shttp_status_map[935] = "공인인증 오류|인증서 상호 연동 정책(OID) 에 부합하지 않는 인증서입니다.";
+shttp_status_map[936] = "공인인증 오류|인증서 상호 연동 정책(OID) 검증에 실패했습니다.";
+shttp_status_map[937] = "공인인증 오류|본 페이지 사용에 적합한 용도(KeyUsage)의 인증서가 아닙니다.";
+shttp_status_map[938] = "공인인증 오류|인증서가 폐기되어 더 이상 사용할 수 없습니다. 인증서를 재발급 받아 사용하십시오.";
+shttp_status_map[939] = "공인인증 오류|인증서가 효력정지 되어 현재는 사용할 수 없습니다. 효력 회복 후 사용 가능합니다.";
+shttp_status_map[940] = "공인인증 오류|인증서 상태(폐기 여부) 확인에 실패했습니다. 관리자에게 문의하세요.";
+shttp_status_map[949] = "공인인증 오류|인증서 검증 과정 중에 내부 서버 오류가 발생했습니다. 관리자에게 문의하세요.";
+
+//전자서명 오류 정의
+shttp_status_map[951] = "전자서명 오류|전자서명 데이터 제출이 필요한 페이지 입니다. 현재 브라우저를 닫고, 새로 접속하시기 바랍니다.";
+shttp_status_map[952] = "전자서명 오류|클라이언트에서 보낸 전자서명 검증에 실패했습니다. 관리자에게 문의하세요.";
+shttp_status_map[953] = "전자서명 오류|서버 측 전자서명에 실패했습니다. 관리자에게 문의하세요.";
+shttp_status_map[954] = "전자서명 오류|전자서명 값을 저장하는 도중 오류가 발생했습니다. 관리자에게 문의하세요.";
+
+//E2E 관련 오류
+shttp_status_map[851] = "E2E 키보드 보안 오류|E2E 키보드 보안 세션이(치환 테이블)이 서로 일치하지 않습니다. 재 접속 하십시오.";
+shttp_status_map[852] = "E2E 키보드 보안 오류|등록되지 않은 파트너 코드입니다.";
+shttp_status_map[853] = "E2E 키보드 보안 오류|입력된 파트너 코드가 올바르지 않습니다.";
+shttp_status_map[854] = "E2E 키보드 보안 오류|이 요청은 Seed 를 폐기 후에 요청할 수 있습니다.";
+shttp_status_map[855] = "E2E 키보드 보안 오류|클라이언트에서 보낸 Hashed Real Seed 정보가 올바르지 않습니다.";
+
+//기타 오류
+shttp_status_map[800] = "공인인증 오류|타행/타기관 인증서 등록이 필요합니다.";
+
+shttp_status_map[1001] = "공인인증 오류|죄송합니다. 제출하신 인증서는 폐기되어 사용할 수 없는 인증서입니다. 현재 사용가능한 인증서를 제출하시거나 ID/Password로 로그인 하신후 인증서를 발급 받은후에 사용하시기 바랍니다.";
+shttp_status_map[1002] = "공인인증 오류|죄송합니다. 제출하신 인증서는 폐기되어 사용할 수 없는 인증서입니다. 현재 사용가능한 인증서를 제출하시거나 ID/Password로 로그인 하신후 인증서를 발급 받은후에 사용하시기 바랍니다.";
+shttp_status_map[1003] = "공인인증 오류|죄송합니다. 제출하신 인증서는 폐기되어 사용할 수 없는 인증서입니다. 현재 사용가능한 인증서를 제출하시거나 인증서를 발급 받은후에 사용하시기 바랍니다.";
+
+shttp_status_map[1004] = "공인인증 오류|죄송합니다. 제출하신 인증서는 효력정지되어 사용할 수 없는 인증서입니다. 현재 사용가능한 인증서를 제출하시거나 인증서를 효력회복 하신후에 사용하시기 바랍니다.";
+shttp_status_map[1005] = "공인인증 오류|죄송합니다. 제출하신 인증서는 효력정지되어 사용할 수 없는 인증서입니다. 현재 사용가능한 인증서를 제출하시거나 인증서를 효력회복 하신후에 사용하시기 바랍니다.";
+shttp_status_map[1006] = "공인인증 오류|죄송합니다. 제출하신 인증서는 효력정지되어 사용할 수 없는 인증서입니다. 현재 사용가능한 인증서를 제출하시거나 인증서를 효력회복 하신후에 사용하시기 바랍니다.";
+
+shttp_status_map[1010] = "공인인증 오류|죄송합니다. 제출하신 공인인증서는 고객원장에 등록되어 있지 않습니다. 1588-1155로 문의하여 주십시오.";
+
+shttp_status_map[1021] = "공인인증 오류|제출하신 인증서는 개인뱅킹 고객이 아닙니다.";
+shttp_status_map[1022] = "공인인증 오류|제출하신 인증서는 기업뱅킹 고객이 아닙니다.";
+shttp_status_map[1023] = "공인인증 오류|제출하신 인증서는 HanaCBS 고객이 아닙니다.";
+
+shttp_status_map[1031] = "공인인증 오류|죄송합니다. 자행 발급 공인인증서는 타행/타기관 등록을 할 수 없습니다.";
+
+
+/**
+ * Form prototype 추가 재정의
+ */
+Form.serializeElements = function(elements, getHash){
+	var data = elements.inject({}, function(result, element){
+		var reDash = /-/g;
+		var reAcct = /,/g;
+		var lTag   = /</g;
+		var rTag   = />/g;
+
+		if (!element.disabled && element.name) {
+			var key = element.name, value = $(element).getValue();
+			if (value!=null && value !=undefined) {
+				var className = element.niceClass || element.className;
+
+				if (className != undefined && className != null) {
+					if (className.indexOf("bizno") != -1 || className.indexOf("cal") != -1) {
+						value = value.replace(reDash, "");
+					}
+					else
+						if (className.indexOf("acct") != -1 || className.indexOf("acctdollar") != -1) {
+							value = value.replace(reAcct, "");
+						}
+				}
+
+				if(!className.indexOf("PASSWORD")){
+					value = value.replace(lTag, "&lt;");
+					value = value.replace(rTag, "&gt;");
+				}
+
+
+				if (key in result) {
+					if (result[key].constructor != Array)
+						result[key] = [result[key]];
+					result[key].push(value.stripScripts());
+				}
+				else
+					result[key] = value.stripScripts();
+
+			}
+		}
+		return result;
+	});
+	return getHash ? data : Hash.toQueryString(data);
+}
+
+
+Form.serializeData = function (form, getHash){
+	return Form.serializeElements(Form.getElements(form), getHash);
+}
+
+/**
+ * 로그아웃 여부 플래그
+ */
+spider.isLogout = false;
+
+spider.transaction = false;
+
+var isCall = false;
+var timer;
+var errorDataMap = '';
+/**
+ * @class Ajax Ajax 통신을 위한 util Class
+ * @constructor spider.Ajax
+ * @param {String} _divTarget  대상 Div
+ * @param {boolean} _isLoading loading 표시 여부
+ * @param {boolean} _isWhole 대상 Div만 마스크레이어를 씌울지 여부, true일 경우 전체대상
+ * @param {String} _timeOut timeout 시간 설정
+ */
+spider.Ajax = function(_divTarget, _isLoading, _isWhole, _timeOut ){ // 생성자 함수
+	/* Member field */
+	var targetDiv = _divTarget; // 대상 Div 이름
+	var isLoading = true; // loading 메세지를 보여줄 지 여부
+	var isWhole = true; // target에 loading 을 표현하는 지 여부
+    var focusElementId = null;
+	var isSuccess = true;
+	var callbackFunc = null;
+	var objectId = null;
+	// 세션 타임 아웃 30초
+	var timeOut = 30;
+	var xmlHttp = null;
+
+    if (_divTarget && _divTarget != undefined) {
+		targetDiv = _divTarget;
+	}
+	
+	if (_isLoading != undefined) {
+		isLoading = _isLoading;
+	}
+
+	if (isWhole != undefined) {
+		isWhole = _isWhole;
+	}
+
+	if (_timeOut != undefined) {
+		timeOut = _timeOut;
+	}
+
+    /**
+     * 타임아웃을 설정 한다.
+     */
+	this.getTimeOut = function(){
+	    return timeOut;
+	}
+
+	this.setXmlHttp = function( xmlHttp1 ){
+	    xmlHttp = xmlHttp1;
+	}
+
+	this.getXmlHttp = function(){
+	    return xmlHttp;
+	}
+
+	/**
+	 * 대상 Div를 가져온다.
+	 */
+	this.getTargetDiv = function(){
+		return targetDiv;
+	}
+
+	this.getMaskTarget = function() {
+		return maskTarget;
+	}
+
+	this.getIsWhole = function() {
+		return isWhole;
+	}
+    /**
+	 * 사용자 정의 포커스 할 element id
+	 * @param {String} element id
+	 */
+    this.setFocusElementId = function(id){
+		focusElementId = id;
+	}
+
+	/**
+	 * Ajax 통신 정상종료여부
+	 * @param {Object} success 정상종료여부
+	 */
+	this.setIsSuccess = function(success){
+		isSuccess = success;
+	}
+
+	/**
+	 * 사용자 정의 함수
+	 * @param {Object} func 사용자 정의 함수
+	 */
+	this.setCallbackFunc = function(func){
+		callbackFunc = func;
+	}
+
+	/**
+	 * 메뉴및 컨텐츠 변경시 히스토리를 남기기 위한  객체
+	 */
+	this.getObjectId = function() {
+		return objectId;
+	}
+
+	this.getIsLoading = function() {
+		return isLoading;
+	}
+
+    /**
+	 * 사용자 정의 포커스 할 element id 제공
+	 */
+    this.getFocusElementId = function(){
+		return focusElementId;
+	}
+
+	// 호출이 된 상태에서 다시 한번 호출 한다면 페이지 호출을 하지 않는다.
+    if( isCall ) return;
+}
+
+
+/**
+ * Ajax의 Callback함수로 넘겨받은 데이터를 가공/처리한다.
+ * 데이터가 json타입일 경우 가공/처리 하지 않는다.
+ * @param {Object} res response 데이터
+ * @param {boolean} isDebug 에러일경우 추가정보를 볼것인지?
+ */
+showError = function(res, useLogin ){
+    var spiderErrorType = res.getResponseHeader('spider-error');
+    var errDataMap = null;
+    if (spiderErrorType == 'error') {
+        errDataMap = eval( "(" + decodeURIComponent(res.getResponseHeader('spider-dataMap')) + ")" );
+        // 로그인이 아닌 경우 에러를 팝업으로 보여 준다.
+        if( errDataMap.errorCode != 'FRU00001'){
+        	if( useLogin ){
+                showErrorLayerPop( errDataMap , useLogin );
+            }else{
+            	showErrorLayerPop( errDataMap );
+            }
+        }
+        // 단순 request만 호출하는 경우 사용
+        if( useLogin ){
+            showErrorLayerPop( errDataMap );
+        }
+    }
+    return errDataMap;
+}
+
+spider.Ajax.prototype = {
+
+	/**
+     * Ajax onCreate 된 시점에 수행 될 함수
+     */
+	onCreate : function() {
+		try {
+			var isLoading = this.getIsLoading();
+			var isWhole = this.getIsWhole();
+			if (isLoading) {
+				// Loading 여부가 true 일때만 loading Div를 나타낸다.
+				if (isWhole) {					
+					spider.extJS.loadingLayer.show();
+				}
+			}
+		}catch(e){
+            //alert('ajax onCreate 시점에서 에러 발생 :' + e.message);
+        }
+	},
+
+    /**
+     * Ajax onComplete 된 시점에 수행 될 함수
+     */
+	postOnComplete : function() {
+	    // 호출 완료 플래그 설정
+	    isCall = false;
+	    // timeout 설정 클리어
+	    window.clearTimeout(timer);
+	    timer = null;
+	    
+		try {
+			document.onmousedown = null;
+			var isLoading      = this.getIsLoading();
+			var isWhole        = this.getIsWhole();
+			var focusElementId = this.getFocusElementId();
+
+            // 로딩바를 사용할 경우 레이어를 닫는다.
+			if (isLoading) {
+				if (isWhole) {
+					spider.extJS.loadingLayer.close();
+				}
+			}
+
+			// 이쪽에서 다이나믹 폼을 변환 시키는 함수를 call 한다.
+			initializeHtmlPage();
+			
+			// 2017. 홈페이지 리뉴얼.. ajax 후 화면 init;
+		    //commTemp();
+
+			if (focusElementId != null) {
+				if ($(focusElementId) != null && $(focusElementId) != undefined) {
+					document.getElementById(focusElementId).select();
+					document.getElementById(focusElementId).focus();
+				}
+			}
+
+			// 화면을 상단메뉴가 보이도록 이동 한다.
+			if(!top_posion_bool){
+				$("wrap_header").scrollTo(0);
+			}
+			//로그인 레이어 팝업에서 로그인 에러시에만 true 다른페이지를 위해 false 재설정
+			top_posion_bool = false;
+
+		}catch(e){
+            //alert('ajax onComplete 시점에서 에러 발생 :' + e.message);
+        }
+    },
+
+	/**
+	 * Ajax로 Form 요청을 보낼때,
+	 * callback 함수가 없고 div에 결과값을 바로 뿌려줄때 이용한다.
+	 * @param {String} url, 요청 url
+	 * @param {Object} formObj, form의 참조값
+	 */
+	ajaxCommSubmit : function(url, formObj, isAlert, useLoginErrLayer ) {
+		try
+		{
+			//공인 인증서 관련 추가 
+			if(formObj['signData'] == null)
+			{
+				var signDataTemp = document.createElement("input");
+				signDataTemp.name = "signData";
+				signDataTemp.type = "hidden";
+				signDataTemp.value = "인증서확인";
+				formObj.appendChild(signDataTemp);
+			}
+			if(formObj['signTitle'] == null)
+			{
+		        var signTitleTemp = document.createElement("input");
+		        signTitleTemp.name = "signTitle";
+		        signTitleTemp.type = "hidden";
+		        signTitleTemp.value = "인증서확인";
+		        formObj.appendChild(signTitleTemp);
+			}
+			
+			if(formObj['signData'].value == '')
+				formObj['signData'].value = "인증서확인";
+			if(formObj['signTitle'].value == '')
+				formObj['signTitle'].value = "인증서확인";
+		}catch(e)
+		{
+			// 폼이 없는 아닌경우 세팅 하지 않는다.
+		}
+		
+		var onCreate = this.onCreate;
+		//var onComplete = this.onComplete;
+		var postOnComplete = this.postOnComplete;
+		var ajaxObj = this;
+
+		var data = 'ajax=true';
+		var targetDiv = this.getTargetDiv();
+		var isWhole = this.getIsWhole();
+		var alertFailure = this.alertFailure;
+		var checkResultType = this.checkResultType;
+		var isSuccess = this.setIsSuccess;
+
+		var signData = '';  
+		var isCert = url.indexOf("P.web") == -1 ? false:true; 
+		if (null != formObj && typeof formObj == 'object') {
+		    if( !initExtValidationCheck( formObj,  isCert) ){
+		        spider.extJS.loadingLayer.close();
+		        return;
+		    }
+
+			data += '&'+Form.serializeData(formObj);
+			if(signData != "" && signUrlHash.keys().include(url)) {
+				data += "&signData="+encodeURIComponent(signData);
+			}
+		}
+
+		// RequireLoginInterceptor 선처리시 본문을 전부 덮는 요청에 대해서만 URL을 저장하도록..
+		data += "&requestTarget="+targetDiv;
+		var request = new Ajax.Request(url, {
+			method: 'post',
+			parameters: null,
+            postBody : data,
+            evalScripts : true,
+            onCreate : function(xmlHttp){
+                // 호출 여부 설정
+		        isCall = true;
+                // 기존에 존재하는 timer를 삭제 한다.
+                if( timer != null ) window.clearTimeout(timer);
+                ajaxObj.setXmlHttp(xmlHttp);
+               
+				onCreate.call(ajaxObj);
+				timer = window.setTimeout(function(xmlHttp) {
+                    // 접속 상태가 완료 상태가 아니면
+                    if (ajaxObj.getXmlHttp().readyState < 4 && isCall == true) {
+                        // 로딩바를 삭제 한다.
+                        spider.extJS.loadingLayer.close();
+                        ajaxObj.getXmlHttp().abort();
+                        isCall = false;
+                    }
+                }
+                        , ajaxObj.getTimeOut() * 1000
+                        );
+			},
+//			onComplete : function(){
+//				onComplete.call(ajaxObj);
+//			},
+			onSuccess: function(xmlHttp, arg){
+				if (xmlHttp.status == 0) {
+				    spider.extJS.loadingLayer.close();
+					return null;
+				}
+                // 결과 값을 alert형식으로 띄울 경우
+                if( isAlert ){
+                    // 에러가 발생 했을 경우 alert layer로 띄운다.
+                    var errMap = showError(xmlHttp, useLoginErrLayer);
+                    // 에러인 경우 화면 출력을 하지 않는다.
+                    if( errMap != null ){
+                        // 에러인 경우 로그인 페이지로 이동을 위해 처리
+                        if( errMap.errorCode == 'FRU00001' && !useLoginErrLayer ){
+                            $(targetDiv).update(xmlHttp.responseText);
+                        }
+                    }
+                    else{
+                        $(targetDiv).update(xmlHttp.responseText);
+                    }
+                }
+                else{
+                    $(targetDiv).update(xmlHttp.responseText);
+                }
+
+				postOnComplete.call(ajaxObj);
+			},
+			asynchronous: true,
+			onFailure: alertFailure
+		});
+
+	},
+
+	/**
+	 * ajaxCommSubmit과 동일하나 callback 함수를 호출 한다.
+	 *
+	 * @author Jiho Park
+	 * @since 2008.01.25
+	 *
+	 * @param {Object} url
+	 * @param {Object} formObj
+	 * @param {Object} callbackFunc
+	 */
+	ajaxCommSubmitCallback : function(url, formObj, callbackFunc, isAlert, useLoginErrLayer) {
+		try
+		{
+			//공인 인증서 관련 추가 
+			if(formObj['signData'] == null)
+			{
+				var signDataTemp = document.createElement("input");
+				signDataTemp.name = "signData";
+				signDataTemp.type = "hidden";
+				signDataTemp.value = "인증서확인";
+				formObj.appendChild(signDataTemp);
+			}
+			if(formObj['signTitle'] == null || formObj['signTitle'].value == '')
+			{
+		        var signTitleTemp = document.createElement("input");
+		        signTitleTemp.name = "signTitle";
+		        signTitleTemp.type = "hidden";
+		        signTitleTemp.value = "인증서확인";
+		        formObj.appendChild(signTitleTemp);
+			}
+			
+			if(formObj['signData'].value == '')
+				formObj['signData'].value = "인증서확인";
+			if(formObj['signTitle'].value == '')
+				formObj['signTitle'].value = "인증서확인";
+		}catch(e){}
+
+		var onCreate = this.onCreate;
+		//var onComplete = this.onComplete;
+		var postOnComplete = this.postOnComplete;
+		var ajaxObj = this;
+		var data = 'ajax=true';
+		var targetDiv = this.getTargetDiv();
+		var isWhole = this.getIsWhole();
+		var alertFailure = this.alertFailure;
+		var checkResultType = this.checkResultType;
+		var isSuccess = this.setIsSuccess;
+		var signData = '';
+		var isCert = url.indexOf("P.web") == -1 ? false:true;
+		if (null != formObj && typeof formObj == 'object') {
+            if( !initExtValidationCheck( formObj , isCert) ){
+                spider.extJS.loadingLayer.close();
+		        return;
+		    }
+			data += '&'+Form.serializeData(formObj);
+			if(signData != "" && signUrlHash.keys().include(url)) {
+				data += "&signData="+encodeURIComponent(signData);
+			}
+
+		}
+
+		// RequireLoginInterceptor 선처리시 본문을 전부 덮는 요청에 대해서만 URL을 저장하도록..
+		data += "&requestTarget="+targetDiv;
+
+		var request = new Ajax.Request(url, {
+			method: 'post',
+			parameters: null,
+            postBody : data,
+			onCreate : function(xmlHttp){
+			    // 호출 여부 설정
+		        isCall = true;
+			    // 기존에 존재하는 timer를 삭제 한다.
+                if( timer != null ) window.clearTimeout(timer);
+                
+                ajaxObj.setXmlHttp(xmlHttp);
+				onCreate.call(ajaxObj);
+				timer = window.setTimeout(function(xmlHttp) {
+                    // 접속 상태가 완료 상태가 아니면
+                    if (ajaxObj.getXmlHttp().readyState < 4 && isCall == true) {
+                        // 로딩바를 삭제 한다.
+                        spider.extJS.loadingLayer.close();
+                        ajaxObj.getXmlHttp().abort();
+                        isCall = false;
+                    }
+                }
+                        , ajaxObj.getTimeOut() * 1000
+                        );
+			},
+			//onComplete : function(){
+			//	onComplete.call(ajaxObj);
+			//},
+			onSuccess: function(xmlHttp, arg){
+				if (xmlHttp.status == 0) {
+				    spider.extJS.loadingLayer.close();
+					return null;
+				}
+
+                // 결과 값을 alert형식으로 띄울 경우
+                if( isAlert ){
+                    // 에러가 발생 했을 경우 alert layer로 띄운다.
+                    var errMap = showError(xmlHttp, useLoginErrLayer);
+                    // 에러인 경우 화면 출력을 하지 않는다.
+                    if( errMap != null ){
+                        // 에러인 경우 로그인 페이지로 이동을 위해 처리
+                        if( errMap.errorCode == 'FRU00001' && !useLoginErrLayer ){
+                            $(targetDiv).update(xmlHttp.responseText);
+                        }
+                    }
+                    else{
+                        $(targetDiv).update(xmlHttp.responseText);
+                    }
+                }
+                else{
+                    $(targetDiv).update(xmlHttp.responseText);
+                }
+
+
+                try {
+                    callbackFunc(true);
+                }catch(e){
+                    e.func = new Function(callbackFunc);
+                    ajaxObj.e = e;
+                }
+				postOnComplete.call(ajaxObj);
+
+			},
+			asynchronous: true,
+			onFailure: alertFailure
+		});
+	},
+
+	/**
+	 * Ajax로 Form 요청을 보내고, Callback 함수로 데이터를 처리할 때 이용한다.
+	 * @param {String} url 요청 URL
+	 * @param {Object} formObj Form의 참조값
+	 * @param {boolean}isAsync 동기화 여부(필수항목, 하지만 비동기로 설정됨)
+	 * @param {String} callbackFunc
+	 * @param {String} encodingType
+	 */
+	ajaxSubmit :  function(url, formObj, isAsync, callbackFunc ) {
+		var onCreate = this.onCreate;
+		var postOnComplete = this.postOnComplete;
+		var ajaxObj = this;
+		var alertFailure = this.alertFailure;
+		var isWhole = this.getIsWhole();
+		var data = 'ajax=true';
+		var _privateCallBack = callbackFunc;
+		var signData = '';
+		var isCert = url.indexOf("P.web") == -1 ? false:true; 
+		if (null != formObj && typeof formObj == 'object') {
+		    if( !initExtValidationCheck( formObj , isCert) ){
+		        spider.extJS.loadingLayer.close();
+		        return;
+		    }
+
+			data += '&'+Form.serializeData(formObj);
+
+			if(signData != "" && signUrlHash.keys().include(url)) {
+				data += "&signData="+encodeURIComponent(signData);
+			}
+		}
+
+		data += "";
+
+		var request = new Ajax.Request(url, {
+			method: 'post',
+			parameters: null,
+            postBody : data,
+			onCreate : function(xmlHttp){
+			    // 호출 여부 설정
+		        isCall = true;
+		        
+			    // 기존에 존재하는 timer를 삭제 한다.
+                if( timer != null ) window.clearTimeout(timer);
+                
+				ajaxObj.setXmlHttp(xmlHttp);
+				onCreate.call(ajaxObj);
+				timer = window.setTimeout(function(xmlHttp) {
+                    // 접속 상태가 완료 상태가 아니면
+                    if (ajaxObj.getXmlHttp().readyState < 4 && isCall == true) {
+                        // 로딩바를 삭제 한다.
+                        spider.extJS.loadingLayer.close();
+                        ajaxObj.getXmlHttp().abort();
+                        isCall = false;
+                    }
+                }
+                        , ajaxObj.getTimeOut() * 1000
+                        );
+			},
+			//onComplete : function(){
+			//	onComplete.call(ajaxObj);
+			//},
+			onSuccess: function(xmlHttp,args) {
+				if (xmlHttp.status == 0) {
+				    spider.extJS.loadingLayer.close();
+					return null;
+				}
+
+                // 에러가 발생 했을 경우 alert layer를 출력
+                showError(xmlHttp, true);
+
+                try{
+                    if (_privateCallBack != undefined) {
+						if (resType != 'error') {
+							_privateCallBack(xmlHttp, args);
+						}
+					}
+                }catch(e){
+                    e.func = new Function(_privateCallBack);
+                    ajaxObj.e = e;
+                }
+				postOnComplete.call(ajaxObj);
+
+            },
+			asynchronous: isAsync,
+			onFailure: alertFailure
+		});
+	},
+
+
+	/**
+	 * ajaxCommSubmit, ajaxCommSubmitCallback 통신을 성공적으로 처리했을때(onSuccess)
+	 * @param {Object} xmlHttp xmlHttp
+	 * @param {Function} callbackFunc 사용자 정의 Callback Function
+	 * @param {Function} isSuccess 정상종료여부 판단 Flag 설정할 Function
+	 */
+	checkResultType: function(xmlHttp, callbackFunc, isSuccess){
+		spider.ajax.parseData(xmlHttp);
+		isSuccess(true);
+	},
+
+	/**
+	 *
+	 * @param {Object} originalResquest
+	 */
+	alertFailure : function (originalResquest) {
+	    // 호출 완료 플래그 설정
+	    isCall = false;
+	    // timeout 설정 클리어
+	    window.clearTimeout(timer);
+	    timer = null;
+	    
+		document.onmousedown=null;
+		var reqStatus = originalResquest.status;
+
+        // 로딩바를 사용할 경우 레이어를 닫는다.
+		if (null != spider.extJS.loadingLayer ) {
+			spider.extJS.loadingLayer.close();
+		}
+
+        //404 error 인 경우 에러 페이지로 보낸다
+        if (reqStatus == '404') {
+            spider.extJS.loadingLayer.close();
+            i18nExtAlert("요청한 페이지를 찾을 수 없습니다.");
+        }
+
+        reqStatus = reqStatus + "";
+        //500, 503, 505 서버 error 인 경우 에러 메세지를 출력 한다.
+        if (reqStatus.startsWith('5') ) {
+            spider.extJS.loadingLayer.close();
+            i18nExtAlert("응답 페이지에 에러가 있습니다.");
+		}
+
+		// 보안모듈 오류인 경우 alert message 출력
+		var tmp = shttp_status_map[reqStatus];
+
+		if(tmp !=null || tmp!="") {
+		    spider.extJS.loadingLayer.close();
+		    var arr = tmp.split("|");
+		    msgTitle = arr[0];
+			msgBody = arr[1];
+			i18nExtAlert("<h5>"+msgTitle+"</h5>" + "<br>" + msgBody);
+        }
+
+		originalResquest.abort();
+	}
+}

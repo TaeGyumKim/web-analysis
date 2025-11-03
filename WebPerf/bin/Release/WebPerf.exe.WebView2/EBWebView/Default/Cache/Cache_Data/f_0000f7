@@ -1,0 +1,839 @@
+/*****************************************************************************
+ * 파일명 : JHSCICommon.js
+ * 작성일 : 2010.03.18
+ * 작성자 : serverside
+ * 설  명 : 메세지 출력 및 공통 기능 정의
+ * Dependency  : ext-all.js, ajax_common.js
+ * 메세지효과를 위하여 ExtJs 아래 정의 되어야 합니다.
+ * ===========================================================================
+ * 변경이력:
+ * DATE				AUTHOR		DESCRIPTION
+ * ---------------------------------------------------------------------------
+ * 변경 이력은 이곳에 추가 합니다.
+ *****************************************************************************/
+var extProLayer = "";
+
+var EXT_ALERT = "alert";
+var EXT_ERROR = "error";
+var EXT_INFO = "info";
+var EXT_WARNING = "warning";
+
+function extProcessLayer() {
+	extProLayer = Ext.MessageBox.wait('처리중입니다. 잠시만 기다려주시기 바랍니다.','Please wait',{
+		width:500,
+		progress:true
+	});
+
+}
+
+function extProcessLayerClose() {
+	extProLayer.hide();
+}
+
+function close_layer(divObj) {
+	var obj = document.getElementById(divObj);
+	document.getElementById('layerDiv_background').style.display = "none";
+	obj.style.display = "none";
+}
+
+//팝업띄우기 전에 기존에 등록된 팝업 제거
+function close_all_popup() {
+	if(jQuery("#alertMsg")) jQuery("#alertMsg").remove();
+	if(jQuery("#alertMsg2")) jQuery("#alertMsg2").remove();
+	if(jQuery("#confirmMsg")) jQuery("#confirmMsg").remove();
+}
+
+
+/**
+ * 다국어 confirm() 메세지를 출력 (ExtJs용)
+ * @param {} title  confirm 제목
+ * @param {} msg    confirm 내용
+ * @param {} width  confirm 창 가로 사이즈
+ * @param {} fn     confirm 값 리턴받을 함수
+ * @param {} localeCode		언어코드 (KO|EN)
+ * @param {} elementObj		닫기 눌렀을 때 포커스가 되돌아올 개체
+ */
+function i18nExtConfirm(msg, title, fn, localeCode, elementObj) {
+    //Ext.MessageBox.confirm(title, msg, fn, localeCode);
+	close_all_popup();
+	
+	if(!msg) {
+		return;	//메시지가 없을 경우 실행 방지
+	}
+	
+	var strHTML = '';
+	strHTML += '';
+	
+	
+	if("EN" == localeCode){
+		strHTML += '<div id="confirmMsg" class="layerPop01" style="width:400px;">';
+		strHTML += '	<div class="pTopLogo"><img src="/img/common/bg/logoPop_EN.png" alt="KEB Hana Card" /></div>';
+		strHTML += '	<div class="layerPopWrap">';
+		strHTML += '		<div class="popCont">';
+		if(!title) {
+			strHTML += '			<h2 class="pTitle01" tabindex="0">Your attention, please.</h2>';
+		} else {
+			strHTML += '			<h2 class="pTitle01" tabindex="0">' + getxssFilter2(title) + '</h2>';
+		}
+		strHTML += '			<div class="popTxtWrap" tabindex="0">';
+		strHTML += '				<strong class="point01">' + getxssFilter2(msg) + '</strong>';
+		strHTML += '			</div>';
+		strHTML += '			<div class="btnWrapB">';
+		strHTML += '				<a href="#" id="btnConfirmOK" onclick="layPopClose(\'confirmMsg\');return false;" class="btn02"><span>Confirm</span></a>';
+		strHTML += '				<a href="#" onclick="layPopClose(\'confirmMsg\');return false;" class="btn12 mL10"><span>Cancel</span></a>';
+		strHTML += '			</div>';
+		strHTML += '		</div>';
+		//strHTML += '		<div class="copyRight">';
+		//strHTML += '			<img src="/img/common/bg/pCopyright.gif" alt="Copyright 2014 KEB Hana Card All Rights Reserved." />';
+		//strHTML += '		</div>';
+		strHTML += '	</div>';
+		strHTML += '	<a href="#" onclick="layPopClose(\'confirmMsg\');return false;" class="btnClose"><img src="/img/common/btn/btnClose.gif" alt="Close Layer Popup" /></a>';
+		strHTML += '</div>';
+		
+		layPop("confirmMsg", strHTML, elementObj);		
+		
+		
+	}else{
+		if(typeof ASIS_URL != "undefined" && ASIS_URL == "Y"){
+			
+			strHTML += '<div id="confirmMsg" class="layerPop01" style="width:400px;">';
+			strHTML += '	<div class="pTopLogo"><img src="/img/common/bg/logoPop.png" alt="하나카드" /></div>';
+			strHTML += '	<div class="layerPopWrap">';
+			strHTML += '		<div class="popCont">';
+			if(!title) {
+				strHTML += '			<h2 class="pTitle01" tabindex="0">알려드립니다.</h2>';
+			} else {
+				strHTML += '			<h2 class="pTitle01" tabindex="0">' + getxssFilter2(title) + '</h2>';
+			}
+			strHTML += '			<div class="popTxtWrap" tabindex="0">';
+			strHTML += '				<strong class="point01">' + getxssFilter2(msg) + '</strong>';
+			strHTML += '			</div>';
+			strHTML += '			<div class="btnWrapB">';
+			strHTML += '				<a href="#" id="btnConfirmOK" onclick="layPopClose(\'confirmMsg\');return false;" class="btn02"><span>확인</span></a>';
+			strHTML += '				<a href="#" onclick="layPopClose(\'confirmMsg\');return false;" class="btn12 mL10"><span>취소</span></a>';
+			strHTML += '			</div>';
+			strHTML += '		</div>';
+			//strHTML += '		<div class="copyRight">';
+			//strHTML += '			<img src="/img/common/bg/pCopyright.gif" alt="copyright 2014 keb hana card all rights reserved" />';
+			//strHTML += '		</div>';
+			strHTML += '	</div>';
+			strHTML += '	<a href="#" onclick="layPopClose(\'confirmMsg\');return false;" class="btnClose"><img src="/img/common/btn/btnClose.gif" alt="레이어팝업 닫기" /></a>';
+			strHTML += '</div>';
+			
+			layPop("confirmMsg", strHTML, elementObj);
+		
+		}else{
+			jQuery("#btnConfirmOK").unbind("click");		
+			
+			jQuery("#confirmMsgMsg").html(getxssFilter2(msg));
+			if(!title) {
+				jQuery("#confirmMsgTitle").html("알림");	
+			}else{
+				jQuery("#confirmMsgTitle").html(getxssFilter2(title));
+			}
+			
+			jQuery("#comConfirmMsg").popup("show");			
+		}
+		
+	}	
+	
+	if(fn && typeof fn == "function") {
+		jQuery("#btnConfirmOK").click(function(){
+			fn("yes");
+			return false;
+		});
+	}
+	
+}
+
+
+
+
+/**
+ * 다국어 prompt() 메세지를 출력 (ExtJs용)
+ * @param {} title  prompt 제목
+ * @param {} msg    prompt 내용
+ * @param {} fn     prompt 값 리턴받을 함수
+ */
+function i18nExtPrompt(msg, title, fn, localeCode) {
+    Ext.MessageBox.prompt(title, msg, fn, localeCode);
+}
+
+/**
+ * 다국어 프로그래스바  (ExtJs용)
+ * @param {} title  prompt 제목
+ * @param {} msg    prompt 내용
+ * @param {} fn     prompt 값 리턴받을 함수
+ */
+ var progressObj = "";
+function i18nExtProgressBar(msg, title, localeCode){
+
+	progressObj=  Ext.MessageBox.show({
+           title: title,
+           progressText: "<BR>"+msg+"<BR>",
+           width:420,
+           /* progress:true, */
+			wait:true,
+           buttons: {}
+       });
+	/*
+          //this hideous block creates the bogus progress
+          var f = function(v){
+               return function(){
+                   if(v == 12){
+                       //Ext.MessageBox.hide();
+                   }else{
+                       var i = v/11;
+                       Ext.MessageBox.updateProgress(i, Math.round(100*i)+'% completed');
+                   }
+              };
+          };
+          for(var i = 1; i < 13; i++){
+              setTimeout(f(i), i*500);
+          }
+    */
+}
+
+/**
+ * GRID Ajax 오류 메시지 출력용 
+ */
+function i18nExtAlertGRID(strResponse, elementObj){
+	close_all_popup();
+	
+	if(!strResponse) {
+		return;	
+	}    
+	var msg = strResponse.substring("WISEGRID_MESSAGE,M=".length + strResponse.indexOf("WISEGRID_MESSAGE,M="),strResponse.indexOf("|WISEGRID_STATUS,U=false"));
+	
+	if (strResponse.indexOf("ERROR_TRX_ID") > -1){
+		if (	strResponse.indexOf("SQBA5601I000") != -1 || strResponse.indexOf("SQBA5601I001") != -1 || strResponse.indexOf("SQBA5601I002") != -1
+			 || strResponse.indexOf("SQBA5601I001") != -1 || strResponse.indexOf("SQBA5601I002") != -1 || strResponse.indexOf("SQBL4030A002") != -1
+			 || strResponse.indexOf("SQBL4041A000") != -1 || strResponse.indexOf("SQBL4202A000") != -1 || strResponse.indexOf("SQBL4210A000") != -1
+			 || strResponse.indexOf("SQBL4210A011") != -1 || strResponse.indexOf("SQBL4349I090") != -1 || strResponse.indexOf("SQBL4349I091") != -1
+			 || strResponse.indexOf("SQBP4200A000") != -1 || strResponse.indexOf("SQBP4230I000") != -1 || strResponse.indexOf("SQBP4231A000") != -1
+			 || strResponse.indexOf("SQBP4231A011") != -1 || strResponse.indexOf("SQBP4262A000") != -1 || strResponse.indexOf("SQBP4262A001") != -1
+			 || strResponse.indexOf("SQCM1220A000") != -1 || strResponse.indexOf("SQCM1248A000") != -1 || strResponse.indexOf("SQCM1395I051") != -1
+			 || strResponse.indexOf("SQCM1395N003") != -1 || strResponse.indexOf("SQCP1735I000") != -1 || strResponse.indexOf("SQCP1750A001") != -1
+			 || strResponse.indexOf("SQCP1770A000") != -1 || strResponse.indexOf("SQCP1802A000") != -1 || strResponse.indexOf("SQCP1890I000") != -1
+			 || strResponse.indexOf("SQIC3700A000") != -1 || strResponse.indexOf("SQIC3900A000") != -1 || strResponse.indexOf("SQPD2084A000") != -1
+			 || strResponse.indexOf("SQPD2089A000") != -1 || strResponse.indexOf("SQPD2118A000") != -1 || strResponse.indexOf("SQPD2150A003") != -1
+			 || strResponse.indexOf("SQPD2150A005") != -1 || strResponse.indexOf("SQPD2291I019") != -1 	
+			) {
+			
+		} else {
+			msg = "An error occurred during your Transaction, If you have an inquiry, please contact the Customer Center 1800-1111. Hours Available: Weekdays 9:00 AM~ 6:00 PM";
+		}
+	} else {
+		if (strResponse.indexOf("FRU00030") > -1) {
+			msg = "Requires login";
+		}
+	}
+	
+	
+	var strHTML = '';
+	if(msg.indexOf("결제일변경으로 당월 2회") !=-1 || msg.indexOf("two settlements this month") != -1) {
+		strHTML += '<div id="alertMsg" class="layerPop01" style="width:445px;">';
+	} else {	
+		strHTML += '<div id="alertMsg" class="layerPop01" style="width:400px;">';
+	}
+	strHTML += '';
+	
+	strHTML += '	<div class="pTopLogo"><img src="/img/common/bg/logoPop_EN.png" alt="KEB Hana Card" /></div>';
+	strHTML += '	<div class="layerPopWrap">';
+	strHTML += '		<div class="popCont">';
+	strHTML += '			<h2 class="pTitle01" tabindex="0">Your attention, please.</h2>';
+	strHTML += '			<div class="popTxtWrap" tabindex="0">';
+	strHTML += '				<strong class="point01">' + getxssFilter2(msg) + '</strong>';
+	strHTML += '			</div>';
+	strHTML += '			<div class="btnWrapB">';
+	strHTML += '				<a href="#" onclick="layPopClose(\'alertMsg\');return false;" id="btnConfirmOK" class="btn02"><span>Confirm</span></a>';
+	strHTML += '			</div>';
+	strHTML += '		</div>';
+	strHTML += '	</div>';
+	strHTML += '	<a href="#" onclick="layPopClose(\'alertMsg\');return false;" class="btnClose"><img src="/img/common/btn/btnClose.gif" alt="Close Layer Popup" /></a>';
+	strHTML += '</div>';
+	
+	layPop("alertMsg", strHTML, elementObj);
+}
+
+
+/**
+ *  다국어 alert() 메세지를 출력 (ExtJs용)
+ *   ex : i18nExtAlert(msg,'I18NUtil.getLabel(localeCode, "IBA00001")',EXT_INFO,'EN',null)
+ * @param {} msg
+ * @param {} title
+ * @param {} icon
+ * @param {} localeCode
+ * @param {} elementObj
+ */
+function i18nExtAlert(msg, title, icon, localeCode, elementObj){
+	close_all_popup();
+
+	if(!msg) {
+		return;	//메시지가 없을 경우 실행 방지
+	}
+	var strHTML = '';
+	strHTML += '';
+	if(msg.indexOf("결제일변경으로 당월 2회") !=-1 || msg.indexOf("two settlements this month") != -1) {
+	strHTML += '<div id="alertMsg" class="layerPop01" style="width:445px;">';
+	}else{	
+	strHTML += '<div id="alertMsg" class="layerPop01" style="width:400px;">';
+	}
+	
+	if("EN" == localeCode){
+		strHTML += '	<div class="pTopLogo"><img src="/img/common/bg/logoPop_EN.png" alt="KEB Hana Card" /></div>';
+		strHTML += '	<div class="layerPopWrap">';
+		strHTML += '		<div class="popCont">';
+		if(!title) {
+			strHTML += '			<h2 class="pTitle01" tabindex="0">Your attention, please.</h2>';
+		} else {
+			strHTML += '			<h2 class="pTitle01" tabindex="0">' + getxssFilter2(title) + '</h2>';
+		}
+		strHTML += '			<div class="popTxtWrap" tabindex="0">';
+		strHTML += '				<strong class="point01">' + getxssFilter2(msg) + '</strong>';
+		strHTML += '			</div>';
+		strHTML += '			<div class="btnWrapB">';
+		strHTML += '				<a href="#" onclick="layPopClose(\'alertMsg\');return false;" id="btnConfirmOK" class="btn02"><span>Confirm</span></a>';
+		strHTML += '			</div>';
+		strHTML += '		</div>';
+		//strHTML += '		<div class="copyRight">';
+		//strHTML += '			<img src="/img/common/bg/pCopyright.gif" alt="Copyright 2014 KEB Hana Card All Rights Reserved." />';
+		//strHTML += '		</div>';
+		strHTML += '	</div>';
+		strHTML += '	<a href="#" onclick="layPopClose(\'alertMsg\');return false;" class="btnClose"><img src="/img/common/btn/btnClose.gif" alt="Close Layer Popup" /></a>';
+		strHTML += '</div>';
+	}else{
+		// 2017.05.19 정윤경 차장님 요건, 단순 메시지 alert으로 변경
+		/*
+		
+		strHTML += '	<div class="pTopLogo"><img src="/img/common/bg/logoPop.png" alt="하나카드" /></div>';
+		strHTML += '	<div class="layerPopWrap">';
+		strHTML += '		<div class="popCont">';
+		if(!title) {
+			strHTML += '			<h2 class="pTitle01" tabindex="0">알려드립니다.</h2>';
+		} else {
+			strHTML += '			<h2 class="pTitle01" tabindex="0">' + getxssFilter2(title) + '</h2>';
+		}
+		strHTML += '			<div class="popTxtWrap" tabindex="0">';
+		strHTML += '				<strong class="point01">' + getxssFilter2(msg) + '</strong>';
+		strHTML += '			</div>';
+		strHTML += '			<div class="btnWrapB">';
+		strHTML += '				<a href="#" onclick="layPopClose(\'alertMsg\');return false;" id="btnConfirmOK" class="btn02"><span>확인</span></a>';
+		strHTML += '			</div>';
+		strHTML += '		</div>';
+		strHTML += '	</div>';
+		strHTML += '	<a href="#" onclick="layPopClose(\'alertMsg\');return false;" class="btnClose"><img src="/img/common/btn/btnClose.gif" alt="레이어팝업 닫기" /></a>';
+		strHTML += '</div>';
+		*/
+		
+		alert_br2ln(msg);
+		return;		
+	}
+
+	layPop("alertMsg", strHTML, elementObj);
+
+}
+
+/*
+function i18nExtAlertFn(msg, title, fn, icon, localeCode){
+	 if(title == undefined) title= "";
+	 var alertBtn = null;
+	 if(localeCode ==  undefined || localeCode == "") localeCode = language;
+	 if(localeCode == "EN") {
+	 	alertBtn = Ext.MessageBox.OK;
+	 } else {
+	 	alertBtn = Ext.MessageBox.확인;
+	 }
+	 Ext.MessageBox.show({
+ 		/* title:title, */
+/*
+ 		msg: "<BR>"+msg+"<BR>",
+ 		width:420,
+ 		buttons: alertBtn,
+ 	/* 	icon: iconType, */
+ /*		fn : fn
+ 	});
+}
+*/
+
+function alert_br2ln(msg) {
+	try
+	{
+		//br tag를 new line으로 변경 해서 처리 한다.
+		alert(msg.replace(/<br\s*[\/]?>/gim, "\n"));
+		return;
+	}
+	catch(e){}
+	
+	alert(msg);
+}
+
+function i18nExtAlertFn(msg, title, fn){
+	close_all_popup();
+	
+	if(!msg) {
+		return;	//메시지가 없을 경우 실행 방지
+	}
+	
+	
+	var strHTML = '';
+	strHTML += '';
+	if("EN" == _fU_localeCode){
+		strHTML += '<div id="alertMsg2" class="layerPop01" style="width:400px;">';
+		strHTML += '	<div class="pTopLogo"><img src="/img/common/bg/logoPop_EN.png" alt="KEB Hana Card" /></div>';
+		strHTML += '	<div class="layerPopWrap">';
+		strHTML += '		<div class="popCont">';	
+		strHTML += '			<div class="popTxtWrap" tabindex="0">';
+		strHTML += '				<strong class="point01">' + getxssFilter2(msg) + '</strong>';
+		strHTML += '			</div>';
+		strHTML += '			<div class="btnWrapB">';
+		strHTML += '				<a href="javascript:void(0);" onclick="layPopClose(\'alertMsg2\');return false;" id = "btnConfirmOK1" class="btn02"><span>Confirm</span></a>';
+		strHTML += '			</div>';
+		strHTML += '		</div>';
+		//strHTML += '		<div class="copyRight">';
+		//strHTML += '			<img src="/img/common/bg/pCopyright.gif" alt="Copyright 2014 KEB Hana Card All Rights Reserved." />';
+		//strHTML += '		</div>';
+		strHTML += '	</div>';
+		strHTML += '	<a href="javascript:void(0);" id="btnConfirmOK2" onclick="layPopClose(\'alertMsg2\'); return false;" class="btnClose"><img src="/img/common/btn/btnClose.gif" alt="Close Layer Popup" /></a>';
+		strHTML += '</div>';
+		
+		
+		layPop("alertMsg2",strHTML, null);	
+		
+		if(fn && typeof fn == "function") {
+			jQuery("#btnConfirmOK1").click(function(){
+				fn("yes");
+			});
+		}
+		
+		if(fn && typeof fn == "function") {
+			jQuery("#btnConfirmOK2").click(function(){
+				fn("yes");
+			});
+		}
+		
+		
+		
+	}else{
+		
+		alert_br2ln(msg);
+		if(fn && typeof fn == "function") {
+			fn("yes");	
+		}
+		return;
+		
+		
+		/*
+		strHTML += '<div id="alertMsg2" class="layerPop01" style="width:400px;">';
+		strHTML += '	<div class="pTopLogo"><img src="/img/common/bg/logoPop.png" alt="하나카드" /></div>';
+		strHTML += '	<div class="layerPopWrap">';
+		strHTML += '		<div class="popCont">';	
+		strHTML += '			<div class="popTxtWrap" tabindex="0">';
+		strHTML += '				<strong class="point01">' + getxssFilter2(msg) + '</strong>';
+		strHTML += '			</div>';
+		strHTML += '			<div class="btnWrapB">';
+		strHTML += '				<a href="javascript:void(0);" onclick="layPopClose(\'alertMsg2\');return false;" id = "btnConfirmOK1" class="btn02"><span>확인</span></a>';
+		strHTML += '			</div>';
+		strHTML += '		</div>';
+		//strHTML += '		<div class="copyRight">';
+		//strHTML += '			<img src="/img/common/bg/pCopyright.gif" alt="copyright 2014 keb hana card all rights reserved" />';
+		//strHTML += '		</div>';
+		strHTML += '	</div>';
+		strHTML += '	<a href="javascript:void(0);" id="btnConfirmOK2" onclick="layPopClose(\'alertMsg2\'); return false;" class="btnClose"><img src="/img/common/btn/btnClose.gif" alt="레이어팝업 닫기" /></a>';
+		strHTML += '</div>';
+		*/
+	}
+
+	
+	
+	
+}
+
+/**
+ * ext 레이어를 띄우는 스크립트
+ * @param title : 창 타이틀
+ * @param url :  레이어에 보여줄 layout Url
+ * @param width : 창 넓이
+ * @param height : 창 높이
+ * @param modal : modal 여부
+ */
+var exWin = "";
+function open_extWin(title, msg, width, height, modal) {
+ 	if(modal =='undefined'){
+ 		modal = true;
+ 	}
+ 	/* ext-all.css에 메세지박스창 안에 박스값의 width가 310으로 되어 있으므로 이보다 커야한다.. */
+ 	if(width <= 300) {
+ 		width += 50;
+ 	}
+
+	/*  MessageBox 정의 */
+    exWin = Ext.MessageBox.show({
+	   /*  title: title, */
+	    msg : msg,
+	    width: width,
+	    modal : modal,
+	    buttons:{} /* Ext.MessageBox.OKCANCEL // 버튼 정의하지 않으면 빈 버튼박스 4개가 생김. */
+    });
+}
+
+/**
+ * ext 레이어를 닫기 스크립트
+ */
+function extWinClose(){
+	exWin.hide();
+}
+
+/**
+ * ext 레이어를 이동  스크립트
+ */
+function extWinMove(url){
+	location.href = url;
+}
+
+/**
+ * extExceptionAlert창을 Ajax에러 발생시  띄우는 스크립트
+ * @param dataMap : 오류정보가 들어있는 dataMap
+ */
+function extExceptionAlert(dataMap) {
+
+console.log(dataMap.RESPONSE_GUIDE_MESSAGE);
+console.log(dataMap.RESPONSE_MESSAGE);
+
+	
+	// 17.05.29 정윤경 차장요건.. 레이어 팝업 alert으로 변경
+	if(!fnIsEnLocale()){
+		
+		if(dataMap.RESPONSE_GUIDE_MESSAGE != "" && dataMap.RESPONSE_GUIDE_MESSAGE != null){
+			alert(dataMap.RESPONSE_MESSAGE + dataMap.RESPONSE_GUIDE_MESSAGE);
+
+			if(dataMap.ERROR_CODE == "FRU00001"){
+				goLoginPage();
+				return;
+			}
+	
+		}else{
+			alert(dataMap.RESPONSE_MESSAGE);
+		}
+		return;	
+	}
+	
+	var schIDGubun = "";
+//alert("__AreaSchID - "+__AreaSchID);
+	//전역변수 __AreaSchID(errcontrol에정의) 에서 카드인지 그외의 사이트인지 구분 - 사용되는 에러창이 다름
+	if(__AreaSchID != undefined || __AreaSchID !=""){
+		schIDGubun=__AreaSchID;
+	}
+
+	if(schIDGubun =="crd"){	//카드사이트에서 사용될 경우
+		// 일반 i18nExtAlert 사용
+		var ajaxErrorMsg = dataMap.ERROR_TITLE + "[" + dataMap.ERROR_CODE + "]"
+						+ "<br>" + dataMap.RESPONSE_MESSAGE ;
+		i18nExtAlert(ajaxErrorMsg, dataMap.ERROR_TITLE);
+	}else{	// 개인, 포탈 등에서 사용될 경우
+		// ajax에러시 에러팝업 호출
+		var errMsg = dataMap.RESPONSE_MESSAGE;
+		var errorCode = dataMap.ERROR_CODE;
+		var title = dataMap.ERROR_TITLE;
+		var errorLevel = "1";						//넘어오는 에러레벨이 없는 케이스이므로 디폴트 값을 1로 둠
+		var modal = "N";							// ajax에러시 모달이어야 함
+		var errBtnNameArr = dataMap.BTN_NAME_ARRY;
+		var errBtnUrlArr= dataMap.BTN_URL_ARRY;
+		var errTempBottom = "N";
+		var btnCloseYn = "";
+		var elementID;
+
+		if(dataMap.Modal != undefined || dataMap.Modal != ""){
+			modal = dataMap.Modal ;
+		}
+
+		if(dataMap.BTN_CLOSE_YN != undefined || dataMap.BTN_CLOSE_YN != ""){
+			btnCloseYn = dataMap.BTN_CLOSE_YN ;
+		}
+
+		if(dataMap.FOCUS_TARGET != undefined || dataMap.FOCUS_TARGET != ""){
+			elementID = dataMap.FOCUS_TARGET ;
+		}
+
+		var errObject = {
+			errMsg : errMsg
+			, errorCode : errorCode
+			, errorLevel : errorLevel
+			, title : title
+			, modal : modal
+			, errBtnNameArr : errBtnNameArr
+			, errBtnUrlArr : errBtnUrlArr
+			, errTempBottom : errTempBottom
+			, btnCloseYn : btnCloseYn
+			, elementID : elementID
+		};
+
+		showErrorLayerPop(errObject);
+	}
+
+	if(_isGridMakskYn == "Y"){
+		if(_isGridPaging == "Y"){
+			gridLoadMaskView(gridObject, false, true);			/* grid mask ??¶??? */
+		}else{
+			gridLoadMaskView(gridObject, false, false);			/* grid mask ??¶??? */
+		}
+	}
+}
+
+/**
+ * extPopExceptionAlert창을 Ajax에러 발생시  띄우는 스크립트
+ * @param dataMap : 오류정보가 들어있는 dataMap
+ */
+function extPopExceptionAlert(dataMap) {
+	var ajaxErrorMsg = dataMap.RESPONSE_MESSAGE + "[" + dataMap.ERROR_CODE + "]";
+
+	if("FRU00001" == dataMap.ERROR_CODE){
+		ajaxErrorMsg = ajaxErrorMsg + "<img src ='../shared/icons/fam/application_go.png' border=0 alt='로그인 페이지로 이동' onClick='goLoginPagePop();'>";
+		i18nExtAlert(ajaxErrorMsg, dataMap.ERROR_TITLE);
+	}else{
+		i18nExtAlert(ajaxErrorMsg, dataMap.ERROR_TITLE);
+	}
+	if(_isGridMakskYn == "Y"){
+		if(_isGridPaging == "Y"){
+			gridLoadMaskView(gridObject, false, true);			/* grid mask ??¶??? */
+		}else{
+			gridLoadMaskView(gridObject, false, false);			/* grid mask ??¶??? */
+		}
+	}
+}
+
+
+function position_center(width, height) {
+	var position = {};
+	var sw, sh;
+	
+	// IE 외 모든 브라우저
+	if (self.innerHeight) { 
+		sw = self.innerWidth
+		sh = self.innerHeight;
+	// Explorer 6 Strict 모드
+	} else if (document.documentElement && document.documentElement.clientHeight) {
+		sw = document.documentElement.clientWidth;
+		sh = document.documentElement.clientHeight;
+	// 다른 IE 브라우저( IE < 6)
+	} else if (document.body) { 
+		 sw= document.body.clientWidth;
+	     sh= document.body.clientHeight;
+	} 
+	
+	position.sw = sw;
+	position.sh = sh;
+	
+	return position;
+}
+
+/**
+ * iframe이 아닌 만들어진 HTML 형식을 그려준다.
+ */
+function open_layer_html(txt, divObj, width, height, xpos, ypos) {
+    var inner_html_txt = txt;
+    var obj = document.getElementById(divObj);
+    var positionObj = position_center(width, height);
+    var sw = positionObj.sw;
+    var sh = positionObj.sh;
+    if(obj != null && obj != undefined) {
+        obj.innerHTML = inner_html_txt;
+        /* obj.style.display == "block"; */
+        if(width == undefined) {
+        	width = 240; /*  처리중입니다 이미지의 가로크기 */
+        }
+        if(height == undefined) {
+        	height = 100; /*  처리중입니다 이미지의 세로크기 */
+        }
+        if(xpos != undefined || ypos != undefined){
+            div_left = (xpos == undefined ? ((div_left == undefined) ? 0:div_left):xpos) + document.documentElement.scrollLeft;
+            div_top  = (ypos == undefined ? ((div_top == undefined)  ? 0:div_top):ypos) + document.documentElement.scrollTop;
+        }else if(divObj == "layerDiv_process" || divObj == "layerDiv_emergency" || divObj == "layerDiv_errPop" || divObj == "layerDiv_system") {        	
+        	/* 진행 프로세스 레이어나 긴급공지 , 에러 팝업 일경우는 가운데 띄운다. */
+            div_left = (sw / 2) - width/2 + document.documentElement.scrollLeft;/* obj.offsetWidth/2; */
+            div_top  = (sh / 2) - height/2 + document.documentElement.scrollTop;/* obj.offsetHeight/2; */
+            if(navigator.appName == 'Netscape') {
+            	div_left = (screen.availWidth - sw) / 2;
+            	div_top = (screen.availHeight - sh) / 2;
+            }
+            if(divObj == "layerDiv_errPop") hideAllLayer();
+        }else if(divObj == "layerDiv_msg_confirm") {
+        	/* alert대체창일 경우  가운데 띄운다. */
+            div_left = (sw / 2) - width/2 + document.documentElement.scrollLeft;/* obj.offsetWidth/2; */
+            div_top  = (sh / 2) - height/2 + document.documentElement.scrollTop + 100;/* obj.offsetHeight/2; */
+            if(navigator.appName == 'Netscape') {
+            	div_left = (screen.availWidth - sw) / 2;
+            	div_top = (screen.availHeight - sh) / 2 + 100;
+            }
+            if(divObj == "layerDiv_errPop") hideAllLayer();
+        }else {
+       		/* 공지사항이나 시스템공지일 경우는 좌측상단 부터 띄운다. */
+            div_left = (div_left == undefined ? 0:div_left) + document.documentElement.scrollLeft;
+            div_top = (div_top == undefined ? 0:div_top) + document.documentElement.scrollTop;
+            /* 브라우저 사이즈 보다 팝업의 추가된후 브라우저 사이즈가 넘을경우 */
+            if(sw < div_left + width) {
+            	div_left = 0;
+            	div_top = div_top + height;
+        	}
+        }
+      
+        if(divObj == "layerDiv_errPop") {
+        	//document.getElementById('layerDiv_iframe').style.left = div_left;
+	        //document.getElementById('layerDiv_iframe').style.top = div_top;
+			document.getElementById('layerDiv_iframe').style.display = "block";
+        } 
+
+        obj.style.left = div_left;
+        obj.style.top = div_top;
+        obj.style.display = "block";
+    }
+}
+
+//에러 레이어 닫기
+function closeErrPop(modal, elementID) {
+	var errObj = document.getElementById('layerDiv_errPop');
+	var iframeObj = document.getElementById('layerDiv_iframe');
+	errObj.style.display = "none";
+	iframeObj.style.display = "none";
+
+	// 모달일경우 불투명 iframe제거
+	if(modal == "Y"){
+		closeProcessLayer();
+	}
+
+	//innerHTML 에서 setFocus를 해주려면
+	if(elementID != undefined){
+		var elementObj = eval("document.getElementById('"+elementID+"')");
+
+		//버튼 눌렀을경우에만 focus
+		if(elementObj != undefined && !elementObj.disabled) {
+			if(elementObj.tagName.toString().toLowerCase() == "select"  ||
+				elementObj.type.toString().toLowerCase() == "checkbox" ||
+				elementObj.type.toString().toLowerCase() == "radio") {
+				elementObj.focus();
+			}else{
+				elementObj.select();
+			}
+		}
+	}
+}
+
+/**
+ *	에러 팝업 레이어를 제외하고 display = none 시킨다.
+ */
+function hideAllLayer() {
+	var parentLayer = document.getElementById("layerDiv");
+	if(parentLayer != undefined) {
+		document.getElementById("layerDiv_notice0").style.display = "none";
+		document.getElementById("layerDiv_notice1").style.display = "none";
+		document.getElementById("layerDiv_notice2").style.display = "none";
+		document.getElementById("layerDiv_notice3").style.display = "none";
+		document.getElementById("layerDiv_system").style.display = "none";
+		document.getElementById("layerDiv_emergency").style.display = "none";
+		document.getElementById("layerDiv_process").style.display = "none";
+		document.getElementById('layerDiv_background').style.display = "none";
+	}
+}
+
+/**
+ *	진행중입니다 레이어를 띄운다
+ * @param localeCode : 언어코드
+ * @param useYn : 사용유무 (N일경우에는 안띄움. 기본값 띄움.)
+ * @param modalYn : Modal 구분
+ */
+function openProcessLayer(localeCode,useYn,modalYn) {
+	jQuery(".loading").show();
+	jQuery(".processing").show();		// 삭제예정. 17.07.13
+	/*
+	
+		
+	if(document.getElementById("layerDiv").style.display != 'block'){
+		document.getElementById("layerDiv").style.display = "block";
+	}
+	
+	if(useYn != "N") {
+		if(modalYn == "Y") {
+			document.getElementById('layerDiv_background').style.display = "block";
+			document.getElementById('layerDiv_background').style.left = "0";
+			document.getElementById('layerDiv_background').style.top = "0";
+			document.getElementById('layerDiv_background').style.width = document.documentElement.scrollWidth;
+			document.getElementById('layerDiv_background').style.height = document.documentElement.scrollHeight;
+			document.getElementById('iframe_processLayer').style.display = "block";
+			document.getElementById('iframe_processLayer').style.width = document.documentElement.scrollWidth;
+			document.getElementById('iframe_processLayer').style.height = document.documentElement.scrollHeight;
+		}
+		if(fnIsEnLocale() || isDirectUrl()){
+			open_layer_html(makeProcessText(localeCode),"layerDiv_process");
+		}else{
+			
+		}
+	}*/
+}
+
+function makeProcessText(localeCode) {	
+	var htmlText = "<table width=\"330\" height=\"181\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" >" +
+	   "<tr><td align=\"center\" style=\"padding: 0 0 0 0\">";
+	//영문웹 분기
+	if(fnIsEnLocale()){
+	   htmlText += "<img src=\"/img/en/common/loading_1_EN.gif\" alt=\"Loading.\"/>";
+	}else{
+	   htmlText += "<img src=\"/img/common/loading_1.gif\" alt=\"처리중입니다.잠시만 기다려주시기 바랍니다..\"/>";
+	}
+	   
+	htmlText += "</td></tr></table>";
+	/*
+	var htmlText = "<table width=\"320\" height=\"152\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" >" +
+				   "<tr><td align=\"center\" style=\"padding: 0 0 0 0\">" +
+				   "<object classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" codebase=\"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0\" width=\"320\" height=\"152\" title=\"progressbar\">" +
+				   "<param name=\"movie\" value=\"/flash/flash_swf/progressbar.swf\" />" +
+				   "<param name=\"quality\" value=\"high\" />" +
+				   "<embed src=\"/flash/flash_swf/progressbar.swf\" quality=\"high\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\" type=\"application/x-shockwave-flash\" width=\"320\" height=\"152\"></embed>" +
+				   "</object></td></tr></table>";
+
+	*/
+	return htmlText; 
+}
+
+function closeProcessLayer() {
+	if(fnIsEnLocale() || isDirectUrl()){
+		close_layer("layerDiv_process");
+	}else{
+		document.getElementById('layerDiv_background').style.display = "none";
+		jQuery(".loading").hide();
+		jQuery(".processing").hide();			// 삭제예정. 17.07.13
+	}
+}
+
+
+/*
+ * 쿠키 가져오는 메소드
+ * @param name :쿠키 이름.
+ */
+function getPopupCookie(name) {
+	var Found = false;
+	var start, end;
+	var i = 0;
+
+	while(i <= document.cookie.length) {
+		start = i;
+		end = start + name.length;
+
+		if(document.cookie.substring(start, end) == name) {
+			Found = true;
+			break;
+		}
+		i++;
+	}
+
+	if(Found == true) {
+		start = end + 1;
+		end = document.cookie.indexOf(";", start);
+	if(end < start)
+		end = document.cookie.length;
+		return document.cookie.substring(start, end);
+	}
+	return "";
+}
+
+
+
