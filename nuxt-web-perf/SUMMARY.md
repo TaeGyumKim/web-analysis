@@ -8,8 +8,8 @@
 
 **기술 스택**:
 - **Frontend**: Nuxt 3, Vue 3, TypeScript, Chart.js
-- **Backend**: Nuxt Server API, Puppeteer
-- **Performance**: Chrome DevTools Protocol (CDP)
+- **Backend**: Nuxt Server API, Puppeteer, Lighthouse
+- **Performance**: Chrome DevTools Protocol (CDP), Lighthouse API
 - **Styling**: Tailwind CSS + Custom CSS
 
 ---
@@ -25,13 +25,14 @@
 
 ### 2. UI/UX 구현 (완료)
 - ✅ HTML 디자인 파일 기반 UI 재작성
-- ✅ 6개 탭 시스템 구현:
+- ✅ 7개 탭 시스템 구현:
   1. **프레임 분석 탭** (`FrameAnalysisTab.vue`)
   2. **네트워크 타임라인 탭** (`NetworkTimelineTab.vue`)
   3. **로딩 분포 탭** (`LoadingDistributionTab.vue`)
-  4. **일괄 분석 탭** (`BatchAnalysis.vue`) ⭐ NEW
-  5. **분석 이력 탭** (`HistoryViewer.vue`) ⭐ NEW
-  6. **성능 예산 탭** (`PerformanceBudget.vue`) ⭐ NEW
+  4. **일괄 분석 탭** (`BatchAnalysis.vue`) ⭐
+  5. **분석 이력 탭** (`HistoryViewer.vue`) ⭐
+  6. **성능 예산 탭** (`PerformanceBudget.vue`) ⭐
+  7. **Lighthouse 탭** (`LighthouseTab.vue`) ⭐ NEW
 - ✅ 색상 팔레트 및 디자인 시스템 적용
 - ✅ 반응형 레이아웃 (카드 기반)
 
@@ -132,6 +133,20 @@
     - 전송 크기: 압축 및 최적화
 - **커밋**: `e1b55ec`
 
+#### 4.7 Lighthouse API 통합 ✅
+- **구현 내용**:
+  - `lighthouseCollector.ts` 수집기 생성
+  - `LighthouseTab.vue` 컴포넌트 생성
+  - 타입 정의 확장 (LighthouseScore, LighthouseMetrics, LighthouseOpportunity 등)
+  - 5개 카테고리 점수 측정 (Performance, Accessibility, Best Practices, SEO, PWA)
+  - 원형 게이지 차트로 점수 시각화
+  - Lighthouse 메트릭 (FCP, LCP, TBT, CLS, Speed Index, TTI, FMP)
+  - 성능 개선 기회 (Opportunities) 목록 및 예상 절감량
+  - 진단 결과 (Diagnostics) 테이블
+  - Mobile/Desktop Form Factor 자동 설정
+  - 선택적 활성화 (체크박스)
+- **커밋**: TBD
+
 ---
 
 ## 📊 메트릭 및 점수 계산
@@ -164,11 +179,14 @@ nuxt-web-perf/
 │   ├── BatchAnalysis.vue               # 일괄 분석 탭 ⭐
 │   ├── HistoryViewer.vue               # 분석 이력 탭 ⭐
 │   ├── PerformanceBudget.vue           # 성능 예산 탭 ⭐
+│   ├── LighthouseTab.vue               # Lighthouse 탭 ⭐ NEW
 │   └── LongTaskHistogram.vue           # Long Task 히스토그램 ⭐
-├── pages/index.vue                      # 메인 페이지 (6탭 시스템)
+├── pages/index.vue                      # 메인 페이지 (7탭 시스템)
 ├── server/
 │   ├── api/analyze.post.ts             # POST /api/analyze 엔드포인트
-│   └── utils/performanceCollector.ts   # Puppeteer 기반 수집기
+│   └── utils/
+│       ├── performanceCollector.ts     # Puppeteer 기반 수집기
+│       └── lighthouseCollector.ts      # Lighthouse 수집기 ⭐ NEW
 ├── types/performance.ts                 # TypeScript 타입 정의
 ├── utils/
 │   ├── scoreCalculator.ts              # 성능 점수 계산

@@ -21,6 +21,11 @@
       <label>URL:</label>
       <input type="text" v-model="url" style="width:280px;" placeholder="https://www.naver.com/" />
 
+      <label style="display: flex; align-items: center; gap: 4px;">
+        <input type="checkbox" v-model="useLighthouse" />
+        Lighthouse 사용
+      </label>
+
       <button class="btn" @click="reAnalyze">재분석</button>
       <button class="btn btn-primary" @click="startAnalysis" :disabled="isAnalyzing">
         {{ isAnalyzing ? '분석 중...' : '시작' }}
@@ -89,6 +94,14 @@
       >
         성능 예산
       </div>
+      <span class="divider">|</span>
+      <div
+        class="tab"
+        :class="{ active: activeTab === 'lighthouse' }"
+        @click="activeTab = 'lighthouse'"
+      >
+        Lighthouse
+      </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
@@ -120,6 +133,11 @@
     <div v-show="activeTab === 'budget'" style="margin-top: 20px;">
       <PerformanceBudget :result="analysisResult" />
     </div>
+
+    <!-- Lighthouse 탭 -->
+    <div v-show="activeTab === 'lighthouse'" style="margin-top: 20px;">
+      <LighthouseTab :result="analysisResult" />
+    </div>
   </div>
 </template>
 
@@ -129,6 +147,7 @@ import type { AnalysisResult } from '~/types/performance';
 const url = ref('https://www.naver.com/');
 const networkSpeed = ref('4G');
 const deviceSpec = ref('Desktop');
+const useLighthouse = ref(false);
 const activeTab = ref('frame');
 const isAnalyzing = ref(false);
 const analysisResult = ref<AnalysisResult | null>(null);
@@ -147,7 +166,9 @@ async function startAnalysis() {
           captureScreenshots: true,
           networkThrottling: getNetworkThrottling(networkSpeed.value),
           cpuThrottling: getCPUThrottling(deviceSpec.value),
-          waitUntil: 'networkidle0'
+          waitUntil: 'networkidle0',
+          useLighthouse: useLighthouse.value,
+          lighthouseFormFactor: deviceSpec.value.includes('Mobile') ? 'mobile' : 'desktop'
         }
       }
     });

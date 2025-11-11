@@ -36,6 +36,49 @@ export interface LongTask {
   attribution?: string;
 }
 
+export interface LighthouseScore {
+  performance: number;
+  accessibility: number;
+  bestPractices: number;
+  seo: number;
+  pwa: number;
+}
+
+export interface LighthouseMetrics {
+  firstContentfulPaint: number;
+  largestContentfulPaint: number;
+  totalBlockingTime: number;
+  cumulativeLayoutShift: number;
+  speedIndex: number;
+  timeToInteractive: number;
+  firstMeaningfulPaint: number;
+}
+
+export interface LighthouseOpportunity {
+  id: string;
+  title: string;
+  description: string;
+  score: number;
+  displayValue?: string;
+  details?: any;
+}
+
+export interface LighthouseDiagnostic {
+  id: string;
+  title: string;
+  description: string;
+  score: number;
+  displayValue?: string;
+}
+
+export interface LighthouseResult {
+  scores: LighthouseScore;
+  metrics: LighthouseMetrics;
+  opportunities: LighthouseOpportunity[];
+  diagnostics: LighthouseDiagnostic[];
+  fetchTime: number;
+}
+
 export interface PerformanceScore {
   overall: number;
   metrics: number;
@@ -60,6 +103,7 @@ export interface AnalysisResult {
   frames: FrameCapture[];
   longTasks: LongTask[];
   performanceScore: PerformanceScore;
+  lighthouse?: LighthouseResult;
 }
 
 export interface AnalysisOptions {
@@ -67,4 +111,6 @@ export interface AnalysisOptions {
   networkThrottling?: 'none' | 'slow-3g' | 'fast-3g' | '4g';
   cpuThrottling?: number;
   waitUntil?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
+  useLighthouse?: boolean;
+  lighthouseFormFactor?: 'mobile' | 'desktop';
 }

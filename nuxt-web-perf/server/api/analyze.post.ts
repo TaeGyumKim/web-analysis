@@ -1,7 +1,9 @@
 import { PerformanceCollector } from '~/server/utils/performanceCollector';
+import { LighthouseCollector } from '~/server/utils/lighthouseCollector';
 import type { AnalysisOptions } from '~/types/performance';
 
 let collector: PerformanceCollector | null = null;
+let lighthouseCollector: LighthouseCollector | null = null;
 
 export default defineEventHandler(async (event) => {
   try {
@@ -37,11 +39,34 @@ export default defineEventHandler(async (event) => {
       captureScreenshots: options?.captureScreenshots ?? true,
       networkThrottling: options?.networkThrottling ?? 'none',
       cpuThrottling: options?.cpuThrottling ?? 1,
-      waitUntil: options?.waitUntil ?? 'networkidle0'
+      waitUntil: options?.waitUntil ?? 'networkidle0',
+      useLighthouse: options?.useLighthouse ?? false,
+      lighthouseFormFactor: options?.lighthouseFormFactor ?? 'desktop'
     };
 
     // Perform analysis
     const result = await collector.analyze(url, analysisOptions);
+
+    // Perform Lighthouse analysis if requested
+    if (analysisOptions.useLighthouse) {
+      if (!lighthouseCollector) {
+        lighthouseCollector = new LighthouseCollector();
+      }
+
+      try {
+        const lighthouseResult = await lighthouseCollector.analyze({
+          url,
+          formFactor: analysisOptions.lighthouseFormFactor,
+          throttling: analysisOptions.networkThrottling === 'none' ? 'none' :
+                      analysisOptions.lighthouseFormFactor === 'mobile' ? 'mobile' : 'desktop'
+        });
+
+        result.lighthouse = lighthouseResult;
+      } catch (lighthouseError) {
+        console.error('Lighthouse analysis failed:', lighthouseError);
+        // Continue without Lighthouse data
+      }
+    }
 
     return {
       success: true,

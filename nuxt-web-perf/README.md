@@ -4,7 +4,7 @@
 
 ## Features
 
-- 🎯 **6개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, 일괄 분석, 분석 이력, 성능 예산
+- 🎯 **7개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, 일괄 분석, 분석 이력, 성능 예산, Lighthouse
 - 📊 **종합 성능 분석**: FCP, LCP, TBT, CLS, TTFB 등 핵심 메트릭 측정
 - 🎬 **프레임별 렌더링 과정**: 페이지 로드 과정을 프레임 단위로 캡처 및 재생
 - 🌊 **네트워크 워터폴 차트**: 모든 네트워크 요청을 타임라인으로 시각화
@@ -16,6 +16,7 @@
 - 🔄 **일괄 분석**: 여러 URL을 동시에 분석하고 성능 비교
 - 📜 **분석 이력**: 과거 데이터 저장 및 추이 차트 생성 (최대 50개)
 - 💰 **성능 예산**: 목표 메트릭 설정 및 실제 성능 비교
+- 🔍 **Lighthouse 통합**: Google Lighthouse 기반 성능, 접근성, SEO, PWA 분석
 
 ## Tech Stack
 
@@ -23,7 +24,7 @@
 - **Styling**: Custom CSS (HTML 디자인 기반) + Tailwind CSS
 - **Charts**: Chart.js (바 차트, 라인 차트)
 - **Backend**: Nuxt Server API
-- **Performance Collection**: Puppeteer (CDP protocol)
+- **Performance Collection**: Puppeteer (CDP protocol), Lighthouse
 - **Scoring Algorithm**: C# WebPerf 구현 기반
 
 ## Installation
@@ -80,9 +81,10 @@ npm run preview
 - **네트워크 속도** 선택: 3G, 4G, Wi-Fi, Slow 3G
 - **장비 사양** 선택: Desktop, Mobile (High-end/Mid-range/Low-end)
 - **URL 입력**: 분석할 웹 페이지 주소 입력
+- **Lighthouse 사용** 체크박스: Google Lighthouse 분석 활성화 (선택)
 - **시작 버튼** 클릭: 분석 시작 (자동으로 스크린샷 캡처)
 
-#### 2. 결과 확인 - 6개 탭 시스템
+#### 2. 결과 확인 - 7개 탭 시스템
 
 **📸 프레임 분석 탭**
 - 좌측: 프레임별 렌더링 과정 뷰어
@@ -128,6 +130,14 @@ npm run preview
 - 통과/초과 상태 및 통계
 - 실패한 메트릭에 대한 개선 권장사항
 
+**🔍 Lighthouse 탭**
+- 5개 카테고리 점수 (Performance, Accessibility, Best Practices, SEO, PWA)
+- 원형 게이지 차트로 각 점수 시각화
+- Lighthouse 메트릭 (FCP, LCP, TBT, CLS, Speed Index, TTI, FMP)
+- 성능 개선 기회 (Opportunities) 목록 및 예상 절감량
+- 진단 결과 (Diagnostics) 테이블
+- Mobile/Desktop 선택에 따른 자동 Form Factor 설정
+
 ## Project Structure
 
 ```
@@ -144,6 +154,7 @@ nuxt-web-perf/
 │   ├── BatchAnalysis.vue         # 일괄 분석 탭 (여러 URL 비교)
 │   ├── HistoryViewer.vue         # 분석 이력 탭 (추이 차트)
 │   ├── PerformanceBudget.vue     # 성능 예산 탭 (목표 설정)
+│   ├── LighthouseTab.vue         # Lighthouse 탭 (5개 카테고리 점수) ⭐
 │   ├── LongTaskHistogram.vue     # Long Task 히스토그램 컴포넌트
 │   ├── FrameTimeline.vue         # 프레임 타임라인 뷰어 (레거시)
 │   ├── MetricBadge.vue           # 메트릭 배지 (레거시)
@@ -151,12 +162,13 @@ nuxt-web-perf/
 │   ├── NetworkWaterfall.vue      # 네트워크 워터폴 (레거시)
 │   └── PerformanceOverview.vue   # 성능 개요 (레거시)
 ├── pages/
-│   └── index.vue                 # 메인 페이지 (상단 제어바 + 3탭)
+│   └── index.vue                 # 메인 페이지 (상단 제어바 + 7탭)
 ├── server/
 │   ├── api/
 │   │   └── analyze.post.ts       # POST /api/analyze 엔드포인트
 │   └── utils/
-│       └── performanceCollector.ts # Puppeteer 기반 수집기
+│       ├── performanceCollector.ts # Puppeteer 기반 수집기
+│       └── lighthouseCollector.ts  # Lighthouse 수집기 ⭐
 ├── types/
 │   └── performance.ts            # TypeScript 타입 정의
 ├── utils/
@@ -231,14 +243,15 @@ C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 - [x] **여러 URL 일괄 분석**: 동시 분석 및 성능 비교 테이블
 - [x] **과거 데이터 비교**: 분석 이력 저장 및 추이 차트 (Chart.js)
 - [x] **성능 예산 설정**: 목표 값 설정 및 실제 성능 대비 분석
+- [x] **Lighthouse API 통합**: Performance, Accessibility, SEO, PWA, Best Practices 분석
 
 ## Future Enhancements
 
 - [ ] CI/CD 파이프라인 통합
 - [ ] 실시간 모니터링 대시보드
 - [ ] PDF 보고서 생성 (현재는 텍스트만 지원)
-- [ ] Lighthouse API 통합
 - [ ] 다국어 지원 (현재 한국어만)
+- [ ] Lighthouse 결과 PDF 리포트 생성
 
 ## License
 
