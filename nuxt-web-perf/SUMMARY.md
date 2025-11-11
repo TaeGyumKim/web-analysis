@@ -151,7 +151,7 @@
 - **구현 내용**:
   - **GitHub Actions 워크플로우**:
     - `ci.yml`: 빌드/테스트/품질 검사 자동화
-      - Node.js 18.x, 20.x 매트릭스 테스트
+      - Node.js 20.x 테스트
       - TypeScript 타입 체크
       - 보안 취약점 스캔
       - Lighthouse 통합 검증
@@ -315,7 +315,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - **버전 태그 (v*)**: 릴리즈 자동 생성
 
 ### 환경 요구사항
-- Node.js 18+
+- Node.js 20+
 - Chrome/Chromium (Puppeteer용, 시스템에 설치됨)
 - Docker (선택사항, 컨테이너 배포용)
 

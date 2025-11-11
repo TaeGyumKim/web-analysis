@@ -31,7 +31,7 @@
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - npm or yarn
 
 ### Setup
@@ -265,7 +265,7 @@ C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 자동 실행 조건: PR 생성, `main`/`master`/`develop`/`claude/**` 브랜치에 푸시
 
 **Build and Test Job**
-- Node.js 18.x, 20.x 매트릭스 테스트
+- Node.js 20.x 테스트
 - 의존성 설치 (npm ci)
 - 프로덕션 빌드 검증
 - 빌드 아티팩트 업로드 (7일 보관)
