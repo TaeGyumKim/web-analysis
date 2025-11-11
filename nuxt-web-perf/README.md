@@ -333,6 +333,52 @@ curl http://localhost:3000/api/health
 }
 ```
 
+### E2E Testing with Playwright
+
+**Test Suite** (`tests/e2e/analyzer.spec.ts`):
+- **Homepage Load Test**: Verifies initial UI rendering
+- **Full Analysis Test**: Tests complete analysis flow with all 7 tabs
+- **UI Elements Test**: Validates all major UI components
+- **Tab Navigation Test**: Tests navigation between empty tabs
+
+**Running Tests Locally**:
+```bash
+cd nuxt-web-perf
+
+# Install Playwright browsers (first time only)
+npx playwright install chromium
+
+# Run tests headless
+npm test
+
+# Run with visible browser
+npm run test:headed
+
+# Open Playwright UI tool
+npm run test:ui
+```
+
+**CI/CD Integration**:
+- E2E tests run automatically on every commit
+- 3 artifacts uploaded (30-day retention):
+  - **e2e-screenshots**: Visual proof of all 7 tabs (10+ screenshots)
+  - **playwright-report**: Detailed HTML test report
+  - **test-results**: Complete results including failure videos
+
+**Test Screenshots Captured**:
+1. Homepage initial state
+2. Analysis configuration
+3. Analysis in progress
+4. All 7 tabs after analysis:
+   - Frame Analysis
+   - Network Timeline
+   - Loading Distribution
+   - Batch Analysis
+   - History
+   - Performance Budget
+   - Lighthouse
+5. Empty tab navigation (7 tabs)
+
 ## Implemented Enhancements ✅
 
 - [x] **CLS 메트릭 추가**: Cumulative Layout Shift 측정 및 시각화
@@ -343,6 +389,7 @@ curl http://localhost:3000/api/health
 - [x] **성능 예산 설정**: 목표 값 설정 및 실제 성능 대비 분석
 - [x] **Lighthouse API 통합**: Performance, Accessibility, SEO, PWA, Best Practices 분석
 - [x] **CI/CD 파이프라인**: GitHub Actions 기반 자동 빌드/테스트/배포
+- [x] **E2E 테스트**: Playwright 기반 자동화 테스트 및 스크린샷 캡처
 
 ## Future Enhancements
 
