@@ -198,19 +198,40 @@ export class PerformanceCollector {
           }
         }
 
+        // CLS calculation
+        let clsValue = 0;
+
         // Observer for LCP
-        const observer = new PerformanceObserver((list) => {
+        const lcpObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1] as any;
           metrics.lcp = lastEntry.renderTime || lastEntry.loadTime;
         });
 
+        // Observer for CLS
+        const clsObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (!(entry as any).hadRecentInput) {
+              clsValue += (entry as any).value;
+            }
+          }
+        });
+
         try {
-          observer.observe({ type: 'largest-contentful-paint', buffered: true });
+          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+
+          // Observe layout shifts for CLS
+          try {
+            clsObserver.observe({ type: 'layout-shift', buffered: true });
+          } catch (e) {
+            // layout-shift may not be supported in all browsers
+            console.warn('layout-shift observation not supported');
+          }
 
           // Wait a bit for metrics to be collected
           setTimeout(() => {
-            observer.disconnect();
+            lcpObserver.disconnect();
+            clsObserver.disconnect();
 
             // Calculate TBT (Total Blocking Time)
             const longTasks = performance.getEntriesByType('longtask') as any[];
@@ -222,10 +243,12 @@ export class PerformanceCollector {
               }
             }
             metrics.tbt = tbt;
+            metrics.cls = clsValue;
 
             resolve(metrics);
           }, 500);
         } catch (e) {
+          metrics.cls = clsValue;
           resolve(metrics);
         }
       });

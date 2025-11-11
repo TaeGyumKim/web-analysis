@@ -107,6 +107,17 @@
               ></div>
             </div>
           </div>
+
+          <div v-if="result.metrics.cls !== undefined" style="margin-top: 12px;">
+            <div>CLS: {{ result.metrics.cls.toFixed(3) }}</div>
+            <div class="metric-bar">
+              <div
+                class="metric-fill"
+                :class="getCLSColor(result.metrics.cls)"
+                :style="{ width: getCLSWidth(result.metrics.cls) + '%' }"
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -194,6 +205,19 @@ function formatBytes(bytes: number): string {
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+}
+
+function getCLSColor(cls: number): string {
+  if (cls <= 0.1) return 'green';
+  if (cls <= 0.25) return 'yellow';
+  return 'orange';
+}
+
+function getCLSWidth(cls: number): number {
+  if (cls <= 0.1) return 100;
+  if (cls <= 0.25) return 70;
+  if (cls <= 0.5) return 50;
+  return 30;
 }
 
 onUnmounted(() => {

@@ -38,6 +38,35 @@ export function scoreTimingMs(ms: number | undefined): number {
 }
 
 /**
+ * Score CLS (Cumulative Layout Shift) metric (0-100, higher is better)
+ * CLS is a score from 0 to infinity (typically 0-1 for good pages)
+ * Based on Web Vitals thresholds
+ */
+export function scoreCLS(cls: number | undefined): number {
+  if (cls === undefined || cls === null || isNaN(cls)) {
+    return 100; // Neutral score for invalid/missing data
+  }
+
+  // Web Vitals thresholds:
+  // Good: ≤ 0.1
+  // Needs improvement: 0.1 - 0.25
+  // Poor: > 0.25
+
+  if (cls <= 0.1) {
+    return 100;
+  } else if (cls <= 0.25) {
+    // Linear decrease from 100 to 50
+    return 100 - ((cls - 0.1) * (50 / 0.15));
+  } else if (cls <= 0.5) {
+    // Linear decrease from 50 to 20
+    return 50 - ((cls - 0.25) * (30 / 0.25));
+  } else {
+    // Slow decrease
+    return Math.max(0, 20 - ((cls - 0.5) * 10));
+  }
+}
+
+/**
  * Calculate metrics score (weighted average of individual metrics)
  */
 export function computeMetricsScore(metrics: PerformanceMetrics): { score: number; details: ScoreDetail[] } {
@@ -49,7 +78,8 @@ export function computeMetricsScore(metrics: PerformanceMetrics): { score: numbe
   for (const [key, weight] of Object.entries(METRIC_WEIGHTS)) {
     const value = metrics[key as keyof PerformanceMetrics];
     if (value !== undefined && value !== null) {
-      const score = scoreTimingMs(value);
+      // Use appropriate scoring function based on metric type
+      const score = key === 'cls' ? scoreCLS(value) : scoreTimingMs(value);
       details.push({
         name: key.toUpperCase(),
         value,
