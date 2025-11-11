@@ -8,7 +8,12 @@
 - 📊 **종합 성능 분석**: FCP, LCP, TBT, CLS, TTFB 등 핵심 메트릭 측정
 - 🎬 **프레임별 렌더링 과정**: 페이지 로드 과정을 프레임 단위로 캡처 및 재생
 - 🌊 **네트워크 워터폴 차트**: 모든 네트워크 요청을 타임라인으로 시각화
-- 📈 **Chart.js 통합**: 네트워크 속도별, 장비별 로딩 시간 분포 차트
+- 📈 **고급 인터랙티브 시각화**:
+  - **Radar Chart**: Core Web Vitals 성능 메트릭 분포
+  - **Doughnut Chart**: 종합 성능 점수 시각화
+  - **Heatmap**: 네트워크 요청 타입별/시간대별 분포
+  - **Animated Progress Bars**: 실시간 메트릭 진행 상태
+  - **Timeline Bar Chart**: 로딩 이벤트 순서 시각화
 - 🎨 **깔끔한 UI**: 16px 보더 라디우스와 부드러운 섀도우를 활용한 모던한 디자인
 - ⚙️ **설정 가능한 테스트 환경**: 네트워크 속도(3G/4G/Wi-Fi), 장비 사양(Desktop/Mobile) 선택
 - 📉 **Long Task 히스토그램**: 메인 스레드 차단 작업 시각화 및 분석
@@ -108,6 +113,11 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 #### 2. 결과 확인 - 7개 탭 시스템
 
 **📸 프레임 분석 탭**
+- **PerformanceMetricsChart 시각화** (NEW ✨):
+  - **Radar Chart**: FCP, LCP, TBT, CLS, TTFB 성능 점수 분포
+  - **Doughnut Chart**: 종합 성능 점수 (0-100) 중앙 오버레이
+  - **Animated Metric Bars**: 각 메트릭의 실시간 진행 상태 (색상 코딩)
+  - **Timeline Bar Chart**: TTFB → FCP → LCP → DCL → Load 순서 표시
 - 좌측: 프레임별 렌더링 과정 뷰어
   - 슬라이더로 프레임 이동
   - 이전/다음/재생 버튼으로 제어
@@ -118,7 +128,16 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
   - Long Tasks 요약 (개수, 평균, 최대)
 
 **🌐 네트워크 타임라인 탭**
-- 리소스별 요청 워터폴 차트 테이블
+- **NetworkHeatmap 히트맵** (NEW ✨):
+  - **인터랙티브 히트맵**: 리소스 타입별(document, stylesheet, script, image, font, xhr, fetch) / 시간대별(10 구간) 요청 분포
+  - **클릭 상세 정보**: 히트맵 셀 클릭 시 해당 시간대의 요청 목록 모달 표시
+  - **Size Distribution Chart**: 타입별 전체 크기 바 차트
+  - **Color-coded Heat Levels**: 요청 수에 따른 5단계 색상 구분
+- **NetworkWaterfall 워터폴 차트** (Enhanced):
+  - 필터링: 타입별 요청 필터 (All/Document/Stylesheet/Script/Image/Font/XHR/Fetch)
+  - 요약 통계: 총 크기, 요청 수, 평균/최장 지속시간
+  - 상세 정보 모달: 클릭 시 URL, 타입, 상태, 크기, 지속시간, 시간대 표시
+- 리소스별 요청 타임라인 테이블
 - 리소스 타입별 색상 구분 (Document, CSS, JS, Image)
 - 각 요청의 시작/종료 시간, 크기 표시
 - 요약 통계: 총 요청 수, 전송 크기, DCL, Load 시간
@@ -128,6 +147,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
   - 네트워크 속도별 로딩 시간 분포 (바 차트)
   - 장비별 로딩 시간 분포 (바 차트)
   - 24시간 로딩 시간 추이 (라인 차트)
+  - ⚠️ Note: 현재 mock 데이터 사용 (향후 히스토리 데이터 연동 예정)
 - 4개 요약 카드: 평균 로딩 시간, 성능 점수, 사용자 만족도, 최적화 가능성
 - 성능 개선 제안 (이미지 최적화, CSS 경량화, 리소스 사전 로딩)
 - Long Task 히스토그램 (지속시간 분포, 상위 작업)
@@ -168,19 +188,21 @@ nuxt-web-perf/
 │   └── css/
 │       └── main.css              # Custom CSS (HTML 디자인 기반)
 ├── components/
-│   ├── FrameAnalysisTab.vue      # 프레임 분석 탭 (좌우 레이아웃)
-│   ├── NetworkTimelineTab.vue    # 네트워크 타임라인 탭 (워터폴 차트)
-│   ├── LoadingDistributionTab.vue # 로딩 분포 탭 (Chart.js)
-│   ├── BatchAnalysis.vue         # 일괄 분석 탭 (여러 URL 비교)
-│   ├── HistoryViewer.vue         # 분석 이력 탭 (추이 차트)
-│   ├── PerformanceBudget.vue     # 성능 예산 탭 (목표 설정)
-│   ├── LighthouseTab.vue         # Lighthouse 탭 (5개 카테고리 점수) ⭐
-│   ├── LongTaskHistogram.vue     # Long Task 히스토그램 컴포넌트
-│   ├── FrameTimeline.vue         # 프레임 타임라인 뷰어 (레거시)
-│   ├── MetricBadge.vue           # 메트릭 배지 (레거시)
-│   ├── MetricsCard.vue           # 메트릭 카드 (레거시)
-│   ├── NetworkWaterfall.vue      # 네트워크 워터폴 (레거시)
-│   └── PerformanceOverview.vue   # 성능 개요 (레거시)
+│   ├── FrameAnalysisTab.vue         # 프레임 분석 탭 (좌우 레이아웃)
+│   ├── NetworkTimelineTab.vue       # 네트워크 타임라인 탭 (워터폴 차트)
+│   ├── LoadingDistributionTab.vue   # 로딩 분포 탭 (Chart.js)
+│   ├── BatchAnalysis.vue            # 일괄 분석 탭 (여러 URL 비교)
+│   ├── HistoryViewer.vue            # 분석 이력 탭 (추이 차트)
+│   ├── PerformanceBudget.vue        # 성능 예산 탭 (목표 설정)
+│   ├── LighthouseTab.vue            # Lighthouse 탭 (5개 카테고리 점수) ⭐
+│   ├── LongTaskHistogram.vue        # Long Task 히스토그램 컴포넌트
+│   ├── PerformanceMetricsChart.vue  # Core Web Vitals 인터랙티브 차트 ⭐ NEW
+│   ├── NetworkHeatmap.vue           # 네트워크 요청 히트맵 시각화 ⭐ NEW
+│   ├── NetworkWaterfall.vue         # 네트워크 워터폴 차트 (Enhanced)
+│   ├── FrameTimeline.vue            # 프레임 타임라인 뷰어 (레거시)
+│   ├── MetricBadge.vue              # 메트릭 배지 (레거시)
+│   ├── MetricsCard.vue              # 메트릭 카드 (레거시)
+│   └── PerformanceOverview.vue      # 성능 개요 (레거시)
 ├── pages/
 │   └── index.vue                 # 메인 페이지 (상단 제어바 + 7탭)
 ├── server/
@@ -406,13 +428,24 @@ npm run test:ui
 - [x] **Lighthouse API 통합**: Performance, Accessibility, SEO, PWA, Best Practices 분석
 - [x] **CI/CD 파이프라인**: GitHub Actions 기반 자동 빌드/테스트/배포
 - [x] **E2E 테스트**: Playwright 기반 자동화 테스트 및 스크린샷 캡처
+- [x] **고급 인터랙티브 시각화** ✨ NEW:
+  - **PerformanceMetricsChart**: Radar, Doughnut, Animated Bars, Timeline
+  - **NetworkHeatmap**: 타입별/시간대별 히트맵 + 클릭 상세 정보
 
 ## Future Enhancements
 
+### High Priority (추천 기능 #5, #10)
+- [ ] **PDF 리포트 생성**: 현재 텍스트/JSON/CSV만 지원, PDF 리포트 추가 필요
+- [ ] **커스텀 메트릭**: 사용자 정의 성능 지표 및 비즈니스 메트릭 추적
+
+### Medium Priority (추천 기능 #8 완료)
+- [x] **고급 시각화**: ✅ Radar, Doughnut, Heatmap, Animated Charts 구현 완료
+- [ ] **로딩 분포 실제 데이터 연동**: 현재 mock 데이터 사용, 히스토리 데이터 활용 필요
+- [ ] **인터랙티브 차트 추가 개선**: D3.js 도입, 줌/팬 기능
+
+### Low Priority
 - [ ] 실시간 모니터링 대시보드
-- [ ] PDF 보고서 생성 (현재는 텍스트만 지원)
 - [ ] 다국어 지원 (현재 한국어만)
-- [ ] Lighthouse 결과 PDF 리포트 생성
 - [ ] Kubernetes 배포 매니페스트
 
 ## License

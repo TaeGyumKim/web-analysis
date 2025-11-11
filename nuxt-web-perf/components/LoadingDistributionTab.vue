@@ -168,6 +168,10 @@ watch(() => props.result, () => {
 function initCharts() {
   if (!chartNetwork.value || !chartDevice.value || !chartTrend.value) return;
 
+  // TODO: Use real historical data from localStorage or database
+  // Currently using mock data for demonstration purposes
+  // This tab should aggregate data from multiple analysis runs
+
   // 네트워크 속도별 차트
   networkChart = new Chart(chartNetwork.value, {
     type: 'bar',
