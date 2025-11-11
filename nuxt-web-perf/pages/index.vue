@@ -65,6 +65,14 @@
       >
         로딩 분포
       </div>
+      <span class="divider">|</span>
+      <div
+        class="tab"
+        :class="{ active: activeTab === 'batch' }"
+        @click="activeTab = 'batch'"
+      >
+        일괄 분석
+      </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
@@ -80,6 +88,11 @@
     <!-- 로딩 분포 탭 -->
     <div v-show="activeTab === 'loading'" style="margin-top: 20px;">
       <LoadingDistributionTab :result="analysisResult" />
+    </div>
+
+    <!-- 일괄 분석 탭 -->
+    <div v-show="activeTab === 'batch'" style="margin-top: 20px;">
+      <BatchAnalysis />
     </div>
   </div>
 </template>
