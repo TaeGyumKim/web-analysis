@@ -42,6 +42,9 @@
         <button class="btn" @click="exportCSV" title="네트워크 요청을 CSV로 내보내기">
           📊 CSV
         </button>
+        <button class="btn btn-primary" @click="exportPDF" :disabled="isGeneratingPDF" title="PDF 리포트로 내보내기">
+          {{ isGeneratingPDF ? '⏳ 생성 중...' : '📑 PDF' }}
+        </button>
       </div>
     </div>
 
@@ -150,6 +153,7 @@ const deviceSpec = ref('Desktop');
 const useLighthouse = ref(false);
 const activeTab = ref('frame');
 const isAnalyzing = ref(false);
+const isGeneratingPDF = ref(false);
 const analysisResult = ref<AnalysisResult | null>(null);
 
 async function startAnalysis() {
@@ -228,6 +232,37 @@ function exportCSV() {
   if (!analysisResult.value) return;
   const { exportNetworkAsCSV } = useExportUtils();
   exportNetworkAsCSV(analysisResult.value);
+}
+
+async function exportPDF() {
+  if (!analysisResult.value || isGeneratingPDF.value) return;
+
+  isGeneratingPDF.value = true;
+
+  try {
+    const response = await $fetch('/api/generate-pdf', {
+      method: 'POST',
+      body: {
+        result: analysisResult.value
+      },
+      responseType: 'blob'
+    });
+
+    // Create download link
+    const blob = new Blob([response as Blob], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.href = url;
+    link.download = `performance-report-${timestamp}.pdf`;
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch (err: any) {
+    console.error('PDF generation error:', err);
+    alert('PDF 생성 중 오류가 발생했습니다: ' + (err.data?.message || err.message));
+  } finally {
+    isGeneratingPDF.value = false;
+  }
 }
 
 function useExportUtils() {

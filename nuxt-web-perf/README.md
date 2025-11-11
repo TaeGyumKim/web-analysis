@@ -17,7 +17,7 @@
 - 🎨 **깔끔한 UI**: 16px 보더 라디우스와 부드러운 섀도우를 활용한 모던한 디자인
 - ⚙️ **설정 가능한 테스트 환경**: 네트워크 속도(3G/4G/Wi-Fi), 장비 사양(Desktop/Mobile) 선택
 - 📉 **Long Task 히스토그램**: 메인 스레드 차단 작업 시각화 및 분석
-- 💾 **결과 내보내기**: JSON, 텍스트 리포트, CSV 형식으로 분석 결과 저장
+- 💾 **결과 내보내기**: JSON, 텍스트 리포트, CSV, **PDF 리포트** 형식으로 분석 결과 저장
 - 🔄 **일괄 분석**: 여러 URL을 동시에 분석하고 성능 비교
 - 📜 **분석 이력**: 과거 데이터 저장 및 추이 차트 생성 (최대 50개)
 - 💰 **성능 예산**: 목표 메트릭 설정 및 실제 성능 비교
@@ -207,7 +207,9 @@ nuxt-web-perf/
 │   └── index.vue                 # 메인 페이지 (상단 제어바 + 7탭)
 ├── server/
 │   ├── api/
-│   │   └── analyze.post.ts       # POST /api/analyze 엔드포인트
+│   │   ├── analyze.post.ts        # POST /api/analyze 엔드포인트
+│   │   ├── generate-pdf.post.ts   # POST /api/generate-pdf 엔드포인트 ⭐ NEW
+│   │   └── health.get.ts          # GET /api/health 엔드포인트
 │   └── utils/
 │       ├── performanceCollector.ts # Puppeteer 기반 수집기
 │       └── lighthouseCollector.ts  # Lighthouse 수집기 ⭐
@@ -421,7 +423,7 @@ npm run test:ui
 
 - [x] **CLS 메트릭 추가**: Cumulative Layout Shift 측정 및 시각화
 - [x] **Long Task 히스토그램**: 50ms 이상 차단 작업 분석 및 통계
-- [x] **결과 내보내기**: JSON, 텍스트 리포트, CSV 형식 지원
+- [x] **결과 내보내기**: JSON, 텍스트 리포트, CSV, PDF 리포트 형식 지원
 - [x] **여러 URL 일괄 분석**: 동시 분석 및 성능 비교 테이블
 - [x] **과거 데이터 비교**: 분석 이력 저장 및 추이 차트 (Chart.js)
 - [x] **성능 예산 설정**: 목표 값 설정 및 실제 성능 대비 분석
@@ -431,11 +433,15 @@ npm run test:ui
 - [x] **고급 인터랙티브 시각화** ✨ NEW:
   - **PerformanceMetricsChart**: Radar, Doughnut, Animated Bars, Timeline
   - **NetworkHeatmap**: 타입별/시간대별 히트맵 + 클릭 상세 정보
+- [x] **PDF 리포트 생성** ✨ NEW:
+  - **Puppeteer 기반 고품질 PDF**: 서버 사이드에서 HTML을 PDF로 변환
+  - **자동 포맷팅**: Core Web Vitals, 네트워크 요약, Long Tasks 등 전체 리포트
+  - **다운로드 버튼**: 상단 제어바에서 원클릭 PDF 다운로드
 
 ## Future Enhancements
 
-### High Priority (추천 기능 #5, #10)
-- [ ] **PDF 리포트 생성**: 현재 텍스트/JSON/CSV만 지원, PDF 리포트 추가 필요
+### High Priority (추천 기능 #10)
+- [x] **PDF 리포트 생성**: ✅ Puppeteer 기반 고품질 PDF 리포트 구현 완료
 - [ ] **커스텀 메트릭**: 사용자 정의 성능 지표 및 비즈니스 메트릭 추적
 
 ### Medium Priority (추천 기능 #8 완료)
