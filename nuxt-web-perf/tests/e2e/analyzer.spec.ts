@@ -19,8 +19,8 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
     const topbar = page.locator('.topbar');
     await expect(topbar).toBeVisible();
 
-    // Check URL input with specific placeholder
-    const urlInput = page.getByPlaceholder(/URL 입력|https:\/\/www\.naver\.com\//);
+    // Check URL input in topbar (avoid strict mode violation)
+    const urlInput = page.locator('.topbar input[type="text"]');
     await expect(urlInput).toBeVisible();
 
     // Check dropdowns exist
@@ -90,8 +90,8 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
   });
 
   test('should accept URL input and enable start button', async ({ page }) => {
-    // Use more specific selector for URL input
-    const urlInput = page.getByPlaceholder(/URL 입력|https:\/\/www\.naver\.com\//);
+    // Use topbar selector to avoid strict mode violation
+    const urlInput = page.locator('.topbar input[type="text"]');
 
     // Clear and enter URL
     await urlInput.clear();
@@ -147,8 +147,8 @@ test.describe('Web Performance Analyzer - Analysis Tests', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Configure - use specific placeholder
-    const urlInput = page.getByPlaceholder(/URL 입력|https:\/\/www\.naver\.com\//);
+    // Configure - use topbar selector
+    const urlInput = page.locator('.topbar input[type="text"]');
     await urlInput.clear();
     await urlInput.fill('https://example.com');
 
