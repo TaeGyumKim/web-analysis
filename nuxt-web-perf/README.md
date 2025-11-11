@@ -74,6 +74,27 @@ Start the production server:
 npm run preview
 ```
 
+### Docker Deployment
+
+Build and run with Docker:
+```bash
+# 단일 컨테이너 실행
+docker build -t web-perf-analyzer ./nuxt-web-perf
+docker run -p 3000:3000 web-perf-analyzer
+
+# Docker Compose 사용
+docker-compose up -d
+
+# Nginx 프록시와 함께 실행
+docker-compose --profile with-nginx up -d
+```
+
+Pull from GitHub Container Registry:
+```bash
+docker pull ghcr.io/TaeGyumKim/web-analysis:latest
+docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
+```
+
 ### Using the Analyzer
 
 #### 1. 분석 시작
@@ -235,6 +256,84 @@ C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 - ✅ **동일한 알고리즘**: 점수 계산 로직 유지
 - ✅ **Chart.js**: 고급 차트 시각화
 
+## CI/CD Pipeline
+
+### GitHub Actions 워크플로우
+
+이 프로젝트는 자동화된 CI/CD 파이프라인을 제공합니다:
+
+#### 🔄 CI (Continuous Integration)
+자동 실행 조건: PR 생성, `main`/`master`/`develop`/`claude/**` 브랜치에 푸시
+
+**Build and Test Job**
+- Node.js 18.x, 20.x 매트릭스 테스트
+- 의존성 설치 (npm ci)
+- 프로덕션 빌드 검증
+- 빌드 아티팩트 업로드 (7일 보관)
+
+**Code Quality Job**
+- TypeScript 타입 체크 (`nuxi typecheck`)
+- 보안 취약점 스캔 (`npm audit`)
+
+**Lighthouse Integration Check**
+- Chromium 의존성 설치
+- Lighthouse 패키지 검증
+- Puppeteer 통합 테스트
+
+#### 🚀 CD (Continuous Deployment)
+자동 배포 조건: `main`/`master` 브랜치에 푸시, 태그 생성 (`v*`)
+
+**Docker Build & Push**
+- 멀티 스테이지 빌드로 최적화된 이미지 생성
+- GitHub Container Registry (ghcr.io)에 자동 푸시
+- 이미지 태그: `latest`, `브랜치명`, `SHA`, 버전 태그
+- GitHub Actions 캐시로 빌드 속도 향상
+
+**GitHub Pages 배포**
+- Static Site Generation (SSG)
+- `npm run generate`로 정적 사이트 생성
+- GitHub Pages에 자동 배포
+- 배포 URL: `https://[username].github.io/[repo]`
+
+**Release 자동 생성**
+- 버전 태그 푸시 시 자동 릴리즈 생성
+- 변경 로그 자동 생성
+- Docker 이미지 pull 명령어 포함
+
+### 워크플로우 파일
+
+- `.github/workflows/ci.yml` - CI 파이프라인
+- `.github/workflows/cd.yml` - CD 파이프라인
+
+### Health Check Endpoint
+
+Docker 컨테이너 헬스 체크를 위한 API:
+```bash
+curl http://localhost:3000/api/health
+```
+
+응답 예시:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "uptime": 123.456,
+  "environment": "production",
+  "checks": {
+    "api": "ok",
+    "memory": "ok",
+    "puppeteer": "ok"
+  },
+  "memory": {
+    "rss": 256,
+    "heapTotal": 128,
+    "heapUsed": 64,
+    "external": 8
+  },
+  "responseTime": "5ms"
+}
+```
+
 ## Implemented Enhancements ✅
 
 - [x] **CLS 메트릭 추가**: Cumulative Layout Shift 측정 및 시각화
@@ -244,14 +343,15 @@ C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 - [x] **과거 데이터 비교**: 분석 이력 저장 및 추이 차트 (Chart.js)
 - [x] **성능 예산 설정**: 목표 값 설정 및 실제 성능 대비 분석
 - [x] **Lighthouse API 통합**: Performance, Accessibility, SEO, PWA, Best Practices 분석
+- [x] **CI/CD 파이프라인**: GitHub Actions 기반 자동 빌드/테스트/배포
 
 ## Future Enhancements
 
-- [ ] CI/CD 파이프라인 통합
 - [ ] 실시간 모니터링 대시보드
 - [ ] PDF 보고서 생성 (현재는 텍스트만 지원)
 - [ ] 다국어 지원 (현재 한국어만)
 - [ ] Lighthouse 결과 PDF 리포트 생성
+- [ ] Kubernetes 배포 매니페스트
 
 ## License
 

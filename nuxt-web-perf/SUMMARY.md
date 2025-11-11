@@ -145,6 +145,28 @@
   - 진단 결과 (Diagnostics) 테이블
   - Mobile/Desktop Form Factor 자동 설정
   - 선택적 활성화 (체크박스)
+- **커밋**: `0f4ef83`
+
+#### 4.8 CI/CD 파이프라인 통합 ✅
+- **구현 내용**:
+  - **GitHub Actions 워크플로우**:
+    - `ci.yml`: 빌드/테스트/품질 검사 자동화
+      - Node.js 18.x, 20.x 매트릭스 테스트
+      - TypeScript 타입 체크
+      - 보안 취약점 스캔
+      - Lighthouse 통합 검증
+    - `cd.yml`: 배포 자동화
+      - Docker 이미지 빌드 및 GHCR 푸시
+      - GitHub Pages 배포 (SSG)
+      - 릴리즈 자동 생성
+  - **Docker 통합**:
+    - `Dockerfile`: 멀티 스테이지 빌드 (Alpine 기반)
+    - `docker-compose.yml`: 로컬 개발 및 배포 설정
+    - `.dockerignore`: 이미지 최적화
+  - **Health Check API**:
+    - `/api/health` 엔드포인트 구현
+    - 메모리, Puppeteer, API 상태 모니터링
+    - Docker 컨테이너 헬스 체크 지원
 - **커밋**: TBD
 
 ---
@@ -170,31 +192,40 @@
 ## 📁 프로젝트 구조
 
 ```
-nuxt-web-perf/
-├── assets/css/main.css                  # 커스텀 CSS (HTML 디자인 기반)
-├── components/
-│   ├── FrameAnalysisTab.vue            # 프레임 분석 탭 (좌우 레이아웃)
-│   ├── NetworkTimelineTab.vue          # 네트워크 타임라인 탭
-│   ├── LoadingDistributionTab.vue      # 로딩 분포 탭
-│   ├── BatchAnalysis.vue               # 일괄 분석 탭 ⭐
-│   ├── HistoryViewer.vue               # 분석 이력 탭 ⭐
-│   ├── PerformanceBudget.vue           # 성능 예산 탭 ⭐
-│   ├── LighthouseTab.vue               # Lighthouse 탭 ⭐ NEW
-│   └── LongTaskHistogram.vue           # Long Task 히스토그램 ⭐
-├── pages/index.vue                      # 메인 페이지 (7탭 시스템)
-├── server/
-│   ├── api/analyze.post.ts             # POST /api/analyze 엔드포인트
-│   └── utils/
-│       ├── performanceCollector.ts     # Puppeteer 기반 수집기
-│       └── lighthouseCollector.ts      # Lighthouse 수집기 ⭐ NEW
-├── types/performance.ts                 # TypeScript 타입 정의
-├── utils/
-│   ├── scoreCalculator.ts              # 성능 점수 계산
-│   ├── exportUtils.ts                  # 결과 내보내기 ⭐
-│   └── historyManager.ts               # 분석 이력 관리 ⭐
-├── package.json
-├── README.md                            # 프로젝트 문서 (업데이트됨)
-└── API.md                               # API 문서 (업데이트됨)
+web-analysis/
+├── .github/workflows/
+│   ├── ci.yml                          # CI 파이프라인 ⭐ NEW
+│   └── cd.yml                          # CD 파이프라인 ⭐ NEW
+├── docker-compose.yml                   # Docker Compose 설정 ⭐ NEW
+└── nuxt-web-perf/
+    ├── assets/css/main.css             # 커스텀 CSS (HTML 디자인 기반)
+    ├── components/
+    │   ├── FrameAnalysisTab.vue        # 프레임 분석 탭 (좌우 레이아웃)
+    │   ├── NetworkTimelineTab.vue      # 네트워크 타임라인 탭
+    │   ├── LoadingDistributionTab.vue  # 로딩 분포 탭
+    │   ├── BatchAnalysis.vue           # 일괄 분석 탭 ⭐
+    │   ├── HistoryViewer.vue           # 분석 이력 탭 ⭐
+    │   ├── PerformanceBudget.vue       # 성능 예산 탭 ⭐
+    │   ├── LighthouseTab.vue           # Lighthouse 탭 ⭐
+    │   └── LongTaskHistogram.vue       # Long Task 히스토그램 ⭐
+    ├── pages/index.vue                 # 메인 페이지 (7탭 시스템)
+    ├── server/
+    │   ├── api/
+    │   │   ├── analyze.post.ts         # POST /api/analyze 엔드포인트
+    │   │   └── health.get.ts           # GET /api/health 헬스 체크 ⭐ NEW
+    │   └── utils/
+    │       ├── performanceCollector.ts # Puppeteer 기반 수집기
+    │       └── lighthouseCollector.ts  # Lighthouse 수집기 ⭐
+    ├── types/performance.ts            # TypeScript 타입 정의
+    ├── utils/
+    │   ├── scoreCalculator.ts          # 성능 점수 계산
+    │   ├── exportUtils.ts              # 결과 내보내기 ⭐
+    │   └── historyManager.ts           # 분석 이력 관리 ⭐
+    ├── Dockerfile                      # Docker 이미지 빌드 ⭐ NEW
+    ├── .dockerignore                   # Docker 빌드 제외 파일 ⭐ NEW
+    ├── package.json
+    ├── README.md                       # 프로젝트 문서 (업데이트됨)
+    └── SUMMARY.md                      # 프로젝트 전체 상황 정리
 ```
 
 ---
@@ -260,9 +291,32 @@ npm run build
 npm run preview
 ```
 
+### Docker 배포 ⭐ NEW
+```bash
+# Docker Compose 사용 (권장)
+docker-compose up -d
+
+# Nginx 프록시와 함께 실행
+docker-compose --profile with-nginx up -d
+
+# 단일 컨테이너 실행
+docker build -t web-perf-analyzer ./nuxt-web-perf
+docker run -p 3000:3000 web-perf-analyzer
+
+# GitHub Container Registry에서 Pull
+docker pull ghcr.io/TaeGyumKim/web-analysis:latest
+docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
+```
+
+### CI/CD 자동 배포 ⭐ NEW
+- **PR 생성 시**: 자동 빌드 및 테스트
+- **main 브랜치 푸시**: Docker 이미지 빌드 및 GHCR 푸시, GitHub Pages 배포
+- **버전 태그 (v*)**: 릴리즈 자동 생성
+
 ### 환경 요구사항
 - Node.js 18+
 - Chrome/Chromium (Puppeteer용, 시스템에 설치됨)
+- Docker (선택사항, 컨테이너 배포용)
 
 ---
 
@@ -291,14 +345,15 @@ npm run preview
 ## 📋 남은 작업 (Future Enhancements)
 
 ### 추가 개발 권장 사항
-- [ ] CI/CD 파이프라인 통합
+- [x] ~~CI/CD 파이프라인 통합~~ ✅ 완료
+- [x] ~~Lighthouse API 통합~~ ✅ 완료
 - [ ] 실시간 모니터링 대시보드
 - [ ] PDF 보고서 생성 (현재는 텍스트만 지원)
-- [ ] Lighthouse API 통합
 - [ ] 다국어 지원 (현재 한국어만)
 - [ ] WebSocket 기반 실시간 분석 진행률
 - [ ] 사용자 계정 및 팀 기능
 - [ ] 알림 및 성능 임계값 경고
+- [ ] Kubernetes 배포 매니페스트
 
 ---
 

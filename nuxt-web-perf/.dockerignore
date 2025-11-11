@@ -1,0 +1,72 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Nuxt build artifacts
+.nuxt
+.output
+dist
+.cache
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
+
+# Documentation
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+*.md
+!package.json
+
+# Tests
+tests
+test
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+coverage
+.nyc_output
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Development files
+.eslintrc*
+.prettierrc*
+.editorconfig
+tsconfig.json
+nuxt.config.ts

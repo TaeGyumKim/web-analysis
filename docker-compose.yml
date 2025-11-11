@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # Nuxt Web Performance Analyzer
+  web-perf:
+    build:
+      context: ./nuxt-web-perf
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+
+    image: web-perf-analyzer:latest
+
+    container_name: nuxt-web-perf
+
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3000
+      # Puppeteer 설정
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+      # Lighthouse 설정
+      - CHROME_PATH=/usr/bin/chromium-browser
+
+    # 보안 설정
+    security_opt:
+      - seccomp:unconfined
+
+    # 리소스 제한
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # 헬스 체크
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # 볼륨 마운트 (개발 모드용 - 프로덕션에서는 제거)
+    # volumes:
+    #   - ./nuxt-web-perf:/app
+    #   - /app/node_modules
+    #   - /app/.nuxt
+
+    networks:
+      - web-perf-network
+
+    labels:
+      - "com.web-perf.description=Nuxt Web Performance Analyzer"
+      - "com.web-perf.version=1.0.0"
+
+  # Nginx 리버스 프록시 (선택사항)
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+
+    depends_on:
+      - web-perf
+
+    networks:
+      - web-perf-network
+
+    profiles:
+      - with-nginx
+
+networks:
+  web-perf-network:
+    driver: bridge
+    name: web-perf-network
