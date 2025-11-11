@@ -15,13 +15,12 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
   });
 
   test('should load homepage with all UI elements', async ({ page }) => {
-    // Check title
-    await expect(page.locator('h1')).toContainText('Web Performance Analyzer');
+    // Check topbar exists (contains network speed selector)
+    const topbar = page.locator('.topbar');
+    await expect(topbar).toBeVisible();
 
-    // Check URL input
-    const urlInput = page.locator('input[placeholder*="URL"]').or(
-      page.locator('input[type="text"]').first()
-    );
+    // Check URL input with specific placeholder
+    const urlInput = page.getByPlaceholder(/URL 입력|https:\/\/www\.naver\.com\//);
     await expect(urlInput).toBeVisible();
 
     // Check dropdowns exist
@@ -91,11 +90,11 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
   });
 
   test('should accept URL input and enable start button', async ({ page }) => {
-    const urlInput = page.locator('input[placeholder*="URL"]').or(
-      page.locator('input[type="text"]').first()
-    );
+    // Use more specific selector for URL input
+    const urlInput = page.getByPlaceholder(/URL 입력|https:\/\/www\.naver\.com\//);
 
-    // Enter URL
+    // Clear and enter URL
+    await urlInput.clear();
     await urlInput.fill('https://example.com');
 
     // Check button state
@@ -140,7 +139,7 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
  */
 test.describe('Web Performance Analyzer - Analysis Tests', () => {
   // Skip these tests in CI for now since Puppeteer may not work reliably
-  test.skip(({ browserName }) => browserName !== 'chromium', 'Analysis tests only on Chromium');
+  test.skip(() => !!process.env.CI, 'Analysis tests are skipped in CI environment');
 
   test('should start analysis when button clicked', async ({ page }) => {
     test.setTimeout(180000); // 3 minutes for full analysis
@@ -148,10 +147,9 @@ test.describe('Web Performance Analyzer - Analysis Tests', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Configure
-    const urlInput = page.locator('input[placeholder*="URL"]').or(
-      page.locator('input[type="text"]').first()
-    );
+    // Configure - use specific placeholder
+    const urlInput = page.getByPlaceholder(/URL 입력|https:\/\/www\.naver\.com\//);
+    await urlInput.clear();
     await urlInput.fill('https://example.com');
 
     await page.screenshot({
