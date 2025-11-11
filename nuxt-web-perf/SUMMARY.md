@@ -198,6 +198,7 @@ web-analysis/
 │   └── cd.yml                          # CD 파이프라인 ⭐ NEW
 ├── docker-compose.yml                   # Docker Compose 설정 ⭐ NEW
 └── nuxt-web-perf/
+    ├── app.vue                         # App entry point
     ├── assets/css/main.css             # 커스텀 CSS (HTML 디자인 기반)
     ├── components/
     │   ├── FrameAnalysisTab.vue        # 프레임 분석 탭 (좌우 레이아웃)

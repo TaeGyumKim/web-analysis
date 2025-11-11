@@ -163,8 +163,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 
 ```
 nuxt-web-perf/
-├── app/
-│   └── app.vue                    # App entry point
+├── app.vue                        # App entry point
 ├── assets/
 │   └── css/
 │       └── main.css              # Custom CSS (HTML 디자인 기반)
