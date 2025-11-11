@@ -81,6 +81,14 @@
       >
         분석 이력
       </div>
+      <span class="divider">|</span>
+      <div
+        class="tab"
+        :class="{ active: activeTab === 'budget' }"
+        @click="activeTab = 'budget'"
+      >
+        성능 예산
+      </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
@@ -106,6 +114,11 @@
     <!-- 분석 이력 탭 -->
     <div v-show="activeTab === 'history'" style="margin-top: 20px;">
       <HistoryViewer />
+    </div>
+
+    <!-- 성능 예산 탭 -->
+    <div v-show="activeTab === 'budget'" style="margin-top: 20px;">
+      <PerformanceBudget :result="analysisResult" />
     </div>
   </div>
 </template>
