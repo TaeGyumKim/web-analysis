@@ -73,6 +73,14 @@
       >
         일괄 분석
       </div>
+      <span class="divider">|</span>
+      <div
+        class="tab"
+        :class="{ active: activeTab === 'history' }"
+        @click="activeTab = 'history'"
+      >
+        분석 이력
+      </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
@@ -93,6 +101,11 @@
     <!-- 일괄 분석 탭 -->
     <div v-show="activeTab === 'batch'" style="margin-top: 20px;">
       <BatchAnalysis />
+    </div>
+
+    <!-- 분석 이력 탭 -->
+    <div v-show="activeTab === 'history'" style="margin-top: 20px;">
+      <HistoryViewer />
     </div>
   </div>
 </template>
@@ -128,6 +141,8 @@ async function startAnalysis() {
 
     if (response.success) {
       analysisResult.value = response.data;
+      // Save to history
+      saveResultToHistory(response.data);
     }
   } catch (err: any) {
     console.error('Analysis error:', err);
@@ -335,5 +350,32 @@ function formatBytes(bytes: number): string {
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+}
+
+function saveResultToHistory(result: AnalysisResult) {
+  if (typeof window === 'undefined') return;
+
+  const STORAGE_KEY = 'performance-analysis-history';
+  const MAX_HISTORY_ITEMS = 50;
+
+  try {
+    const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const entry = {
+      id: `${result.url}-${result.timestamp}`,
+      url: result.url,
+      timestamp: result.timestamp,
+      result
+    };
+
+    history.unshift(entry);
+
+    if (history.length > MAX_HISTORY_ITEMS) {
+      history.splice(MAX_HISTORY_ITEMS);
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  } catch (error) {
+    console.error('Failed to save to history:', error);
+  }
 }
 </script>
