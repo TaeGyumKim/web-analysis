@@ -336,10 +336,19 @@ curl http://localhost:3000/api/health
 ### E2E Testing with Playwright
 
 **Test Suite** (`tests/e2e/analyzer.spec.ts`):
-- **Homepage Load Test**: Verifies initial UI rendering
-- **Full Analysis Test**: Tests complete analysis flow with all 7 tabs
-- **UI Elements Test**: Validates all major UI components
-- **Tab Navigation Test**: Tests navigation between empty tabs
+
+**UI Tests** (Always Run):
+- **Homepage Load**: Verifies all UI elements are visible
+- **7 Tabs Display**: Checks all tabs exist and are visible
+- **Tab Navigation**: Tests switching between empty tabs (7 screenshots)
+- **URL Input**: Validates URL input and button enabling
+- **Export Buttons**: Checks export UI area
+- **Lighthouse Checkbox**: Validates Lighthouse option
+
+**Analysis Tests** (Skipped in CI):
+- **Full Analysis Flow**: Tests actual performance analysis
+- Note: Skipped in CI due to Puppeteer reliability in headless environments
+- Can be run locally with `npm run test:headed`
 
 **Running Tests Locally**:
 ```bash
@@ -359,17 +368,17 @@ npm run test:ui
 ```
 
 **CI/CD Integration**:
-- E2E tests run automatically on every commit
+- UI tests run automatically on every commit (fast, reliable)
+- Analysis tests skipped in CI (can run locally)
 - 3 artifacts uploaded (30-day retention):
-  - **e2e-screenshots**: Visual proof of all 7 tabs (10+ screenshots)
+  - **e2e-screenshots**: Visual proof of UI (12+ screenshots)
   - **playwright-report**: Detailed HTML test report
-  - **test-results**: Complete results including failure videos
+  - **test-results**: Complete results including videos
 
-**Test Screenshots Captured**:
-1. Homepage initial state
-2. Analysis configuration
-3. Analysis in progress
-4. All 7 tabs after analysis:
+**Screenshots Captured in CI**:
+1. Homepage with all UI elements (01)
+2. All 7 tabs visible verification (02)
+3-9. Individual tab navigation (03-09):
    - Frame Analysis
    - Network Timeline
    - Loading Distribution
@@ -377,7 +386,14 @@ npm run test:ui
    - History
    - Performance Budget
    - Lighthouse
-5. Empty tab navigation (7 tabs)
+10. URL input test (10)
+11. Export area (11)
+12. Lighthouse checkbox area (12)
+
+**Local Analysis Tests** (npm run test:headed):
+- Captures full analysis flow with 20-30 second wait
+- Screenshots before, during, and after analysis
+- Tests actual Puppeteer-based performance collection
 
 ## Implemented Enhancements ✅
 
