@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>A타입 – 완성형 (프레임 / 네트워크 / 로딩 분포)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background:#f6f7f9;
+    margin:40px;
+    color:#333;
+  }
+  .card { background:#fff; border-radius:16px; padding:24px; box-shadow:0 10px 32px rgba(0,0,0,0.12); }
+  .topbar { display:flex; gap:14px; align-items:center; padding:20px; background:#fff; border-radius:16px; box-shadow:0 8px 28px rgba(0,0,0,0.08); }
+  .topbar select, .topbar input { padding:10px 12px; border-radius:12px; border:1px solid #d1d1d4; background:#f8f8fa; }
+  .btn { padding:10px 14px; border-radius:12px; border:1px solid #d9d9e0; background:#fff; cursor:pointer; }
+  .tabs-wrapper { background:#EFF0F3; padding:10px 20px; border-radius:16px; display:flex; align-items:center; gap:24px; margin-top:20px; width:max-content; font-size:15px; }
+  .tab { padding:8px 18px; border-radius:12px; cursor:pointer; }
+  .tab.active { background:#fff; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+  .divider { opacity:0.4; }
+  .layout { display:flex; gap:20px; margin-top:20px; }
+  .left-area { flex:1; }
+  .right-area { width:340px; }
+  .frame-box { height:360px; background:#EFEFF1; border-radius:16px; margin-top:16px; }
+  .slider { width:100%; margin-top:26px; }
+  .frame-control { text-align:center; margin-top:10px; }
+  .frame-control button { margin:0 5px; padding:6px 12px; border:1px solid #ccc; border-radius:8px; background:#fff; cursor:pointer; }
+  .section-card { background:#fff; border-radius:16px; padding:20px; box-shadow:0 4px 18px rgba(0,0,0,0.08); margin-bottom:16px; }
+  .metric-bar { height:6px; border-radius:4px; background:#e0e0e3; position:relative; margin-top:6px; }
+  .metric-fill { height:6px; border-radius:4px; position:absolute; left:0; top:0; }
+  .green { background:#48d178; } .yellow { background:#e6b421; } .orange { background:#e67e22; }
+  .tab-content { display:none; margin-top:20px; }
+  .tab-content.active { display:block; }
+  .timeline-table { width:100%; border-collapse:collapse; }
+  .timeline-table th, .timeline-table td { padding:8px; border-bottom:1px solid #e0e0e0; }
+  .bar { height:10px; border-radius:5px; margin-top:4px; }
+  .Document { background:#5b8efc; } .CSS { background:#c08eff; } .JS { background:#f4b940; } .Image { background:#60c989; }
+  .summary { display:flex; gap:24px; margin-top:16px; font-size:14px; }
+  .chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .chart-container { background:#fff; border-radius:16px; padding:20px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+  .summary-cards { display:flex; gap:20px; margin-top:20px; }
+  .summary-card { flex:1; background:#fff; border-radius:16px; padding:16px; box-shadow:0 4px 14px rgba(0,0,0,0.08); text-align:center; }
+  .suggestion-card { margin-top:16px; padding:12px 16px; border-radius:10px; }
+  .suggestion-card.yellow { background:#fff6d1; } .suggestion-card.blue { background:#e6f0ff; } .suggestion-card.green { background:#e9f6e8; }
+</style>
+</head>
+<body>
+
+<!-- 상단 제어 -->
+<div class="topbar">
+  <label>네트워크 속도:</label>
+  <select><option>3G</option><option selected>4G</option><option>Wi-Fi</option><option>Slow 3G</option></select>
+  <label>장비 사양:</label>
+  <select><option selected>Desktop</option><option>Mobile (High-end)</option><option>Mobile (Mid-range)</option><option>Mobile (Low-end)</option></select>
+  <label>URL:</label><input type="text" value="https://www.naver.com/" style="width:280px;" />
+  <button class="btn">재분석</button><button class="btn">시작</button>
+</div>
+
+<!-- 탭 -->
+<div class="tabs-wrapper">
+  <div class="tab active" data-tab="frame">프레임 분석</div><span class="divider">|</span>
+  <div class="tab" data-tab="network">네트워크 타임라인</div><span class="divider">|</span>
+  <div class="tab" data-tab="loading">로딩 분포</div>
+</div>
+
+<!-- 프레임 분석 -->
+<div class="tab-content active" id="frame">
+  <div class="layout">
+    <div class="left-area">
+      <div class="card">
+        <h3>프레임별 렌더링 과정</h3>
+        <div class="frame-box"></div>
+        <input type="range" min="0" max="100" class="slider" />
+        <div class="frame-control"><button>◀</button><button>▶</button><button>▶▶</button></div>
+        <div style="text-align:center; margin-top:12px;">프레임 1 / 5 - 초기 HTML</div>
+      </div>
+    </div>
+    <div class="right-area">
+      <div class="card">
+        <div class="section-card"><h3>현재 프레임 정보</h3><div>시간: 0ms</div><div>상태: 초기 HTML</div><div>설명: 빈 화면</div></div>
+        <div class="section-card"><h3>로드된 리소스</h3><div>DOM 노드: 0</div><div>CSS 파일: 0</div><div>이미지: 0</div></div>
+        <div class="section-card">
+          <h3>핵심 메트릭</h3>
+          <div>FCP: 1,274ms</div><div class="metric-bar"><div class="metric-fill green" style="width:70%;"></div></div>
+          <div style="margin-top:12px;">LCP: 2,349ms</div><div class="metric-bar"><div class="metric-fill yellow" style="width:50%;"></div></div>
+          <div style="margin-top:12px;">TTI: 4,562ms</div><div class="metric-bar"><div class="metric-fill orange" style="width:30%;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 네트워크 타임라인 -->
+<div class="tab-content" id="network">
+  <div class="card">
+    <h3>네트워크 요청 타임라인</h3>
+    <table class="timeline-table">
+      <thead><tr><th>리소스 이름</th><th>요청 구간</th><th>크기</th></tr></thead>
+      <tbody>
+        <tr><td>index.html</td><td><div class="bar Document" style="width:8%;"></div></td><td>42 KB</td></tr>
+        <tr><td>main.css</td><td><div class="bar CSS" style="width:16%; margin-left:4%;"></div></td><td>156 KB</td></tr>
+        <tr><td>app.js</td><td><div class="bar JS" style="width:28%; margin-left:8%;"></div></td><td>428 KB</td></tr>
+        <tr><td>logo.png</td><td><div class="bar Image" style="width:18%; margin-left:12%;"></div></td><td>89 KB</td></tr>
+        <tr><td>hero.jpg</td><td><div class="bar Image" style="width:36%; margin-left:16%;"></div></td><td>342 KB</td></tr>
+        <tr><td>font.woff2</td><td><div class="bar CSS" style="width:12%; margin-left:22%;"></div></td><td>45 KB</td></tr>
+        <tr><td>api/user</td><td><div class="bar JS" style="width:12%; margin-left:40%;"></div></td><td>2.1 KB</td></tr>
+      </tbody>
+    </table>
+    <div class="summary">
+      <div>총 요청 수: <strong>10</strong></div>
+      <div>총 전송 크기: <strong>1.2 MB</strong></div>
+      <div>DOMContentLoaded: <strong>1250 ms</strong></div>
+      <div>Load: <strong>2256 ms</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- 로딩 분포 -->
+<div class="tab-content" id="loading">
+  <div class="chart-grid">
+    <div class="chart-container"><h3>네트워크 속도별 로딩 시간 분포</h3><canvas id="chartNetwork"></canvas></div>
+    <div class="chart-container"><h3>장비별 로딩 시간 분포</h3><canvas id="chartDevice"></canvas></div>
+  </div>
+  <div class="chart-container" style="margin-top:20px;"><h3>24시간 로딩 시간 추이</h3><canvas id="chartTrend"></canvas></div>
+  <div class="summary-cards">
+    <div class="summary-card"><strong>평균 로딩 시간</strong><br>3,234 ms<br><span style="color:green;">12% 개선</span></div>
+    <div class="summary-card"><strong>성능 점수</strong><br>69 / 100<br>양호</div>
+    <div class="summary-card"><strong>사용자 만족도</strong><br>76%<br>목표 달성</div>
+    <div class="summary-card"><strong>최적화 가능성</strong><br>중간<br><span style="color:orange;">개선 필요</span></div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h3>성능 개선 제안</h3>
+    <div class="suggestion-card yellow">1. <strong>이미지 최적화</strong> – hero.jpg(342KB)를 WebP로 변환 시 약 40% 절감</div>
+    <div class="suggestion-card blue">2. <strong>CSS 경량화</strong> – 중복 규칙 제거로 main.css 156KB → 90KB 가능</div>
+    <div class="suggestion-card green">3. <strong>리소스 사전 로딩</strong> – &lt;link rel="preload"&gt; 태그 권장</div>
+  </div>
+</div>
+
+<script>
+const tabs=document.querySelectorAll('.tab'); const contents=document.querySelectorAll('.tab-content');
+tabs.forEach(tab=>tab.addEventListener('click',()=>{tabs.forEach(t=>t.classList.remove('active'));tab.classList.add('active');contents.forEach(c=>c.classList.remove('active'));document.getElementById(tab.dataset.tab).classList.add('active');}));
+
+new Chart(document.getElementById('chartNetwork'),{type:'bar',data:{labels:['3G','4G','Wi-Fi'],datasets:[{label:'P50',data:[5200,3400,1800],backgroundColor:'#7b91f0'},{label:'P95',data:[6200,4200,2200],backgroundColor:'#f3b94a'},{label:'평균',data:[5800,3600,1900],backgroundColor:'#68ca84'}]},options:{scales:{y:{beginAtZero:true}}}});
+new Chart(document.getElementById('chartDevice'),{type:'bar',data:{labels:['Desktop','Mobile High','Mobile Mid','Mobile Low'],datasets:[{label:'P50',data:[1500,2200,3900,6500],backgroundColor:'#7b91f0'},{label:'P95',data:[2000,2900,4300,8000],backgroundColor:'#f3b94a'},{label:'평균',data:[1600,2300,3800,6540],backgroundColor:'#68ca84'}]},options:{scales:{y:{beginAtZero:true}}}});
+new Chart(document.getElementById('chartTrend'),{type:'line',data:{labels:['0:00','2:00','4:00','6:00','8:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00'],datasets:[{label:'평균 로딩 시간',data:[3200,3800,3100,3400,3650,3450,3600,3750,3650,3700,3300,3100],borderColor:'#3b82f6',tension:0.3,fill:false}]},options:{scales:{y:{beginAtZero:true}}}});
+</script>
+</body>
+</html>
