@@ -1,7 +1,13 @@
 <template>
-  <div style="display: flex; gap: 20px;">
-    <!-- 좌측 영역 -->
-    <div style="flex: 1;">
+  <div>
+    <!-- Performance Metrics Chart (New) -->
+    <div v-if="result" style="margin-bottom: 20px;">
+      <PerformanceMetricsChart :result="result" />
+    </div>
+
+    <div style="display: flex; gap: 20px;">
+      <!-- 좌측 영역 -->
+      <div style="flex: 1;">
       <div class="card">
         <h3>프레임별 렌더링 과정</h3>
 
@@ -133,6 +139,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 

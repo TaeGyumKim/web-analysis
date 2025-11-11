@@ -1,8 +1,19 @@
 <template>
-  <div class="card">
-    <h3>네트워크 요청 타임라인</h3>
+  <div>
+    <!-- Network Heatmap (New) -->
+    <div v-if="result && result.networkRequests.length > 0" style="margin-bottom: 20px;">
+      <NetworkHeatmap :requests="result.networkRequests" />
+    </div>
 
-    <table v-if="result && result.networkRequests.length > 0" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <!-- Network Waterfall (New) -->
+    <div v-if="result && result.networkRequests.length > 0" style="margin-bottom: 20px;">
+      <NetworkWaterfall :requests="result.networkRequests" />
+    </div>
+
+    <div class="card">
+      <h3>네트워크 요청 타임라인</h3>
+
+      <table v-if="result && result.networkRequests.length > 0" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
       <thead>
         <tr style="border-bottom: 2px solid #e0e0e0;">
           <th style="padding: 12px 8px; text-align: left; font-weight: 600;">리소스 이름</th>
@@ -54,6 +65,7 @@
         Load: <strong>{{ result.metrics.loadComplete.toFixed(0) }} ms</strong>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
