@@ -56,6 +56,7 @@ Content-Type: application/json
       "fcp": 1274,
       "lcp": 2349,
       "tbt": 156,
+      "cls": 0.045,
       "ttfb": 234,
       "domContentLoaded": 1250,
       "loadComplete": 2256
@@ -77,6 +78,14 @@ Content-Type: application/json
         "timestamp": 0.1,
         "screenshot": "base64-encoded-png-data",
         "metadata": {}
+      }
+    ],
+    "longTasks": [
+      {
+        "name": "self",
+        "startTime": 1234.5,
+        "duration": 125.3,
+        "attribution": "script"
       }
     ],
     "performanceScore": {
@@ -127,6 +136,7 @@ Content-Type: application/json
 | `metrics` | PerformanceMetrics | 성능 메트릭 |
 | `networkRequests` | NetworkRequest[] | 네트워크 요청 목록 |
 | `frames` | FrameCapture[] | 캡처된 프레임 목록 |
+| `longTasks` | LongTask[] | Long Task 목록 (50ms 이상 차단 작업) |
 | `performanceScore` | PerformanceScore | 성능 점수 |
 
 ### PerformanceMetrics
@@ -162,6 +172,15 @@ Content-Type: application/json
 | `timestamp` | number | 타임스탬프 (초) |
 | `screenshot` | string | Base64 인코딩된 PNG 이미지 |
 | `metadata` | object | 메타데이터 (선택적) |
+
+### LongTask
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | 작업 이름 (예: "self", "unknown") |
+| `startTime` | number | 시작 시간 (ms) |
+| `duration` | number | 지속 시간 (ms) |
+| `attribution` | string | 원인 출처 (선택적, 예: "script") |
 
 ### PerformanceScore
 
