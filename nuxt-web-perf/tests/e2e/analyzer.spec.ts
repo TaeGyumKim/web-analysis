@@ -27,8 +27,8 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
     const selects = page.locator('select');
     expect(await selects.count()).toBeGreaterThanOrEqual(2);
 
-    // Check start button
-    const startButton = page.locator('button').filter({ hasText: '시작' });
+    // Check start button in topbar (avoid strict mode violation)
+    const startButton = page.locator('.topbar button').filter({ hasText: '시작' });
     await expect(startButton).toBeVisible();
 
     // Take screenshot
@@ -97,8 +97,8 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
     await urlInput.clear();
     await urlInput.fill('https://example.com');
 
-    // Check button state
-    const startButton = page.locator('button').filter({ hasText: '시작' });
+    // Check button state in topbar (avoid strict mode violation)
+    const startButton = page.locator('.topbar button').filter({ hasText: '시작' });
     await expect(startButton).toBeVisible();
     await expect(startButton).toBeEnabled();
 
@@ -157,8 +157,8 @@ test.describe('Web Performance Analyzer - Analysis Tests', () => {
       fullPage: true
     });
 
-    // Start analysis
-    const startButton = page.locator('button').filter({ hasText: '시작' });
+    // Start analysis (use topbar selector)
+    const startButton = page.locator('.topbar button').filter({ hasText: '시작' });
     await startButton.click();
 
     // Wait a bit
