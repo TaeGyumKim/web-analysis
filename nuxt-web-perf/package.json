@@ -1,7 +1,23 @@
 {
   "name": "nuxt-web-perf",
+  "version": "1.0.0",
+  "description": "Web Performance Analyzer - 웹 페이지 로딩 성능 분석 및 시각화 도구 (Nuxt 3 + Puppeteer + Chart.js)",
   "type": "module",
   "private": true,
+  "keywords": [
+    "web-performance",
+    "performance-analysis",
+    "nuxt3",
+    "puppeteer",
+    "chartjs",
+    "web-vitals",
+    "fcp",
+    "lcp",
+    "tbt",
+    "performance-metrics"
+  ],
+  "author": "Web Performance Team",
+  "license": "MIT",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",

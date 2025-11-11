@@ -1,23 +1,25 @@
 # Web Performance Analyzer
 
-A web-based tool for analyzing and visualizing web page loading performance. Built with Nuxt 3 and Puppeteer, this tool makes it easy for designers and non-developers to understand page performance metrics.
+웹 페이지 로딩 성능을 분석하고 시각화하는 도구입니다. Nuxt 3와 Puppeteer로 구축되어 디자이너와 비개발자도 쉽게 페이지 성능 메트릭을 이해할 수 있습니다.
 
 ## Features
 
-- 📊 **Comprehensive Performance Analysis**: Analyze FCP, LCP, TBT, TTFB, and more
-- 🎯 **Performance Scoring**: Get an overall score (0-100) based on metrics, network, and frame analysis
-- 🌊 **Network Waterfall**: Visualize all network requests in a timeline
-- 📸 **Frame Capture**: See how your page loads frame-by-frame
-- 🎮 **Interactive Controls**: Filter, sort, and drill down into performance data
-- 🎨 **Beautiful UI**: Clean, modern interface built with Tailwind CSS
+- 🎯 **3개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포를 분리된 탭으로 제공
+- 📊 **종합 성능 분석**: FCP, LCP, TBT, TTFB 등 핵심 메트릭 측정
+- 🎬 **프레임별 렌더링 과정**: 페이지 로드 과정을 프레임 단위로 캡처 및 재생
+- 🌊 **네트워크 워터폴 차트**: 모든 네트워크 요청을 타임라인으로 시각화
+- 📈 **Chart.js 통합**: 네트워크 속도별, 장비별 로딩 시간 분포 차트
+- 🎨 **깔끔한 UI**: 16px 보더 라디우스와 부드러운 섀도우를 활용한 모던한 디자인
+- ⚙️ **설정 가능한 테스트 환경**: 네트워크 속도(3G/4G/Wi-Fi), 장비 사양(Desktop/Mobile) 선택
 
 ## Tech Stack
 
 - **Frontend**: Nuxt 3, Vue 3, TypeScript
-- **Styling**: Tailwind CSS
+- **Styling**: Custom CSS (HTML 디자인 기반) + Tailwind CSS
+- **Charts**: Chart.js (바 차트, 라인 차트)
 - **Backend**: Nuxt Server API
 - **Performance Collection**: Puppeteer (CDP protocol)
-- **Scoring Algorithm**: Based on the original C# WebPerf implementation
+- **Scoring Algorithm**: C# WebPerf 구현 기반
 
 ## Installation
 
@@ -68,91 +70,137 @@ npm run preview
 
 ### Using the Analyzer
 
-1. **Enter URL**: Type or paste the URL you want to analyze
-2. **Configure Options**:
-   - **Network Throttling**: Simulate different connection speeds (None, Slow 3G, Fast 3G, 4G)
-   - **CPU Throttling**: Simulate slower devices (1x, 2x, 4x, 6x slowdown)
-   - **Wait Until**: Choose when to consider page load complete
-   - **Screenshots**: Enable/disable frame capture
-3. **Start Analysis**: Click the button and wait for the analysis to complete
-4. **Review Results**:
-   - **Performance Overview**: See overall score and sub-scores
-   - **Metrics Card**: Detailed performance metrics with explanations
-   - **Network Waterfall**: Visualize network requests timeline
-   - **Frame Timeline**: Play through captured frames
+#### 1. 분석 시작
+상단 제어바에서:
+- **네트워크 속도** 선택: 3G, 4G, Wi-Fi, Slow 3G
+- **장비 사양** 선택: Desktop, Mobile (High-end/Mid-range/Low-end)
+- **URL 입력**: 분석할 웹 페이지 주소 입력
+- **시작 버튼** 클릭: 분석 시작 (자동으로 스크린샷 캡처)
+
+#### 2. 결과 확인 - 3개 탭 시스템
+
+**📸 프레임 분석 탭**
+- 좌측: 프레임별 렌더링 과정 뷰어
+  - 슬라이더로 프레임 이동
+  - 이전/다음/재생 버튼으로 제어
+- 우측: 메트릭 정보 (340px 고정폭)
+  - 현재 프레임 정보 (시간, 상태)
+  - 로드된 리소스 통계
+  - 핵심 메트릭 (FCP, LCP, TBT) 색상 바 표시
+
+**🌐 네트워크 타임라인 탭**
+- 리소스별 요청 워터폴 차트 테이블
+- 리소스 타입별 색상 구분 (Document, CSS, JS, Image)
+- 각 요청의 시작/종료 시간, 크기 표시
+- 요약 통계: 총 요청 수, 전송 크기, DCL, Load 시간
+
+**📊 로딩 분포 탭**
+- Chart.js 차트 3종:
+  - 네트워크 속도별 로딩 시간 분포 (바 차트)
+  - 장비별 로딩 시간 분포 (바 차트)
+  - 24시간 로딩 시간 추이 (라인 차트)
+- 4개 요약 카드: 평균 로딩 시간, 성능 점수, 사용자 만족도, 최적화 가능성
+- 성능 개선 제안 (이미지 최적화, CSS 경량화, 리소스 사전 로딩)
 
 ## Project Structure
 
 ```
 nuxt-web-perf/
-├── app/                      # App entry point
-├── assets/                   # CSS and static assets
+├── app/
+│   └── app.vue                    # App entry point
+├── assets/
 │   └── css/
-│       └── main.css         # Tailwind and custom styles
-├── components/              # Vue components
-│   ├── FrameTimeline.vue   # Frame-by-frame viewer
-│   ├── MetricBadge.vue     # Individual metric display
-│   ├── MetricsCard.vue     # Metrics dashboard
-│   ├── NetworkWaterfall.vue # Network timeline chart
-│   └── PerformanceOverview.vue # Summary scores
-├── pages/                   # Nuxt pages (routes)
-│   └── index.vue           # Main analyzer page
-├── server/                  # Backend API
+│       └── main.css              # Custom CSS (HTML 디자인 기반)
+├── components/
+│   ├── FrameAnalysisTab.vue      # 프레임 분석 탭 (좌우 레이아웃)
+│   ├── NetworkTimelineTab.vue    # 네트워크 타임라인 탭 (워터폴 차트)
+│   ├── LoadingDistributionTab.vue # 로딩 분포 탭 (Chart.js)
+│   ├── FrameTimeline.vue         # 프레임 타임라인 뷰어 (레거시)
+│   ├── MetricBadge.vue           # 메트릭 배지 (레거시)
+│   ├── MetricsCard.vue           # 메트릭 카드 (레거시)
+│   ├── NetworkWaterfall.vue      # 네트워크 워터폴 (레거시)
+│   └── PerformanceOverview.vue   # 성능 개요 (레거시)
+├── pages/
+│   └── index.vue                 # 메인 페이지 (상단 제어바 + 3탭)
+├── server/
 │   ├── api/
-│   │   └── analyze.post.ts # Analysis endpoint
+│   │   └── analyze.post.ts       # POST /api/analyze 엔드포인트
 │   └── utils/
-│       └── performanceCollector.ts # Puppeteer-based collector
-├── types/                   # TypeScript type definitions
-│   └── performance.ts
-├── utils/                   # Shared utilities
-│   └── scoreCalculator.ts  # Scoring algorithm
-└── nuxt.config.ts          # Nuxt configuration
+│       └── performanceCollector.ts # Puppeteer 기반 수집기
+├── types/
+│   └── performance.ts            # TypeScript 타입 정의
+├── utils/
+│   └── scoreCalculator.ts        # 성능 점수 계산 로직
+└── nuxt.config.ts                # Nuxt 설정
 ```
 
 ## Performance Scoring
 
-The tool calculates an overall performance score (0-100) based on three components:
+성능 점수는 세 가지 요소의 가중 평균으로 계산됩니다 (0-100점):
 
-### Metrics Score (50% weight)
-- Evaluates FCP, LCP, TBT, TTFB, and DOM timing
-- Each metric is scored using thresholds:
-  - ≤1000ms: 100 points
-  - 1000-3000ms: Linear decrease to 75
-  - 3000-7000ms: Linear decrease to 30
-  - >7000ms: Slow decrease
+### 메트릭 점수 (50% 가중치)
+FCP, LCP, TBT, TTFB, DOM 타이밍 평가:
+- **≤1000ms**: 100점 (녹색 바)
+- **1000-3000ms**: 선형 감소 → 75점 (노란색 바)
+- **3000-7000ms**: 선형 감소 → 30점 (주황색 바)
+- **>7000ms**: 느린 감소
 
-### Network Score (35% weight)
-Penalties based on:
-- Total transfer size (>5MB)
-- Number of requests (>40)
-- Longest request duration (>2000ms)
+### 네트워크 점수 (35% 가중치)
+패널티 기준:
+- 총 전송 크기 > 5MB
+- 요청 수 > 40개
+- 최장 요청 시간 > 2000ms
 
-### Frames Score (15% weight)
-Based on frame capture consistency:
-- Average interval ≤100ms: 100 points
-- Average interval ≤200ms: 90 points
-- Average interval ≤400ms: 75 points
-- Otherwise: 60 points
+### 프레임 점수 (15% 가중치)
+프레임 캡처 일관성 기준:
+- 평균 간격 ≤100ms: 100점
+- 평균 간격 ≤200ms: 90점
+- 평균 간격 ≤400ms: 75점
+- 그 외: 60점
+
+## UI Design
+
+### 색상 테마
+- **배경**: `#f6f7f9` (밝은 회색)
+- **카드**: 흰색 배경, 16px 보더 라디우스, 부드러운 섀도우
+- **메트릭 색상**:
+  - 녹색: `#48d178` (좋음)
+  - 노란색: `#e6b421` (보통)
+  - 주황색: `#e67e22` (개선 필요)
+- **리소스 타입 색상**:
+  - Document: `#5b8efc`
+  - CSS: `#c08eff`
+  - JS: `#f4b940`
+  - Image: `#60c989`
+
+### 레이아웃
+- **상단 제어바**: 네트워크/장비 선택, URL 입력, 버튼
+- **탭 네비게이션**: 3개 탭 (프레임 분석 | 네트워크 타임라인 | 로딩 분포)
+- **프레임 분석**: 좌우 분할 (프레임 뷰어 + 메트릭 사이드바 340px)
+- **네트워크**: 워터폴 차트 테이블
+- **로딩 분포**: 2열 그리드 차트 + 추이 차트 + 요약 카드
 
 ## Migration from C# WebPerf
 
-This Nuxt 3 application is a modern web-based reimplementation of the original C# WebView2 desktop application. Key improvements:
+C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 
-- ✅ Cross-platform web access (no Windows-only requirement)
-- ✅ Modern, responsive UI
-- ✅ RESTful API for integration with other tools
-- ✅ Same scoring algorithm and metrics collection
-- ✅ Enhanced visualization capabilities
+- ✅ **크로스 플랫폼**: Windows 전용 → 모든 브라우저에서 접근
+- ✅ **모던 UI**: HTML 디자인 파일 기반의 깔끔한 인터페이스
+- ✅ **3탭 시스템**: 프레임/네트워크/분포를 분리된 탭으로 제공
+- ✅ **RESTful API**: 다른 도구와 통합 가능
+- ✅ **동일한 알고리즘**: 점수 계산 로직 유지
+- ✅ **Chart.js**: 고급 차트 시각화
 
 ## Future Enhancements
 
-- [ ] CLS (Cumulative Layout Shift) metric
-- [ ] Long Task histogram visualization
-- [ ] Export results as JSON/PDF
-- [ ] Batch analysis for multiple URLs
-- [ ] Historical comparison and trending
-- [ ] Custom performance budgets
-- [ ] Integration with CI/CD pipelines
+- [ ] CLS (Cumulative Layout Shift) 메트릭 추가
+- [ ] Long Task 히스토그램 시각화
+- [ ] 결과 내보내기 (JSON/PDF)
+- [ ] 여러 URL 일괄 분석
+- [ ] 과거 데이터 비교 및 추이 분석
+- [ ] 성능 예산 설정 기능
+- [ ] CI/CD 파이프라인 통합
+- [ ] 실시간 모니터링 대시보드
 
 ## License
 
