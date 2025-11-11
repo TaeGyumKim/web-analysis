@@ -119,6 +119,18 @@
             </div>
           </div>
         </div>
+
+        <!-- Long Tasks 요약 -->
+        <div class="section-card" v-if="result && result.longTasks && result.longTasks.length > 0">
+          <h3>Long Tasks</h3>
+          <div>총 작업: {{ result.longTasks.length }}</div>
+          <div style="margin-top: 8px;">
+            평균: {{ averageLongTaskDuration.toFixed(0) }}ms
+          </div>
+          <div style="margin-top: 8px;">
+            최대: {{ maxLongTaskDuration.toFixed(0) }}ms
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -148,6 +160,17 @@ const imageCount = computed(() => {
   return props.result.networkRequests.filter(req =>
     req.type.toLowerCase() === 'image'
   ).length;
+});
+
+const averageLongTaskDuration = computed(() => {
+  if (!props.result || !props.result.longTasks || props.result.longTasks.length === 0) return 0;
+  const sum = props.result.longTasks.reduce((acc, task) => acc + task.duration, 0);
+  return sum / props.result.longTasks.length;
+});
+
+const maxLongTaskDuration = computed(() => {
+  if (!props.result || !props.result.longTasks || props.result.longTasks.length === 0) return 0;
+  return Math.max(...props.result.longTasks.map(t => t.duration));
 });
 
 function prevFrame() {

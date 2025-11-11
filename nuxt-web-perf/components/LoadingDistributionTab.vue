@@ -71,6 +71,11 @@
         </div>
       </div>
     </div>
+
+    <!-- Long Task 히스토그램 -->
+    <div v-if="result && result.longTasks" style="margin-top: 20px;">
+      <LongTaskHistogram :longTasks="result.longTasks" />
+    </div>
   </div>
 </template>
 

@@ -29,6 +29,13 @@ export interface FrameCapture {
   };
 }
 
+export interface LongTask {
+  name: string;
+  startTime: number;  // ms
+  duration: number;   // ms
+  attribution?: string;
+}
+
 export interface PerformanceScore {
   overall: number;
   metrics: number;
@@ -51,6 +58,7 @@ export interface AnalysisResult {
   metrics: PerformanceMetrics;
   networkRequests: NetworkRequest[];
   frames: FrameCapture[];
+  longTasks: LongTask[];
   performanceScore: PerformanceScore;
 }
 

@@ -3,6 +3,7 @@ import type {
   NetworkRequest,
   PerformanceMetrics,
   FrameCapture,
+  LongTask,
   AnalysisResult,
   AnalysisOptions
 } from '~/types/performance';
@@ -87,6 +88,9 @@ export class PerformanceCollector {
       // Collect performance metrics
       const metrics = await this.collectMetrics(page, client);
 
+      // Collect long tasks
+      const longTasks = await this.collectLongTasks(page);
+
       // Stop frame capture
       if (this.captureInterval) {
         clearInterval(this.captureInterval);
@@ -112,6 +116,7 @@ export class PerformanceCollector {
         metrics,
         networkRequests,
         frames: this.frames,
+        longTasks,
         performanceScore
       };
 
@@ -233,7 +238,7 @@ export class PerformanceCollector {
             lcpObserver.disconnect();
             clsObserver.disconnect();
 
-            // Calculate TBT (Total Blocking Time)
+            // Calculate TBT (Total Blocking Time) from long tasks
             const longTasks = performance.getEntriesByType('longtask') as any[];
             let tbt = 0;
             for (const task of longTasks) {
@@ -255,6 +260,21 @@ export class PerformanceCollector {
     });
 
     return rawMetrics as PerformanceMetrics;
+  }
+
+  private async collectLongTasks(page: Page): Promise<LongTask[]> {
+    // Collect long tasks from the page
+    const longTasksData = await page.evaluate(() => {
+      const longTasks = performance.getEntriesByType('longtask') as any[];
+      return longTasks.map((task: any) => ({
+        name: task.name || 'unknown',
+        startTime: task.startTime,
+        duration: task.duration,
+        attribution: task.attribution?.[0]?.name || undefined
+      }));
+    });
+
+    return longTasksData as LongTask[];
   }
 
   private async applyNetworkThrottling(client: CDPSession, profile: string) {
