@@ -105,6 +105,14 @@
       >
         Lighthouse
       </div>
+      <span class="divider">|</span>
+      <div
+        class="tab"
+        :class="{ active: activeTab === 'custom' }"
+        @click="activeTab = 'custom'"
+      >
+        커스텀 메트릭
+      </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
@@ -141,11 +149,16 @@
     <div v-show="activeTab === 'lighthouse'" style="margin-top: 20px;">
       <LighthouseTab :result="analysisResult" />
     </div>
+
+    <!-- 커스텀 메트릭 탭 -->
+    <div v-show="activeTab === 'custom'" style="margin-top: 20px;">
+      <CustomMetricsTab :result="analysisResult" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { AnalysisResult } from '~/types/performance';
+import type { AnalysisResult, CustomMetricDefinition } from '~/types/performance';
 
 const url = ref('https://www.naver.com/');
 const networkSpeed = ref('4G');
@@ -162,6 +175,9 @@ async function startAnalysis() {
   isAnalyzing.value = true;
 
   try {
+    // Load custom metrics from localStorage
+    const customMetrics = loadCustomMetrics();
+
     const response = await $fetch('/api/analyze', {
       method: 'POST',
       body: {
@@ -172,7 +188,8 @@ async function startAnalysis() {
           cpuThrottling: getCPUThrottling(deviceSpec.value),
           waitUntil: 'networkidle0',
           useLighthouse: useLighthouse.value,
-          lighthouseFormFactor: deviceSpec.value.includes('Mobile') ? 'mobile' : 'desktop'
+          lighthouseFormFactor: deviceSpec.value.includes('Mobile') ? 'mobile' : 'desktop',
+          customMetrics: customMetrics
         }
       }
     });
@@ -214,6 +231,20 @@ function getCPUThrottling(device: string): number {
     'Mobile (Low-end)': 6
   };
   return mapping[device] || 1;
+}
+
+function loadCustomMetrics(): CustomMetricDefinition[] {
+  try {
+    const stored = localStorage.getItem('customMetrics');
+    if (stored) {
+      const metrics = JSON.parse(stored) as CustomMetricDefinition[];
+      // Only return enabled metrics
+      return metrics.filter(m => m.enabled);
+    }
+  } catch (e) {
+    console.error('Failed to load custom metrics:', e);
+  }
+  return [];
 }
 
 function exportJSON() {

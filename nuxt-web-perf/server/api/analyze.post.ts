@@ -1,5 +1,6 @@
 import { PerformanceCollector } from '~/server/utils/performanceCollector';
 import { LighthouseCollector } from '~/server/utils/lighthouseCollector';
+import { CustomMetricsCalculator } from '~/server/utils/customMetricsCalculator';
 import type { AnalysisOptions } from '~/types/performance';
 
 let collector: PerformanceCollector | null = null;
@@ -41,7 +42,8 @@ export default defineEventHandler(async (event) => {
       cpuThrottling: options?.cpuThrottling ?? 1,
       waitUntil: options?.waitUntil ?? 'networkidle0',
       useLighthouse: options?.useLighthouse ?? false,
-      lighthouseFormFactor: options?.lighthouseFormFactor ?? 'desktop'
+      lighthouseFormFactor: options?.lighthouseFormFactor ?? 'desktop',
+      customMetrics: options?.customMetrics ?? []
     };
 
     // Perform analysis
@@ -65,6 +67,25 @@ export default defineEventHandler(async (event) => {
       } catch (lighthouseError) {
         console.error('Lighthouse analysis failed:', lighthouseError);
         // Continue without Lighthouse data
+      }
+    }
+
+    // Calculate custom metrics if any are defined
+    if (analysisOptions.customMetrics && analysisOptions.customMetrics.length > 0) {
+      try {
+        // Get user timing and element timing data from the collector
+        const userTimingData = collector.getUserTimingData?.() || [];
+        const elementTimingData = collector.getElementTimingData?.() || [];
+
+        result.customMetrics = CustomMetricsCalculator.calculateMetrics(
+          analysisOptions.customMetrics,
+          result,
+          userTimingData,
+          elementTimingData
+        );
+      } catch (customMetricsError) {
+        console.error('Custom metrics calculation failed:', customMetricsError);
+        // Continue without custom metrics
       }
     }
 

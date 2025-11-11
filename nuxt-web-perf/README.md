@@ -4,7 +4,7 @@
 
 ## Features
 
-- 🎯 **7개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, 일괄 분석, 분석 이력, 성능 예산, Lighthouse
+- 🎯 **8개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, 일괄 분석, 분석 이력, 성능 예산, Lighthouse, 커스텀 메트릭
 - 📊 **종합 성능 분석**: FCP, LCP, TBT, CLS, TTFB 등 핵심 메트릭 측정
 - 🎬 **프레임별 렌더링 과정**: 페이지 로드 과정을 프레임 단위로 캡처 및 재생
 - 🌊 **네트워크 워터폴 차트**: 모든 네트워크 요청을 타임라인으로 시각화
@@ -22,6 +22,11 @@
 - 📜 **분석 이력**: 과거 데이터 저장 및 추이 차트 생성 (최대 50개)
 - 💰 **성능 예산**: 목표 메트릭 설정 및 실제 성능 비교
 - 🔍 **Lighthouse 통합**: Google Lighthouse 기반 성능, 접근성, SEO, PWA 분석
+- 🎛️ **커스텀 메트릭**: 사용자 정의 성능 지표 생성 및 추적
+  - **User Timing API**: performance.mark()/measure() 기반 메트릭
+  - **Element Timing**: 특정 요소의 렌더링 시간 측정
+  - **계산된 메트릭**: 기존 메트릭 조합으로 새로운 지표 생성
+  - **임계값 설정**: 양호/개선 필요/나쁨 기준 커스터마이징
 
 ## Tech Stack
 
@@ -110,7 +115,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - **Lighthouse 사용** 체크박스: Google Lighthouse 분석 활성화 (선택)
 - **시작 버튼** 클릭: 분석 시작 (자동으로 스크린샷 캡처)
 
-#### 2. 결과 확인 - 7개 탭 시스템
+#### 2. 결과 확인 - 8개 탭 시스템
 
 **📸 프레임 분석 탭**
 - **PerformanceMetricsChart 시각화** (NEW ✨):
@@ -179,6 +184,25 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - 진단 결과 (Diagnostics) 테이블
 - Mobile/Desktop 선택에 따른 자동 Form Factor 설정
 
+**🎛️ 커스텀 메트릭 탭** (NEW ✨)
+- **메트릭 관리**:
+  - 커스텀 메트릭 추가/편집/삭제
+  - 메트릭 활성화/비활성화 토글
+  - 3가지 메트릭 타입 지원:
+    - **User Timing API**: performance.mark()/measure() 기반
+    - **Element Timing**: 특정 요소의 렌더링 시간
+    - **계산된 메트릭**: 기존 메트릭 조합 (예: lcp - fcp)
+  - 임계값 설정 (양호/개선 필요/나쁨)
+  - 단위 선택 (ms, s, score, bytes, count)
+- **메트릭 결과 시각화**:
+  - 상태별 색상 코딩 (양호=녹색, 개선필요=노랑, 나쁨=빨강)
+  - 0-100 점수 표시
+  - 진행 바로 점수 시각화
+- **사용 팁 및 예제**:
+  - User Timing API 사용법
+  - Element Timing 설정 방법
+  - 계산된 메트릭 예제 (히어로 이미지 로딩 시간, API 응답 시간, 컨텐츠 렌더링 시간, 리소스 개수)
+
 ## Project Structure
 
 ```
@@ -199,20 +223,23 @@ nuxt-web-perf/
 │   ├── PerformanceMetricsChart.vue  # Core Web Vitals 인터랙티브 차트 ⭐ NEW
 │   ├── NetworkHeatmap.vue           # 네트워크 요청 히트맵 시각화 ⭐ NEW
 │   ├── NetworkWaterfall.vue         # 네트워크 워터폴 차트 (Enhanced)
+│   ├── CustomMetricsManager.vue     # 커스텀 메트릭 관리 컴포넌트 ⭐ NEW
+│   ├── CustomMetricsTab.vue         # 커스텀 메트릭 결과 시각화 탭 ⭐ NEW
 │   ├── FrameTimeline.vue            # 프레임 타임라인 뷰어 (레거시)
 │   ├── MetricBadge.vue              # 메트릭 배지 (레거시)
 │   ├── MetricsCard.vue              # 메트릭 카드 (레거시)
 │   └── PerformanceOverview.vue      # 성능 개요 (레거시)
 ├── pages/
-│   └── index.vue                 # 메인 페이지 (상단 제어바 + 7탭)
+│   └── index.vue                 # 메인 페이지 (상단 제어바 + 8탭)
 ├── server/
 │   ├── api/
 │   │   ├── analyze.post.ts        # POST /api/analyze 엔드포인트
 │   │   ├── generate-pdf.post.ts   # POST /api/generate-pdf 엔드포인트 ⭐ NEW
 │   │   └── health.get.ts          # GET /api/health 엔드포인트
 │   └── utils/
-│       ├── performanceCollector.ts # Puppeteer 기반 수집기
-│       └── lighthouseCollector.ts  # Lighthouse 수집기 ⭐
+│       ├── performanceCollector.ts    # Puppeteer 기반 수집기
+│       ├── lighthouseCollector.ts     # Lighthouse 수집기 ⭐
+│       └── customMetricsCalculator.ts # 커스텀 메트릭 계산 유틸리티 ⭐ NEW
 ├── types/
 │   └── performance.ts            # TypeScript 타입 정의
 ├── utils/
@@ -437,12 +464,19 @@ npm run test:ui
   - **Puppeteer 기반 고품질 PDF**: 서버 사이드에서 HTML을 PDF로 변환
   - **자동 포맷팅**: Core Web Vitals, 네트워크 요약, Long Tasks 등 전체 리포트
   - **다운로드 버튼**: 상단 제어바에서 원클릭 PDF 다운로드
+- [x] **커스텀 메트릭** ✨ NEW:
+  - **User Timing API 지원**: performance.mark()/measure() 기반 메트릭 추적
+  - **Element Timing 지원**: 특정 요소의 렌더링 시간 측정
+  - **계산된 메트릭**: 기존 메트릭 조합으로 새로운 지표 생성 (예: lcp - fcp)
+  - **임계값 커스터마이징**: 양호/개선 필요/나쁨 기준 사용자 정의
+  - **메트릭 관리 UI**: 메트릭 추가/편집/삭제/활성화/비활성화
+  - **시각화**: 상태별 색상 코딩, 점수 표시, 진행 바
 
 ## Future Enhancements
 
-### High Priority (추천 기능 #10)
+### High Priority
 - [x] **PDF 리포트 생성**: ✅ Puppeteer 기반 고품질 PDF 리포트 구현 완료
-- [ ] **커스텀 메트릭**: 사용자 정의 성능 지표 및 비즈니스 메트릭 추적
+- [x] **커스텀 메트릭**: ✅ 사용자 정의 성능 지표 추적 시스템 구현 완료
 
 ### Medium Priority (추천 기능 #8 완료)
 - [x] **고급 시각화**: ✅ Radar, Doughnut, Heatmap, Animated Charts 구현 완료

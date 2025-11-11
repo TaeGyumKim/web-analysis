@@ -94,6 +94,38 @@ export interface ScoreDetail {
   weight: number;
 }
 
+export interface CustomMetricDefinition {
+  id: string;
+  name: string;
+  description: string;
+  type: 'user-timing' | 'element-timing' | 'calculated';
+  // For user-timing: mark name or measure name
+  markName?: string;
+  measureName?: string;
+  // For element-timing: element selector
+  elementSelector?: string;
+  // For calculated: formula based on existing metrics
+  formula?: string; // e.g., "lcp - fcp", "networkRequests.length", etc.
+  // Thresholds
+  thresholds: {
+    good: number;
+    needsImprovement: number;
+    poor: number;
+  };
+  unit: 'ms' | 's' | 'score' | 'bytes' | 'count';
+  enabled: boolean;
+}
+
+export interface CustomMetricResult {
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  score: number; // 0-100 based on thresholds
+  status: 'good' | 'needs-improvement' | 'poor';
+  timestamp: number;
+}
+
 export interface AnalysisResult {
   url: string;
   timestamp: number;
@@ -104,6 +136,7 @@ export interface AnalysisResult {
   longTasks: LongTask[];
   performanceScore: PerformanceScore;
   lighthouse?: LighthouseResult;
+  customMetrics?: CustomMetricResult[];
 }
 
 export interface AnalysisOptions {
@@ -113,4 +146,5 @@ export interface AnalysisOptions {
   waitUntil?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
   useLighthouse?: boolean;
   lighthouseFormFactor?: 'mobile' | 'desktop';
+  customMetrics?: CustomMetricDefinition[];
 }
