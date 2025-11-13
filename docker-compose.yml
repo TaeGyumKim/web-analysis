@@ -4,7 +4,7 @@ services:
   # Nuxt Web Performance Analyzer
   web-perf:
     build:
-      context: ./nuxt-web-perf
+      context: .
       dockerfile: Dockerfile
       args:
         NODE_ENV: production
