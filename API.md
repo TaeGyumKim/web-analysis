@@ -9,11 +9,13 @@
 **Endpoint**: `POST /api/analyze`
 
 **Headers**:
+
 ```
 Content-Type: application/json
 ```
 
 **Body**:
+
 ```json
 {
   "url": "https://www.example.com",
@@ -28,28 +30,29 @@ Content-Type: application/json
 
 ### Request Parameters
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url` | string | ✅ | 분석할 웹 페이지 URL |
-| `options` | object | ❌ | 분석 옵션 |
+| Field     | Type   | Required | Description          |
+| --------- | ------ | -------- | -------------------- |
+| `url`     | string | ✅       | 분석할 웹 페이지 URL |
+| `options` | object | ❌       | 분석 옵션            |
 
 ### Options Parameters
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `captureScreenshots` | boolean | `true` | 프레임 캡처 여부 (100ms 간격) |
-| `networkThrottling` | string | `"none"` | 네트워크 스로틀링: `"none"`, `"slow-3g"`, `"fast-3g"`, `"4g"` |
-| `cpuThrottling` | number | `1` | CPU 스로틀링 배율: `1` (없음), `2`, `4`, `6` |
-| `waitUntil` | string | `"networkidle0"` | 로드 완료 조건: `"load"`, `"domcontentloaded"`, `"networkidle0"`, `"networkidle2"` |
-| `viewportWidth` | number | `1920` | 뷰포트 너비 (픽셀) |
-| `viewportHeight` | number | `1080` | 뷰포트 높이 (픽셀) |
-| `useLighthouse` | boolean | `false` | Google Lighthouse 분석 실행 여부 |
-| `lighthouseFormFactor` | string | `"desktop"` | Lighthouse 폼 팩터: `"mobile"`, `"desktop"` |
-| `customMetrics` | CustomMetricDefinition[] | `[]` | 사용자 정의 커스텀 메트릭 목록 |
+| Field                  | Type                     | Default          | Description                                                                        |
+| ---------------------- | ------------------------ | ---------------- | ---------------------------------------------------------------------------------- |
+| `captureScreenshots`   | boolean                  | `true`           | 프레임 캡처 여부 (100ms 간격)                                                      |
+| `networkThrottling`    | string                   | `"none"`         | 네트워크 스로틀링: `"none"`, `"slow-3g"`, `"fast-3g"`, `"4g"`                      |
+| `cpuThrottling`        | number                   | `1`              | CPU 스로틀링 배율: `1` (없음), `2`, `4`, `6`                                       |
+| `waitUntil`            | string                   | `"networkidle0"` | 로드 완료 조건: `"load"`, `"domcontentloaded"`, `"networkidle0"`, `"networkidle2"` |
+| `viewportWidth`        | number                   | `1920`           | 뷰포트 너비 (픽셀)                                                                 |
+| `viewportHeight`       | number                   | `1080`           | 뷰포트 높이 (픽셀)                                                                 |
+| `useLighthouse`        | boolean                  | `false`          | Google Lighthouse 분석 실행 여부                                                   |
+| `lighthouseFormFactor` | string                   | `"desktop"`      | Lighthouse 폼 팩터: `"mobile"`, `"desktop"`                                        |
+| `customMetrics`        | CustomMetricDefinition[] | `[]`             | 사용자 정의 커스텀 메트릭 목록                                                     |
 
 ### Response
 
 **Success (200 OK)**:
+
 ```json
 {
   "success": true,
@@ -112,6 +115,7 @@ Content-Type: application/json
 ```
 
 **Error (400 Bad Request)**:
+
 ```json
 {
   "success": false,
@@ -121,6 +125,7 @@ Content-Type: application/json
 ```
 
 **Error (500 Internal Server Error)**:
+
 ```json
 {
   "success": false,
@@ -133,71 +138,71 @@ Content-Type: application/json
 
 ### AnalysisResult
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `url` | string | 분석한 URL |
-| `timestamp` | number | 분석 시작 타임스탬프 (ms) |
-| `runningTime` | number | 총 실행 시간 (ms) |
-| `metrics` | PerformanceMetrics | 성능 메트릭 |
-| `networkRequests` | NetworkRequest[] | 네트워크 요청 목록 |
-| `frames` | FrameCapture[] | 캡처된 프레임 목록 |
-| `longTasks` | LongTask[] | Long Task 목록 (50ms 이상 차단 작업) |
-| `performanceScore` | PerformanceScore | 성능 점수 |
-| `lighthouse` | LighthouseResult | Lighthouse 분석 결과 (useLighthouse가 true일 때) |
-| `customMetrics` | CustomMetricResult[] | 커스텀 메트릭 측정 결과 |
+| Field              | Type                 | Description                                      |
+| ------------------ | -------------------- | ------------------------------------------------ |
+| `url`              | string               | 분석한 URL                                       |
+| `timestamp`        | number               | 분석 시작 타임스탬프 (ms)                        |
+| `runningTime`      | number               | 총 실행 시간 (ms)                                |
+| `metrics`          | PerformanceMetrics   | 성능 메트릭                                      |
+| `networkRequests`  | NetworkRequest[]     | 네트워크 요청 목록                               |
+| `frames`           | FrameCapture[]       | 캡처된 프레임 목록                               |
+| `longTasks`        | LongTask[]           | Long Task 목록 (50ms 이상 차단 작업)             |
+| `performanceScore` | PerformanceScore     | 성능 점수                                        |
+| `lighthouse`       | LighthouseResult     | Lighthouse 분석 결과 (useLighthouse가 true일 때) |
+| `customMetrics`    | CustomMetricResult[] | 커스텀 메트릭 측정 결과                          |
 
 ### PerformanceMetrics
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `fcp` | number | First Contentful Paint (ms) |
-| `lcp` | number | Largest Contentful Paint (ms) |
-| `tbt` | number | Total Blocking Time (ms) |
-| `cls` | number | Cumulative Layout Shift |
-| `fid` | number | First Input Delay (ms) |
-| `ttfb` | number | Time to First Byte (ms) |
-| `domContentLoaded` | number | DOMContentLoaded 시간 (ms) |
-| `loadComplete` | number | Load 완료 시간 (ms) |
+| Field              | Type   | Description                   |
+| ------------------ | ------ | ----------------------------- |
+| `fcp`              | number | First Contentful Paint (ms)   |
+| `lcp`              | number | Largest Contentful Paint (ms) |
+| `tbt`              | number | Total Blocking Time (ms)      |
+| `cls`              | number | Cumulative Layout Shift       |
+| `fid`              | number | First Input Delay (ms)        |
+| `ttfb`             | number | Time to First Byte (ms)       |
+| `domContentLoaded` | number | DOMContentLoaded 시간 (ms)    |
+| `loadComplete`     | number | Load 완료 시간 (ms)           |
 
 ### NetworkRequest
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | 요청 ID |
-| `url` | string | 요청 URL |
-| `type` | string | 리소스 타입 (document, stylesheet, script, image, font, xhr, fetch) |
-| `startTime` | number | 시작 시간 (초) |
-| `endTime` | number | 종료 시간 (초) |
-| `duration` | number | 소요 시간 (ms) |
-| `size` | number | 전송 크기 (bytes) |
-| `status` | number | HTTP 상태 코드 |
+| Field       | Type   | Description                                                         |
+| ----------- | ------ | ------------------------------------------------------------------- |
+| `id`        | string | 요청 ID                                                             |
+| `url`       | string | 요청 URL                                                            |
+| `type`      | string | 리소스 타입 (document, stylesheet, script, image, font, xhr, fetch) |
+| `startTime` | number | 시작 시간 (초)                                                      |
+| `endTime`   | number | 종료 시간 (초)                                                      |
+| `duration`  | number | 소요 시간 (ms)                                                      |
+| `size`      | number | 전송 크기 (bytes)                                                   |
+| `status`    | number | HTTP 상태 코드                                                      |
 
 ### FrameCapture
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `timestamp` | number | 타임스탬프 (초) |
+| Field        | Type   | Description                |
+| ------------ | ------ | -------------------------- |
+| `timestamp`  | number | 타임스탬프 (초)            |
 | `screenshot` | string | Base64 인코딩된 PNG 이미지 |
-| `metadata` | object | 메타데이터 (선택적) |
+| `metadata`   | object | 메타데이터 (선택적)        |
 
 ### LongTask
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | string | 작업 이름 (예: "self", "unknown") |
-| `startTime` | number | 시작 시간 (ms) |
-| `duration` | number | 지속 시간 (ms) |
-| `attribution` | string | 원인 출처 (선택적, 예: "script") |
+| Field         | Type   | Description                       |
+| ------------- | ------ | --------------------------------- |
+| `name`        | string | 작업 이름 (예: "self", "unknown") |
+| `startTime`   | number | 시작 시간 (ms)                    |
+| `duration`    | number | 지속 시간 (ms)                    |
+| `attribution` | string | 원인 출처 (선택적, 예: "script")  |
 
 ### PerformanceScore
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `overall` | number | 전체 점수 (0-100) |
-| `metrics` | number | 메트릭 점수 (0-100) |
-| `network` | number | 네트워크 점수 (0-100) |
-| `frames` | number | 프레임 점수 (0-100) |
-| `details` | ScoreDetail[] | 상세 점수 정보 |
+| Field     | Type          | Description           |
+| --------- | ------------- | --------------------- |
+| `overall` | number        | 전체 점수 (0-100)     |
+| `metrics` | number        | 메트릭 점수 (0-100)   |
+| `network` | number        | 네트워크 점수 (0-100) |
+| `frames`  | number        | 프레임 점수 (0-100)   |
+| `details` | ScoreDetail[] | 상세 점수 정보        |
 
 ## Usage Examples
 
@@ -289,38 +294,38 @@ API는 다음과 같은 HTTP 상태 코드를 반환합니다:
 
 ### CustomMetricDefinition
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | 메트릭 고유 ID |
-| `name` | string | 메트릭 이름 |
-| `description` | string | 메트릭 설명 |
-| `type` | string | 메트릭 타입: `"user-timing"`, `"element-timing"`, `"calculated"` |
-| `markName` | string | User Timing API 마크 이름 (type이 "user-timing"일 때) |
-| `measureName` | string | User Timing API 측정 이름 (type이 "user-timing"일 때) |
-| `elementSelector` | string | CSS 선택자 (type이 "element-timing"일 때) |
-| `formula` | string | 계산 수식 (type이 "calculated"일 때, 예: "lcp - fcp") |
-| `thresholds` | object | 임계값 설정 { good, needsImprovement, poor } |
-| `unit` | string | 단위: `"ms"`, `"s"`, `"score"`, `"bytes"`, `"count"` |
-| `enabled` | boolean | 활성화 여부 |
+| Field             | Type    | Description                                                      |
+| ----------------- | ------- | ---------------------------------------------------------------- |
+| `id`              | string  | 메트릭 고유 ID                                                   |
+| `name`            | string  | 메트릭 이름                                                      |
+| `description`     | string  | 메트릭 설명                                                      |
+| `type`            | string  | 메트릭 타입: `"user-timing"`, `"element-timing"`, `"calculated"` |
+| `markName`        | string  | User Timing API 마크 이름 (type이 "user-timing"일 때)            |
+| `measureName`     | string  | User Timing API 측정 이름 (type이 "user-timing"일 때)            |
+| `elementSelector` | string  | CSS 선택자 (type이 "element-timing"일 때)                        |
+| `formula`         | string  | 계산 수식 (type이 "calculated"일 때, 예: "lcp - fcp")            |
+| `thresholds`      | object  | 임계값 설정 { good, needsImprovement, poor }                     |
+| `unit`            | string  | 단위: `"ms"`, `"s"`, `"score"`, `"bytes"`, `"count"`             |
+| `enabled`         | boolean | 활성화 여부                                                      |
 
 ### CustomMetricResult
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | 메트릭 ID (CustomMetricDefinition의 id와 일치) |
-| `name` | string | 메트릭 이름 |
-| `value` | number | 측정된 값 |
-| `unit` | string | 단위 |
-| `score` | number | 점수 (0-100) |
-| `status` | string | 상태: `"good"`, `"needs-improvement"`, `"poor"` |
-| `timestamp` | number | 측정 시간 타임스탬프 |
+| Field       | Type   | Description                                     |
+| ----------- | ------ | ----------------------------------------------- |
+| `id`        | string | 메트릭 ID (CustomMetricDefinition의 id와 일치)  |
+| `name`      | string | 메트릭 이름                                     |
+| `value`     | number | 측정된 값                                       |
+| `unit`      | string | 단위                                            |
+| `score`     | number | 점수 (0-100)                                    |
+| `status`    | string | 상태: `"good"`, `"needs-improvement"`, `"poor"` |
+| `timestamp` | number | 측정 시간 타임스탬프                            |
 
 ### LighthouseResult
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field    | Type   | Description                                                             |
+| -------- | ------ | ----------------------------------------------------------------------- |
 | `scores` | object | 카테고리별 점수 { performance, accessibility, bestPractices, seo, pwa } |
-| `audits` | object | 상세 감사 항목 결과 |
+| `audits` | object | 상세 감사 항목 결과                                                     |
 
 ---
 
@@ -333,11 +338,13 @@ API는 다음과 같은 HTTP 상태 코드를 반환합니다:
 **Endpoint**: `POST /api/generate-pdf`
 
 **Headers**:
+
 ```
 Content-Type: application/json
 ```
 
 **Body**:
+
 ```json
 {
   "result": {
@@ -355,13 +362,14 @@ Content-Type: application/json
 
 ### Request Parameters
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `result` | AnalysisResult | ✅ | 분석 결과 객체 (POST /api/analyze의 응답 데이터) |
+| Field    | Type           | Required | Description                                      |
+| -------- | -------------- | -------- | ------------------------------------------------ |
+| `result` | AnalysisResult | ✅       | 분석 결과 객체 (POST /api/analyze의 응답 데이터) |
 
 ### Response
 
 **Success (200 OK)**:
+
 ```json
 {
   "pdfBase64": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL...",
@@ -370,6 +378,7 @@ Content-Type: application/json
 ```
 
 **Error (400 Bad Request)**:
+
 ```json
 {
   "statusCode": 400,
@@ -378,6 +387,7 @@ Content-Type: application/json
 ```
 
 **Error (500 Internal Server Error)**:
+
 ```json
 {
   "statusCode": 500,
@@ -390,10 +400,10 @@ Content-Type: application/json
 
 ### Response Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field       | Type   | Description                       |
+| ----------- | ------ | --------------------------------- |
 | `pdfBase64` | string | Base64로 인코딩된 PDF 파일 데이터 |
-| `filename` | string | 생성된 PDF 파일명 |
+| `filename`  | string | 생성된 PDF 파일명                 |
 
 ### Usage Example
 

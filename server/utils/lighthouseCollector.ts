@@ -64,19 +64,22 @@ export class LighthouseCollector {
         port: chrome.port,
         formFactor: config.formFactor || 'desktop',
         throttling: this.getThrottlingConfig(config.throttling || 'none'),
-        screenEmulation: config.formFactor === 'mobile' ? {
-          mobile: true,
-          width: 375,
-          height: 667,
-          deviceScaleFactor: 2,
-          disabled: false
-        } : {
-          mobile: false,
-          width: 1920,
-          height: 1080,
-          deviceScaleFactor: 1,
-          disabled: false
-        }
+        screenEmulation:
+          config.formFactor === 'mobile'
+            ? {
+                mobile: true,
+                width: 375,
+                height: 667,
+                deviceScaleFactor: 2,
+                disabled: false
+              }
+            : {
+                mobile: false,
+                width: 1920,
+                height: 1080,
+                deviceScaleFactor: 1,
+                disabled: false
+              }
       };
 
       const runnerResult = await lighthouse(config.url, options);
@@ -114,7 +117,13 @@ export class LighthouseCollector {
 
       for (const auditRef of performanceAudits) {
         const audit = audits[auditRef.id];
-        if (audit && audit.details && audit.details.type === 'opportunity' && audit.score !== null && audit.score < 1) {
+        if (
+          audit &&
+          audit.details &&
+          audit.details.type === 'opportunity' &&
+          audit.score !== null &&
+          audit.score < 1
+        ) {
           opportunities.push({
             id: audit.id,
             title: audit.title,
@@ -130,7 +139,13 @@ export class LighthouseCollector {
       const diagnostics: LighthouseDiagnostic[] = [];
       for (const auditRef of performanceAudits) {
         const audit = audits[auditRef.id];
-        if (audit && audit.details && audit.details.type === 'debugdata' && audit.score !== null && audit.score < 1) {
+        if (
+          audit &&
+          audit.details &&
+          audit.details.type === 'debugdata' &&
+          audit.score !== null &&
+          audit.score < 1
+        ) {
           diagnostics.push({
             id: audit.id,
             title: audit.title,
@@ -148,7 +163,6 @@ export class LighthouseCollector {
         diagnostics: diagnostics.slice(0, 10), // Top 10 diagnostics
         fetchTime: lhr.fetchTime
       };
-
     } finally {
       await chrome.kill();
     }

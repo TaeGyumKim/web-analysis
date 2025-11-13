@@ -48,13 +48,20 @@ export function exportAsTextReport(result: AnalysisResult, filename?: string): v
   report += '-'.repeat(80) + '\n';
   report += 'CORE WEB VITALS\n';
   report += '-'.repeat(80) + '\n';
-  if (result.metrics.fcp) report += `FCP (First Contentful Paint): ${result.metrics.fcp.toFixed(0)}ms\n`;
-  if (result.metrics.lcp) report += `LCP (Largest Contentful Paint): ${result.metrics.lcp.toFixed(0)}ms\n`;
-  if (result.metrics.tbt) report += `TBT (Total Blocking Time): ${result.metrics.tbt.toFixed(0)}ms\n`;
-  if (result.metrics.cls !== undefined) report += `CLS (Cumulative Layout Shift): ${result.metrics.cls.toFixed(3)}\n`;
-  if (result.metrics.ttfb) report += `TTFB (Time to First Byte): ${result.metrics.ttfb.toFixed(0)}ms\n`;
-  if (result.metrics.domContentLoaded) report += `DOM Content Loaded: ${result.metrics.domContentLoaded.toFixed(0)}ms\n`;
-  if (result.metrics.loadComplete) report += `Load Complete: ${result.metrics.loadComplete.toFixed(0)}ms\n\n`;
+  if (result.metrics.fcp)
+    report += `FCP (First Contentful Paint): ${result.metrics.fcp.toFixed(0)}ms\n`;
+  if (result.metrics.lcp)
+    report += `LCP (Largest Contentful Paint): ${result.metrics.lcp.toFixed(0)}ms\n`;
+  if (result.metrics.tbt)
+    report += `TBT (Total Blocking Time): ${result.metrics.tbt.toFixed(0)}ms\n`;
+  if (result.metrics.cls !== undefined)
+    report += `CLS (Cumulative Layout Shift): ${result.metrics.cls.toFixed(3)}\n`;
+  if (result.metrics.ttfb)
+    report += `TTFB (Time to First Byte): ${result.metrics.ttfb.toFixed(0)}ms\n`;
+  if (result.metrics.domContentLoaded)
+    report += `DOM Content Loaded: ${result.metrics.domContentLoaded.toFixed(0)}ms\n`;
+  if (result.metrics.loadComplete)
+    report += `Load Complete: ${result.metrics.loadComplete.toFixed(0)}ms\n\n`;
 
   report += '-'.repeat(80) + '\n';
   report += 'NETWORK SUMMARY\n';
@@ -74,9 +81,13 @@ export function exportAsTextReport(result: AnalysisResult, filename?: string): v
     report += '-'.repeat(80) + '\n';
     report += 'LONG TASKS\n';
     report += '-'.repeat(80) + '\n';
-    const avgDuration = result.longTasks.reduce((sum, t) => sum + t.duration, 0) / result.longTasks.length;
+    const avgDuration =
+      result.longTasks.reduce((sum, t) => sum + t.duration, 0) / result.longTasks.length;
     const maxDuration = Math.max(...result.longTasks.map(t => t.duration));
-    const totalBlocking = result.longTasks.reduce((sum, t) => sum + Math.max(0, t.duration - 50), 0);
+    const totalBlocking = result.longTasks.reduce(
+      (sum, t) => sum + Math.max(0, t.duration - 50),
+      0
+    );
 
     report += `Total Long Tasks: ${result.longTasks.length}\n`;
     report += `Average Duration: ${avgDuration.toFixed(0)}ms\n`;

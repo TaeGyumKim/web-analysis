@@ -85,7 +85,6 @@ export class PerformanceCollector {
       }
 
       // Navigate to URL
-      const navigationStart = Date.now();
       await page.goto(url, {
         waitUntil: options.waitUntil || 'networkidle0',
         timeout: 60000
@@ -95,7 +94,7 @@ export class PerformanceCollector {
       await new Promise<void>(resolve => setTimeout(resolve, 2000));
 
       // Collect performance metrics
-      const metrics = await this.collectMetrics(page, client);
+      const metrics = await this.collectMetrics(page);
 
       // Collect long tasks
       const longTasks = await this.collectLongTasks(page);
@@ -128,7 +127,6 @@ export class PerformanceCollector {
         longTasks,
         performanceScore
       };
-
     } catch (error) {
       await page.close();
       throw error;
@@ -184,16 +182,16 @@ export class PerformanceCollector {
           timestamp,
           screenshot: screenshot as string
         });
-      } catch (error) {
-        console.error('Failed to capture frame:', error);
+      } catch (_error) {
+        console.error('Failed to capture frame:', _error);
       }
     }, 100); // Capture every 100ms
   }
 
-  private async collectMetrics(page: Page, client: CDPSession): Promise<PerformanceMetrics> {
+  private async collectMetrics(page: Page): Promise<PerformanceMetrics> {
     // Inject performance collection script
     const rawMetrics = await page.evaluate(() => {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         const metrics: any = {};
 
         // Get navigation timing
@@ -216,14 +214,14 @@ export class PerformanceCollector {
         let clsValue = 0;
 
         // Observer for LCP
-        const lcpObserver = new PerformanceObserver((list) => {
+        const lcpObserver = new PerformanceObserver(list => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1] as any;
           metrics.lcp = lastEntry.renderTime || lastEntry.loadTime;
         });
 
         // Observer for CLS
-        const clsObserver = new PerformanceObserver((list) => {
+        const clsObserver = new PerformanceObserver(list => {
           for (const entry of list.getEntries()) {
             if (!(entry as any).hadRecentInput) {
               clsValue += (entry as any).value;
@@ -237,7 +235,7 @@ export class PerformanceCollector {
           // Observe layout shifts for CLS
           try {
             clsObserver.observe({ type: 'layout-shift', buffered: true });
-          } catch (e) {
+          } catch {
             // layout-shift may not be supported in all browsers
             console.warn('layout-shift observation not supported');
           }
@@ -261,7 +259,7 @@ export class PerformanceCollector {
 
             resolve(metrics);
           }, 500);
-        } catch (e) {
+        } catch {
           metrics.cls = clsValue;
           resolve(metrics);
         }
@@ -289,18 +287,18 @@ export class PerformanceCollector {
   private async applyNetworkThrottling(client: CDPSession, profile: string) {
     const profiles = {
       'slow-3g': {
-        downloadThroughput: 500 * 1024 / 8,
-        uploadThroughput: 500 * 1024 / 8,
+        downloadThroughput: (500 * 1024) / 8,
+        uploadThroughput: (500 * 1024) / 8,
         latency: 400
       },
       'fast-3g': {
-        downloadThroughput: 1.6 * 1024 * 1024 / 8,
-        uploadThroughput: 750 * 1024 / 8,
+        downloadThroughput: (1.6 * 1024 * 1024) / 8,
+        uploadThroughput: (750 * 1024) / 8,
         latency: 150
       },
       '4g': {
-        downloadThroughput: 4 * 1024 * 1024 / 8,
-        uploadThroughput: 3 * 1024 * 1024 / 8,
+        downloadThroughput: (4 * 1024 * 1024) / 8,
+        uploadThroughput: (3 * 1024 * 1024) / 8,
         latency: 20
       }
     };

@@ -41,15 +41,15 @@ export default defineConfig({
     screenshot: 'only-on-failure',
 
     // Video on failure
-    video: 'retain-on-failure',
+    video: 'retain-on-failure'
   },
 
   // Configure projects for major browsers
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+      use: { ...devices['Desktop Chrome'] }
+    }
   ],
 
   // Run your local dev server before starting the tests
@@ -57,6 +57,6 @@ export default defineConfig({
     command: 'npm run build && npm run preview',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+    timeout: 120 * 1000
+  }
 });

@@ -7,6 +7,7 @@
 **목적**: C# WebView2 데스크톱 애플리케이션을 Nuxt3 기반 웹 애플리케이션으로 마이그레이션하여, 디자이너와 비개발자도 쉽게 웹 페이지 성능을 분석할 수 있도록 함
 
 **기술 스택**:
+
 - **Frontend**: Nuxt 3, Vue 3, TypeScript, Chart.js
 - **Backend**: Nuxt Server API, Puppeteer, Lighthouse
 - **Performance**: Chrome DevTools Protocol (CDP), Lighthouse API
@@ -17,6 +18,7 @@
 ## ✅ 완료된 작업 (Current Status)
 
 ### 1. 기본 프로젝트 구조 (완료)
+
 - ✅ Nuxt3 프로젝트 초기화
 - ✅ TypeScript 타입 정의 (`types/performance.ts`)
 - ✅ Puppeteer 기반 성능 수집기 (`server/utils/performanceCollector.ts`)
@@ -24,6 +26,7 @@
 - ✅ RESTful API 엔드포인트 (`/api/analyze`)
 
 ### 2. UI/UX 구현 (완료)
+
 - ✅ HTML 디자인 파일 기반 UI 재작성
 - ✅ 8개 탭 시스템 구현:
   1. **프레임 분석 탭** (`FrameAnalysisTab.vue`)
@@ -43,6 +46,7 @@
   - `LongTaskHistogram.vue`: Long Task 히스토그램
 
 ### 3. 핵심 기능 (완료)
+
 - ✅ **성능 메트릭 측정**:
   - FCP (First Contentful Paint)
   - LCP (Largest Contentful Paint)
@@ -70,6 +74,7 @@
 ### 4. Future Enhancements 구현 (6개 완료) ⭐
 
 #### 4.1 CLS 메트릭 추가 ✅
+
 - **구현 내용**:
   - PerformanceObserver API를 사용한 layout-shift 관찰
   - Web Vitals 기준 점수 계산 (≤0.1 good, 0.1-0.25 needs improvement, >0.25 poor)
@@ -77,6 +82,7 @@
 - **커밋**: `b5745ce`
 
 #### 4.2 Long Task 히스토그램 시각화 ✅
+
 - **구현 내용**:
   - `LongTaskHistogram.vue` 컴포넌트 생성
   - 50ms 이상 차단 작업 수집
@@ -87,6 +93,7 @@
 - **커밋**: `38d81e9`
 
 #### 4.3 결과 내보내기 (JSON/Text/CSV) ✅
+
 - **구현 내용**:
   - `exportUtils.ts` 유틸리티 생성
   - 3가지 내보내기 형식:
@@ -98,6 +105,7 @@
 - **커밋**: `d6d2056`
 
 #### 4.4 여러 URL 일괄 분석 ✅
+
 - **구현 내용**:
   - `BatchAnalysis.vue` 컴포넌트 생성
   - URL 큐 관리 (추가/삭제)
@@ -109,6 +117,7 @@
 - **커밋**: `0ed45d3`
 
 #### 4.5 과거 데이터 비교 및 추이 분석 ✅
+
 - **구현 내용**:
   - `historyManager.ts` 유틸리티 생성
   - `HistoryViewer.vue` 컴포넌트 생성
@@ -122,6 +131,7 @@
 - **커밋**: `d1f90b3`
 
 #### 4.6 성능 예산 설정 ✅
+
 - **구현 내용**:
   - `PerformanceBudget.vue` 컴포넌트 생성
   - 6개 메트릭 예산 설정 (FCP, LCP, TBT, CLS, 요청 수, 전송 크기)
@@ -140,6 +150,7 @@
 - **커밋**: `e1b55ec`
 
 #### 4.7 Lighthouse API 통합 ✅
+
 - **구현 내용**:
   - `lighthouseCollector.ts` 수집기 생성
   - `LighthouseTab.vue` 컴포넌트 생성
@@ -154,6 +165,7 @@
 - **커밋**: `0f4ef83`
 
 #### 4.8 CI/CD 파이프라인 통합 ✅
+
 - **구현 내용**:
   - **GitHub Actions 워크플로우**:
     - `ci.yml`: 빌드/테스트/품질 검사 자동화
@@ -176,6 +188,7 @@
 - **커밋**: `0f4ef83`
 
 #### 4.9 PDF 리포트 생성 ✅
+
 - **구현 내용**:
   - `generate-pdf.post.ts`: PDF 생성 API 엔드포인트
   - Puppeteer 기반 HTML to PDF 변환
@@ -187,6 +200,7 @@
 - **커밋**: `5f8a923`
 
 #### 4.10 커스텀 메트릭 시스템 ✅
+
 - **구현 내용**:
   - `CustomMetricsManager.vue`: 메트릭 정의 및 관리 UI
     - 3가지 메트릭 타입: User Timing API, Element Timing, 계산된 메트릭
@@ -205,6 +219,7 @@
 - **커밋**: `ec28ce5`
 
 #### 4.11 Viewport 설정 기능 ✅
+
 - **구현 내용**:
   - 7개 디바이스 프리셋:
     - Desktop: 1920x1080, 1366x768, 1280x720
@@ -221,15 +236,17 @@
 ## 📊 메트릭 및 점수 계산
 
 ### 성능 메트릭
-| 메트릭 | 가중치 | 우수 기준 | 개선 필요 | 취약 |
-|--------|--------|----------|----------|------|
-| FCP | 28% | ≤1000ms | 1000-3000ms | >3000ms |
-| LCP | 28% | ≤2500ms | 2500-4000ms | >4000ms |
-| TBT | 18% | ≤200ms | 200-600ms | >600ms |
-| CLS | 12% | ≤0.1 | 0.1-0.25 | >0.25 |
-| TTFB | 14% | ≤600ms | 600-1800ms | >1800ms |
+
+| 메트릭 | 가중치 | 우수 기준 | 개선 필요   | 취약    |
+| ------ | ------ | --------- | ----------- | ------- |
+| FCP    | 28%    | ≤1000ms   | 1000-3000ms | >3000ms |
+| LCP    | 28%    | ≤2500ms   | 2500-4000ms | >4000ms |
+| TBT    | 18%    | ≤200ms    | 200-600ms   | >600ms  |
+| CLS    | 12%    | ≤0.1      | 0.1-0.25    | >0.25   |
+| TTFB   | 14%    | ≤600ms    | 600-1800ms  | >1800ms |
 
 ### 종합 점수
+
 - **메트릭 점수** (50%): 위 5개 메트릭 가중 평균
 - **네트워크 점수** (35%): 요청 수, 전송 크기, 지연시간 기반
 - **프레임 점수** (15%): 프레임 수, 평균 간격 기반
@@ -290,6 +307,7 @@ web-analysis/
 ## 🎯 사용 가능한 기능
 
 ### 1. 단일 페이지 분석
+
 1. URL 입력
 2. 네트워크 속도 선택 (3G/4G/Wi-Fi/Slow 3G)
 3. 장비 사양 선택 (Desktop/Mobile High/Mid/Low-end)
@@ -303,11 +321,13 @@ web-analysis/
    - 성능 예산 (목표 대비 실제)
 
 ### 2. 결과 내보내기
+
 - JSON: 전체 데이터 (프로그래밍 용도)
 - 텍스트 리포트: 읽기 쉬운 요약 (문서화 용도)
 - CSV: 네트워크 요청 (스프레드시트 분석)
 
 ### 3. 일괄 분석
+
 1. "일괄 분석" 탭 선택
 2. 여러 URL 추가
 3. "N개 URL 분석 시작" 클릭
@@ -316,6 +336,7 @@ web-analysis/
 6. 결과 내보내기
 
 ### 4. 분석 이력 추적
+
 1. "분석 이력" 탭 선택
 2. URL 선택 (자동으로 이력 로드)
 3. 2개 결과 선택하여 비교
@@ -323,6 +344,7 @@ web-analysis/
 5. 평균 메트릭 확인
 
 ### 5. 성능 예산 관리
+
 1. "성능 예산" 탭 선택
 2. 메트릭별 목표 값 설정 (또는 프리셋 선택)
 3. "저장" 버튼 클릭
@@ -334,6 +356,7 @@ web-analysis/
 ## 🚀 배포 및 실행
 
 ### 개발 환경
+
 ```bash
 # 의존성 설치
 PUPPETEER_SKIP_DOWNLOAD=true npm install
@@ -343,12 +366,14 @@ npm run dev
 ```
 
 ### 프로덕션 빌드
+
 ```bash
 npm run build
 npm run preview
 ```
 
 ### Docker 배포 ⭐ NEW
+
 ```bash
 # Docker Compose 사용 (권장)
 docker-compose up -d
@@ -366,11 +391,13 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 ```
 
 ### CI/CD 자동 배포 ⭐ NEW
+
 - **PR 생성 시**: 자동 빌드 및 테스트
 - **main 브랜치 푸시**: Docker 이미지 빌드 및 GHCR 푸시, GitHub Pages 배포
-- **버전 태그 (v*)**: 릴리즈 자동 생성
+- **버전 태그 (v\*)**: 릴리즈 자동 생성
 
 ### 환경 요구사항
+
 - Node.js 20+
 - Chrome/Chromium (Puppeteer용, 시스템에 설치됨)
 - Docker (선택사항, 컨테이너 배포용)
@@ -380,6 +407,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 ## 📈 성능 개선 효과
 
 ### 구현 전 (C# WebView2)
+
 - ❌ Windows 전용
 - ❌ 설치 필요
 - ❌ 제한된 배포
@@ -388,6 +416,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - ❌ 예산 설정 불가
 
 ### 구현 후 (Nuxt3)
+
 - ✅ 크로스 플랫폼 (웹 기반)
 - ✅ 설치 불필요
 - ✅ URL로 즉시 접근
@@ -402,6 +431,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 ## 📋 남은 작업 (Future Enhancements)
 
 ### 추가 개발 권장 사항
+
 - [x] ~~CI/CD 파이프라인 통합~~ ✅ 완료
 - [x] ~~Lighthouse API 통합~~ ✅ 완료
 - [x] ~~PDF 보고서 생성~~ ✅ 완료
@@ -423,6 +453,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 **현재 상태**: ✅ 프로덕션 준비 완료
 
 **주요 기능 (11개)**:
+
 1. ✅ CLS 메트릭 추가
 2. ✅ Long Task 히스토그램 시각화
 3. ✅ 결과 내보내기 (JSON/Text/CSV)
@@ -436,6 +467,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 11. ✅ Viewport 설정 기능
 
 **코드 품질 개선 (최근 세션)**:
+
 - ✅ 코드 중복 제거 (pages/index.vue에서 ~150줄 삭제)
 - ✅ 레거시 컴포넌트 정리 (4개 삭제)
 - ✅ API 문서 업데이트 (PDF, 커스텀 메트릭, viewport 추가)
@@ -443,6 +475,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - ✅ 프로젝트 구조 개편 (nuxt-web-perf를 루트로 이동)
 
 **아키텍처**:
+
 - **Frontend**: Nuxt 3 + Vue 3 + TypeScript + Chart.js
 - **Backend**: Nuxt Server API + Puppeteer + Lighthouse
 - **Storage**: localStorage (히스토리, 예산, 커스텀 메트릭)

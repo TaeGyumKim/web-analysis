@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import type { AnalysisResult } from '~/types/performance';
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   try {
     const body = await readBody<{ result: AnalysisResult }>(event);
 
@@ -20,11 +20,7 @@ export default defineEventHandler(async (event) => {
     // Launch Puppeteer to generate PDF
     const browser = await puppeteer.launch({
       headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage'
-      ],
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined
     });
 
@@ -57,7 +53,6 @@ export default defineEventHandler(async (event) => {
     });
 
     return pdfBuffer;
-
   } catch (error: any) {
     console.error('PDF generation error:', error);
     throw createError({
@@ -372,21 +367,28 @@ function generateReportHTML(result: AnalysisResult): string {
           </tr>
         </thead>
         <tbody>
-          ${result.networkRequests.slice(0, 15).map(req => `
+          ${result.networkRequests
+            .slice(0, 15)
+            .map(
+              req => `
             <tr>
               <td><span class="badge badge-good">${req.type}</span></td>
               <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${req.url}</td>
               <td>${formatBytes(req.size)}</td>
               <td>${req.duration.toFixed(0)}ms</td>
             </tr>
-          `).join('')}
+          `
+            )
+            .join('')}
         </tbody>
       </table>
       ${result.networkRequests.length > 15 ? `<p style="margin-top: 10px; font-size: 11px; color: #666;">... 외 ${result.networkRequests.length - 15}개 요청</p>` : ''}
     </div>
 
     <!-- Long Tasks -->
-    ${result.longTasks && result.longTasks.length > 0 ? `
+    ${
+      result.longTasks && result.longTasks.length > 0
+        ? `
     <div class="section">
       <h2 class="section-title">⚠️ Long Tasks (50ms 이상)</h2>
       <div class="stats-grid">
@@ -409,14 +411,21 @@ function generateReportHTML(result: AnalysisResult): string {
       </div>
 
       <div class="long-task-list">
-        ${result.longTasks.slice(0, 5).map((task, i) => `
+        ${result.longTasks
+          .slice(0, 5)
+          .map(
+            (task, i) => `
           <div class="long-task-item">
             <strong>${i + 1}. ${task.name}</strong> - ${task.duration.toFixed(0)}ms (시작: ${task.startTime.toFixed(0)}ms)
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <!-- Performance Scores -->
     <div class="section">
@@ -445,27 +454,39 @@ function generateReportHTML(result: AnalysisResult): string {
     <div class="section">
       <h2 class="section-title">📈 추가 메트릭</h2>
       <div class="metrics-grid">
-        ${result.metrics.ttfb ? `
+        ${
+          result.metrics.ttfb
+            ? `
         <div class="metric-card">
           <div class="metric-name">TTFB</div>
           <div class="metric-value">${result.metrics.ttfb.toFixed(0)}ms</div>
           <div class="metric-description">Time to First Byte</div>
         </div>
-        ` : ''}
-        ${result.metrics.domContentLoaded ? `
+        `
+            : ''
+        }
+        ${
+          result.metrics.domContentLoaded
+            ? `
         <div class="metric-card">
           <div class="metric-name">DOM Content Loaded</div>
           <div class="metric-value">${result.metrics.domContentLoaded.toFixed(0)}ms</div>
           <div class="metric-description">DOM 로드 완료</div>
         </div>
-        ` : ''}
-        ${result.metrics.loadComplete ? `
+        `
+            : ''
+        }
+        ${
+          result.metrics.loadComplete
+            ? `
         <div class="metric-card">
           <div class="metric-name">Load Complete</div>
           <div class="metric-value">${result.metrics.loadComplete.toFixed(0)}ms</div>
           <div class="metric-description">전체 로드 완료</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
         <div class="metric-card">
           <div class="metric-name">Total Running Time</div>
           <div class="metric-value">${result.runningTime.toFixed(0)}ms</div>

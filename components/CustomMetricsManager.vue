@@ -1,46 +1,51 @@
 <template>
   <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      "
+    >
       <h3>커스텀 메트릭 관리</h3>
-      <button class="btn btn-primary" @click="openAddDialog">
-        + 새 메트릭 추가
-      </button>
+      <button class="btn btn-primary" @click="openAddDialog">+ 새 메트릭 추가</button>
     </div>
 
     <!-- 커스텀 메트릭 목록 -->
-    <div v-if="customMetrics.length === 0" style="text-align: center; padding: 40px; color: #999;">
+    <div v-if="customMetrics.length === 0" style="text-align: center; padding: 40px; color: #999">
       정의된 커스텀 메트릭이 없습니다. 새 메트릭을 추가하여 시작하세요.
     </div>
 
     <div v-else>
-      <table style="width: 100%; border-collapse: collapse;">
+      <table style="width: 100%; border-collapse: collapse">
         <thead>
-          <tr style="border-bottom: 2px solid #e0e0e0;">
-            <th style="padding: 12px 8px; text-align: left; font-weight: 600;">이름</th>
-            <th style="padding: 12px 8px; text-align: left; font-weight: 600;">타입</th>
-            <th style="padding: 12px 8px; text-align: left; font-weight: 600;">설명</th>
-            <th style="padding: 12px 8px; text-align: center; font-weight: 600;">상태</th>
-            <th style="padding: 12px 8px; text-align: right; font-weight: 600;">작업</th>
+          <tr style="border-bottom: 2px solid #e0e0e0">
+            <th style="padding: 12px 8px; text-align: left; font-weight: 600">이름</th>
+            <th style="padding: 12px 8px; text-align: left; font-weight: 600">타입</th>
+            <th style="padding: 12px 8px; text-align: left; font-weight: 600">설명</th>
+            <th style="padding: 12px 8px; text-align: center; font-weight: 600">상태</th>
+            <th style="padding: 12px 8px; text-align: right; font-weight: 600">작업</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="metric in customMetrics"
             :key="metric.id"
-            style="border-bottom: 1px solid #e0e0e0;"
+            style="border-bottom: 1px solid #e0e0e0"
           >
-            <td style="padding: 12px 8px;">
+            <td style="padding: 12px 8px">
               <strong>{{ metric.name }}</strong>
             </td>
-            <td style="padding: 12px 8px;">
+            <td style="padding: 12px 8px">
               <span class="badge" :class="getTypeBadgeClass(metric.type)">
                 {{ getTypeLabel(metric.type) }}
               </span>
             </td>
-            <td style="padding: 12px 8px; color: #666;">
+            <td style="padding: 12px 8px; color: #666">
               {{ metric.description }}
             </td>
-            <td style="padding: 12px 8px; text-align: center;">
+            <td style="padding: 12px 8px; text-align: center">
               <button
                 class="toggle-btn"
                 :class="{ active: metric.enabled }"
@@ -49,13 +54,9 @@
                 {{ metric.enabled ? '활성' : '비활성' }}
               </button>
             </td>
-            <td style="padding: 12px 8px; text-align: right;">
-              <button class="btn-icon" @click="editMetric(metric)" title="수정">
-                ✏️
-              </button>
-              <button class="btn-icon" @click="deleteMetric(metric.id)" title="삭제">
-                🗑️
-              </button>
+            <td style="padding: 12px 8px; text-align: right">
+              <button class="btn-icon" title="수정" @click="editMetric(metric)">✏️</button>
+              <button class="btn-icon" title="삭제" @click="deleteMetric(metric.id)">🗑️</button>
             </td>
           </tr>
         </tbody>
@@ -109,8 +110,9 @@
               placeholder="performance.measure() 또는 performance.mark()의 이름"
               required
             />
-            <small style="color: #666; display: block; margin-top: 4px;">
-              웹사이트 코드에서 performance.measure() 또는 performance.mark()로 측정한 이름을 입력하세요.
+            <small style="color: #666; display: block; margin-top: 4px">
+              웹사이트 코드에서 performance.measure() 또는 performance.mark()로 측정한 이름을
+              입력하세요.
             </small>
           </div>
 
@@ -124,7 +126,7 @@
               placeholder="예: .hero-image, #main-banner"
               required
             />
-            <small style="color: #666; display: block; margin-top: 4px;">
+            <small style="color: #666; display: block; margin-top: 4px">
               CSS 선택자를 입력하세요. 요소에 elementtiming 속성이 필요합니다.
             </small>
           </div>
@@ -139,8 +141,9 @@
               placeholder="예: lcp - fcp, networkRequests.length, totalSize"
               required
             />
-            <small style="color: #666; display: block; margin-top: 4px;">
-              사용 가능: lcp, fcp, tbt, cls, fid, ttfb, domContentLoaded, loadComplete, networkRequests.length, longTasks.length
+            <small style="color: #666; display: block; margin-top: 4px">
+              사용 가능: lcp, fcp, tbt, cls, fid, ttfb, domContentLoaded, loadComplete,
+              networkRequests.length, longTasks.length
             </small>
           </div>
 
@@ -156,8 +159,8 @@
           </div>
 
           <!-- 임계값 설정 -->
-          <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 16px 0;">
-            <h4 style="margin: 0 0 12px 0; font-size: 14px;">임계값 설정</h4>
+          <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 16px 0">
+            <h4 style="margin: 0 0 12px 0; font-size: 14px">임계값 설정</h4>
 
             <div class="form-group">
               <label>양호 (Good) - 이 값 이하면 양호 *</label>
@@ -182,23 +185,21 @@
             </div>
 
             <div class="form-group">
-              <label style="color: #666;">나쁨 (Poor) - 개선 필요 값 초과 시 자동으로 나쁨으로 분류됩니다</label>
+              <label style="color: #666"
+                >나쁨 (Poor) - 개선 필요 값 초과 시 자동으로 나쁨으로 분류됩니다</label
+              >
             </div>
           </div>
 
           <div class="form-group">
-            <label style="display: flex; align-items: center; cursor: pointer;">
-              <input
-                v-model="formData.enabled"
-                type="checkbox"
-                style="margin-right: 8px;"
-              />
+            <label style="display: flex; align-items: center; cursor: pointer">
+              <input v-model="formData.enabled" type="checkbox" style="margin-right: 8px" />
               메트릭 활성화
             </label>
           </div>
 
           <!-- 액션 버튼 -->
-          <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px;">
+          <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px">
             <button type="button" class="btn" @click="closeDialog">취소</button>
             <button type="submit" class="btn btn-primary">저장</button>
           </div>
@@ -323,7 +324,7 @@ function getTypeLabel(type: string): string {
   const labels: Record<string, string> = {
     'user-timing': 'User Timing',
     'element-timing': 'Element Timing',
-    'calculated': '계산'
+    calculated: '계산'
   };
   return labels[type] || type;
 }
@@ -332,7 +333,7 @@ function getTypeBadgeClass(type: string): string {
   const classes: Record<string, string> = {
     'user-timing': 'badge-blue',
     'element-timing': 'badge-green',
-    'calculated': 'badge-purple'
+    calculated: 'badge-purple'
   };
   return classes[type] || '';
 }

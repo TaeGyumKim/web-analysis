@@ -3,7 +3,7 @@
  * Docker 컨테이너 및 로드 밸런서를 위한 헬스 체크 엔드포인트
  */
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const startTime = Date.now();
 
   try {
@@ -16,8 +16,8 @@ export default defineEventHandler(async (event) => {
       checks: {
         api: 'ok',
         memory: 'ok',
-        puppeteer: 'ok',
-      },
+        puppeteer: 'ok'
+      }
     };
 
     // 메모리 사용량 체크
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
       rss: Math.round(memoryUsage.rss / 1024 / 1024),
       heapTotal: Math.round(memoryUsage.heapTotal / 1024 / 1024),
       heapUsed: Math.round(memoryUsage.heapUsed / 1024 / 1024),
-      external: Math.round(memoryUsage.external / 1024 / 1024),
+      external: Math.round(memoryUsage.external / 1024 / 1024)
     };
 
     // 메모리 임계값 체크 (1GB)
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
         health.checks.puppeteer = 'error';
         health.status = 'degraded';
       }
-    } catch (error) {
+    } catch {
       health.checks.puppeteer = 'error';
       health.status = 'unhealthy';
     }
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     return {
       ...health,
       memory: memoryUsageMB,
-      responseTime: `${responseTime}ms`,
+      responseTime: `${responseTime}ms`
     };
   } catch (error) {
     // 에러 발생 시 unhealthy 상태 반환
@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
     return {
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 });

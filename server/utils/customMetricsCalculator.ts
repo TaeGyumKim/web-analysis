@@ -86,8 +86,7 @@ export class CustomMetricsCalculator {
     // Element timing data would contain the render time of elements
     // This is a simplified implementation
     const element = elementTimingData.find(
-      entry => entry.entryType === 'element' &&
-               (entry as any).identifier === def.elementSelector
+      entry => entry.entryType === 'element' && (entry as any).identifier === def.elementSelector
     );
 
     if (element) {
@@ -132,9 +131,8 @@ export class CustomMetricsCalculator {
         // Helper functions
         networkRequests: {
           length: result.networkRequests.length,
-          filter: (type: string) => result.networkRequests.filter(r =>
-            r.type.toLowerCase() === type.toLowerCase()
-          )
+          filter: (type: string) =>
+            result.networkRequests.filter(r => r.type.toLowerCase() === type.toLowerCase())
         }
       };
 
@@ -176,7 +174,6 @@ export class CustomMetricsCalculator {
       // Evaluate the formula
       const result_value = Function(`"use strict"; return (${evalFormula})`)();
       return typeof result_value === 'number' ? result_value : null;
-
     } catch (error) {
       console.error(`Failed to evaluate formula "${def.formula}":`, error);
       return null;

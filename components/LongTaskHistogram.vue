@@ -1,39 +1,73 @@
 <template>
   <div class="card">
     <h3>Long Task 히스토그램</h3>
-    <p style="font-size: 14px; color: #666; margin-top: 8px;">
+    <p style="font-size: 14px; color: #666; margin-top: 8px">
       메인 스레드를 50ms 이상 차단한 작업들
     </p>
 
     <div v-if="longTasks && longTasks.length > 0">
       <!-- Summary stats -->
-      <div style="display: flex; gap: 24px; margin: 20px 0; padding: 16px; background: #f6f7f9; border-radius: 8px;">
+      <div
+        style="
+          display: flex;
+          gap: 24px;
+          margin: 20px 0;
+          padding: 16px;
+          background: #f6f7f9;
+          border-radius: 8px;
+        "
+      >
         <div>
-          <div style="font-size: 12px; color: #666;">총 Long Task 수</div>
-          <div style="font-size: 20px; font-weight: 600; margin-top: 4px;">{{ longTasks.length }}</div>
+          <div style="font-size: 12px; color: #666">총 Long Task 수</div>
+          <div style="font-size: 20px; font-weight: 600; margin-top: 4px">
+            {{ longTasks.length }}
+          </div>
         </div>
         <div>
-          <div style="font-size: 12px; color: #666;">평균 지속시간</div>
-          <div style="font-size: 20px; font-weight: 600; margin-top: 4px;">{{ averageDuration.toFixed(0) }}ms</div>
+          <div style="font-size: 12px; color: #666">평균 지속시간</div>
+          <div style="font-size: 20px; font-weight: 600; margin-top: 4px">
+            {{ averageDuration.toFixed(0) }}ms
+          </div>
         </div>
         <div>
-          <div style="font-size: 12px; color: #666;">최대 지속시간</div>
-          <div style="font-size: 20px; font-weight: 600; margin-top: 4px;">{{ maxDuration.toFixed(0) }}ms</div>
+          <div style="font-size: 12px; color: #666">최대 지속시간</div>
+          <div style="font-size: 20px; font-weight: 600; margin-top: 4px">
+            {{ maxDuration.toFixed(0) }}ms
+          </div>
         </div>
         <div>
-          <div style="font-size: 12px; color: #666;">총 차단 시간</div>
-          <div style="font-size: 20px; font-weight: 600; margin-top: 4px;">{{ totalBlockingTime.toFixed(0) }}ms</div>
+          <div style="font-size: 12px; color: #666">총 차단 시간</div>
+          <div style="font-size: 20px; font-weight: 600; margin-top: 4px">
+            {{ totalBlockingTime.toFixed(0) }}ms
+          </div>
         </div>
       </div>
 
       <!-- Histogram -->
-      <div style="margin-top: 24px;">
-        <div style="font-weight: 600; margin-bottom: 12px;">지속시간 분포</div>
-        <div style="display: flex; align-items: flex-end; gap: 4px; height: 200px; padding: 12px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;">
+      <div style="margin-top: 24px">
+        <div style="font-weight: 600; margin-bottom: 12px">지속시간 분포</div>
+        <div
+          style="
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 200px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+          "
+        >
           <div
             v-for="(bucket, index) in histogram"
             :key="index"
-            style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-end;
+              align-items: center;
+            "
           >
             <div
               :style="{
@@ -45,7 +79,7 @@
               }"
               :title="`${bucket.range}: ${bucket.count}개 작업`"
             ></div>
-            <div style="font-size: 11px; color: #999; margin-top: 6px; writing-mode: horizontal-tb;">
+            <div style="font-size: 11px; color: #999; margin-top: 6px; writing-mode: horizontal-tb">
               {{ bucket.label }}
             </div>
           </div>
@@ -53,25 +87,33 @@
       </div>
 
       <!-- Task list -->
-      <div style="margin-top: 24px;">
-        <div style="font-weight: 600; margin-bottom: 12px;">상위 Long Tasks</div>
-        <table style="width: 100%; border-collapse: collapse;">
+      <div style="margin-top: 24px">
+        <div style="font-weight: 600; margin-bottom: 12px">상위 Long Tasks</div>
+        <table style="width: 100%; border-collapse: collapse">
           <thead>
-            <tr style="border-bottom: 2px solid #e0e0e0;">
-              <th style="padding: 8px; text-align: left; font-weight: 600; font-size: 13px;">시작 시간</th>
-              <th style="padding: 8px; text-align: left; font-weight: 600; font-size: 13px;">지속시간</th>
-              <th style="padding: 8px; text-align: left; font-weight: 600; font-size: 13px;">차단 시간</th>
-              <th style="padding: 8px; text-align: left; font-weight: 600; font-size: 13px;">이름</th>
+            <tr style="border-bottom: 2px solid #e0e0e0">
+              <th style="padding: 8px; text-align: left; font-weight: 600; font-size: 13px">
+                시작 시간
+              </th>
+              <th style="padding: 8px; text-align: left; font-weight: 600; font-size: 13px">
+                지속시간
+              </th>
+              <th style="padding: 8px; text-align: left; font-weight: 600; font-size: 13px">
+                차단 시간
+              </th>
+              <th style="padding: 8px; text-align: left; font-weight: 600; font-size: 13px">
+                이름
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr
               v-for="(task, index) in topLongTasks"
               :key="index"
-              style="border-bottom: 1px solid #e0e0e0;"
+              style="border-bottom: 1px solid #e0e0e0"
             >
-              <td style="padding: 8px; font-size: 13px;">{{ task.startTime.toFixed(0) }}ms</td>
-              <td style="padding: 8px; font-size: 13px;">
+              <td style="padding: 8px; font-size: 13px">{{ task.startTime.toFixed(0) }}ms</td>
+              <td style="padding: 8px; font-size: 13px">
                 <span
                   :style="{
                     display: 'inline-block',
@@ -85,15 +127,17 @@
                   {{ task.duration.toFixed(0) }}ms
                 </span>
               </td>
-              <td style="padding: 8px; font-size: 13px;">{{ Math.max(0, task.duration - 50).toFixed(0) }}ms</td>
-              <td style="padding: 8px; font-size: 13px; color: #666;">{{ task.name }}</td>
+              <td style="padding: 8px; font-size: 13px">
+                {{ Math.max(0, task.duration - 50).toFixed(0) }}ms
+              </td>
+              <td style="padding: 8px; font-size: 13px; color: #666">{{ task.name }}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <div v-else style="text-align: center; padding: 40px; color: #999;">
+    <div v-else style="text-align: center; padding: 40px; color: #999">
       Long Task가 감지되지 않았습니다. (50ms 이상 차단한 작업 없음)
     </div>
   </div>
@@ -126,9 +170,7 @@ const totalBlockingTime = computed(() => {
 // Top 10 longest tasks
 const topLongTasks = computed(() => {
   if (!props.longTasks) return [];
-  return [...props.longTasks]
-    .sort((a, b) => b.duration - a.duration)
-    .slice(0, 10);
+  return [...props.longTasks].sort((a, b) => b.duration - a.duration).slice(0, 10);
 });
 
 // Create histogram buckets

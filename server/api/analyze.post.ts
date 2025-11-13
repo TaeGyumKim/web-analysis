@@ -6,7 +6,7 @@ import type { AnalysisOptions } from '~/types/performance';
 let collector: PerformanceCollector | null = null;
 let lighthouseCollector: LighthouseCollector | null = null;
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   try {
     const body = await readBody(event);
     const { url, options } = body as { url: string; options: AnalysisOptions };
@@ -61,8 +61,12 @@ export default defineEventHandler(async (event) => {
         const lighthouseResult = await lighthouseCollector.analyze({
           url,
           formFactor: analysisOptions.lighthouseFormFactor,
-          throttling: analysisOptions.networkThrottling === 'none' ? 'none' :
-                      analysisOptions.lighthouseFormFactor === 'mobile' ? 'mobile' : 'desktop'
+          throttling:
+            analysisOptions.networkThrottling === 'none'
+              ? 'none'
+              : analysisOptions.lighthouseFormFactor === 'mobile'
+                ? 'mobile'
+                : 'desktop'
         });
 
         result.lighthouse = lighthouseResult;
@@ -95,7 +99,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       data: result
     };
-
   } catch (error: any) {
     console.error('Analysis error:', error);
 

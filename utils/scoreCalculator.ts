@@ -1,4 +1,10 @@
-import type { PerformanceMetrics, NetworkRequest, FrameCapture, PerformanceScore, ScoreDetail } from '~/types/performance';
+import type {
+  PerformanceMetrics,
+  NetworkRequest,
+  FrameCapture,
+  PerformanceScore,
+  ScoreDetail
+} from '~/types/performance';
 
 // Weight constants
 const PERF_WEIGHT_METRICS = 0.5;
@@ -27,13 +33,13 @@ export function scoreTimingMs(ms: number | undefined): number {
     return 100;
   } else if (ms <= 3000) {
     // Linear decrease from 100 to 75
-    return 100 - ((ms - 1000) * (25 / 2000));
+    return 100 - (ms - 1000) * (25 / 2000);
   } else if (ms <= 7000) {
     // Linear decrease from 75 to 30
-    return 75 - ((ms - 3000) * (45 / 4000));
+    return 75 - (ms - 3000) * (45 / 4000);
   } else {
     // Slow decrease: -1 per second
-    return Math.max(0, 30 - ((ms - 7000) / 1000));
+    return Math.max(0, 30 - (ms - 7000) / 1000);
   }
 }
 
@@ -56,20 +62,23 @@ export function scoreCLS(cls: number | undefined): number {
     return 100;
   } else if (cls <= 0.25) {
     // Linear decrease from 100 to 50
-    return 100 - ((cls - 0.1) * (50 / 0.15));
+    return 100 - (cls - 0.1) * (50 / 0.15);
   } else if (cls <= 0.5) {
     // Linear decrease from 50 to 20
-    return 50 - ((cls - 0.25) * (30 / 0.25));
+    return 50 - (cls - 0.25) * (30 / 0.25);
   } else {
     // Slow decrease
-    return Math.max(0, 20 - ((cls - 0.5) * 10));
+    return Math.max(0, 20 - (cls - 0.5) * 10);
   }
 }
 
 /**
  * Calculate metrics score (weighted average of individual metrics)
  */
-export function computeMetricsScore(metrics: PerformanceMetrics): { score: number; details: ScoreDetail[] } {
+export function computeMetricsScore(metrics: PerformanceMetrics): {
+  score: number;
+  details: ScoreDetail[];
+} {
   const details: ScoreDetail[] = [];
   let totalWeight = 0;
   let weightedSum = 0;
@@ -100,7 +109,10 @@ export function computeMetricsScore(metrics: PerformanceMetrics): { score: numbe
 /**
  * Calculate network score based on total bytes, request count, and longest request
  */
-export function computeNetworkScore(requests: NetworkRequest[]): { score: number; details: ScoreDetail[] } {
+export function computeNetworkScore(requests: NetworkRequest[]): {
+  score: number;
+  details: ScoreDetail[];
+} {
   if (!requests || requests.length === 0) {
     return { score: 100, details: [] };
   }
@@ -157,7 +169,10 @@ export function computeNetworkScore(requests: NetworkRequest[]): { score: number
 /**
  * Calculate frames score based on frame interval consistency
  */
-export function computeFramesScore(frames: FrameCapture[]): { score: number; details: ScoreDetail[] } {
+export function computeFramesScore(frames: FrameCapture[]): {
+  score: number;
+  details: ScoreDetail[];
+} {
   if (!frames || frames.length < 2) {
     return { score: 100, details: [] };
   }
@@ -214,8 +229,8 @@ export function computePerformanceScore(
 
   const overall = Math.round(
     metricsResult.score * PERF_WEIGHT_METRICS +
-    networkResult.score * PERF_WEIGHT_NETWORK +
-    framesResult.score * PERF_WEIGHT_FRAMES
+      networkResult.score * PERF_WEIGHT_NETWORK +
+      framesResult.score * PERF_WEIGHT_FRAMES
   );
 
   const details: ScoreDetail[] = [

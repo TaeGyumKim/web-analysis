@@ -1,145 +1,145 @@
 <template>
   <div>
     <!-- Performance Metrics Chart (New) -->
-    <div v-if="result" style="margin-bottom: 20px;">
+    <div v-if="result" style="margin-bottom: 20px">
       <PerformanceMetricsChart :result="result" />
     </div>
 
-    <div style="display: flex; gap: 20px;">
+    <div style="display: flex; gap: 20px">
       <!-- 좌측 영역 -->
-      <div style="flex: 1;">
-      <div class="card">
-        <h3>프레임별 렌더링 과정</h3>
+      <div style="flex: 1">
+        <div class="card">
+          <h3>프레임별 렌더링 과정</h3>
 
-        <!-- 프레임 박스 -->
-        <div class="frame-box">
-          <img
-            v-if="currentFrame"
-            :src="`data:image/png;base64,${currentFrame.screenshot}`"
-            alt="Frame screenshot"
-            style="width: 100%; height: 100%; object-fit: contain;"
+          <!-- 프레임 박스 -->
+          <div class="frame-box">
+            <img
+              v-if="currentFrame"
+              :src="`data:image/png;base64,${currentFrame.screenshot}`"
+              alt="Frame screenshot"
+              style="width: 100%; height: 100%; object-fit: contain"
+            />
+            <div v-else style="color: #999">
+              분석 결과가 없습니다. 상단에서 URL을 입력하고 분석을 시작하세요.
+            </div>
+          </div>
+
+          <!-- 슬라이더 -->
+          <input
+            v-if="frames.length > 0"
+            v-model="currentFrameIndex"
+            type="range"
+            min="0"
+            :max="frames.length - 1"
+            class="slider"
+            style="width: 100%; margin-top: 26px"
           />
-          <div v-else style="color: #999;">
-            분석 결과가 없습니다. 상단에서 URL을 입력하고 분석을 시작하세요.
+
+          <!-- 프레임 컨트롤 -->
+          <div v-if="frames.length > 0" style="text-align: center; margin-top: 10px">
+            <button class="btn" style="margin: 0 5px; padding: 6px 12px" @click="prevFrame">
+              ◀
+            </button>
+            <button class="btn" style="margin: 0 5px; padding: 6px 12px" @click="nextFrame">
+              ▶
+            </button>
+            <button class="btn" style="margin: 0 5px; padding: 6px 12px" @click="playFrames">
+              {{ isPlaying ? '■' : '▶▶' }}
+            </button>
           </div>
-        </div>
 
-        <!-- 슬라이더 -->
-        <input
-          v-if="frames.length > 0"
-          type="range"
-          min="0"
-          :max="frames.length - 1"
-          v-model="currentFrameIndex"
-          class="slider"
-          style="width: 100%; margin-top: 26px;"
-        />
-
-        <!-- 프레임 컨트롤 -->
-        <div v-if="frames.length > 0" style="text-align: center; margin-top: 10px;">
-          <button class="btn" @click="prevFrame" style="margin: 0 5px; padding: 6px 12px;">◀</button>
-          <button class="btn" @click="nextFrame" style="margin: 0 5px; padding: 6px 12px;">▶</button>
-          <button class="btn" @click="playFrames" style="margin: 0 5px; padding: 6px 12px;">
-            {{ isPlaying ? '■' : '▶▶' }}
-          </button>
-        </div>
-
-        <!-- 프레임 정보 -->
-        <div v-if="currentFrame" style="text-align: center; margin-top: 12px;">
-          프레임 {{ currentFrameIndex + 1 }} / {{ frames.length }} - {{ (currentFrame.timestamp * 1000).toFixed(0) }}ms
+          <!-- 프레임 정보 -->
+          <div v-if="currentFrame" style="text-align: center; margin-top: 12px">
+            프레임 {{ currentFrameIndex + 1 }} / {{ frames.length }} -
+            {{ (currentFrame.timestamp * 1000).toFixed(0) }}ms
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 우측 영역 -->
-    <div style="width: 340px;">
-      <div class="card" style="padding: 0;">
-        <!-- 현재 프레임 정보 -->
-        <div class="section-card">
-          <h3>현재 프레임 정보</h3>
-          <div v-if="currentFrame">
-            <div>시간: {{ (currentFrame.timestamp * 1000).toFixed(0) }}ms</div>
-            <div style="margin-top: 8px;">상태: 렌더링 진행 중</div>
-            <div style="margin-top: 8px;">설명: 페이지 로딩 프레임</div>
+      <!-- 우측 영역 -->
+      <div style="width: 340px">
+        <div class="card" style="padding: 0">
+          <!-- 현재 프레임 정보 -->
+          <div class="section-card">
+            <h3>현재 프레임 정보</h3>
+            <div v-if="currentFrame">
+              <div>시간: {{ (currentFrame.timestamp * 1000).toFixed(0) }}ms</div>
+              <div style="margin-top: 8px">상태: 렌더링 진행 중</div>
+              <div style="margin-top: 8px">설명: 페이지 로딩 프레임</div>
+            </div>
+            <div v-else style="color: #999">분석 결과 없음</div>
           </div>
-          <div v-else style="color: #999;">분석 결과 없음</div>
-        </div>
 
-        <!-- 로드된 리소스 -->
-        <div class="section-card" v-if="result">
-          <h3>로드된 리소스</h3>
-          <div>총 요청: {{ result.networkRequests.length }}</div>
-          <div style="margin-top: 8px;">
-            총 크기: {{ formatBytes(totalSize) }}
+          <!-- 로드된 리소스 -->
+          <div v-if="result" class="section-card">
+            <h3>로드된 리소스</h3>
+            <div>총 요청: {{ result.networkRequests.length }}</div>
+            <div style="margin-top: 8px">총 크기: {{ formatBytes(totalSize) }}</div>
+            <div style="margin-top: 8px">이미지: {{ imageCount }}</div>
           </div>
-          <div style="margin-top: 8px;">
-            이미지: {{ imageCount }}
-          </div>
-        </div>
 
-        <!-- 핵심 메트릭 -->
-        <div class="section-card" v-if="result && result.metrics">
-          <h3>핵심 메트릭</h3>
+          <!-- 핵심 메트릭 -->
+          <div v-if="result && result.metrics" class="section-card">
+            <h3>핵심 메트릭</h3>
 
-          <div v-if="result.metrics.fcp">
-            <div>FCP: {{ result.metrics.fcp.toFixed(0) }}ms</div>
-            <div class="metric-bar">
-              <div
-                class="metric-fill"
-                :class="getMetricColor(result.metrics.fcp)"
-                :style="{ width: getMetricWidth(result.metrics.fcp) + '%' }"
-              ></div>
+            <div v-if="result.metrics.fcp">
+              <div>FCP: {{ result.metrics.fcp.toFixed(0) }}ms</div>
+              <div class="metric-bar">
+                <div
+                  class="metric-fill"
+                  :class="getMetricColor(result.metrics.fcp)"
+                  :style="{ width: getMetricWidth(result.metrics.fcp) + '%' }"
+                ></div>
+              </div>
+            </div>
+
+            <div v-if="result.metrics.lcp" style="margin-top: 12px">
+              <div>LCP: {{ result.metrics.lcp.toFixed(0) }}ms</div>
+              <div class="metric-bar">
+                <div
+                  class="metric-fill"
+                  :class="getMetricColor(result.metrics.lcp)"
+                  :style="{ width: getMetricWidth(result.metrics.lcp) + '%' }"
+                ></div>
+              </div>
+            </div>
+
+            <div v-if="result.metrics.tbt" style="margin-top: 12px">
+              <div>TBT: {{ result.metrics.tbt.toFixed(0) }}ms</div>
+              <div class="metric-bar">
+                <div
+                  class="metric-fill"
+                  :class="getMetricColor(result.metrics.tbt)"
+                  :style="{ width: getMetricWidth(result.metrics.tbt) + '%' }"
+                ></div>
+              </div>
+            </div>
+
+            <div v-if="result.metrics.cls !== undefined" style="margin-top: 12px">
+              <div>CLS: {{ result.metrics.cls.toFixed(3) }}</div>
+              <div class="metric-bar">
+                <div
+                  class="metric-fill"
+                  :class="getCLSColor(result.metrics.cls)"
+                  :style="{ width: getCLSWidth(result.metrics.cls) + '%' }"
+                ></div>
+              </div>
             </div>
           </div>
 
-          <div v-if="result.metrics.lcp" style="margin-top: 12px;">
-            <div>LCP: {{ result.metrics.lcp.toFixed(0) }}ms</div>
-            <div class="metric-bar">
-              <div
-                class="metric-fill"
-                :class="getMetricColor(result.metrics.lcp)"
-                :style="{ width: getMetricWidth(result.metrics.lcp) + '%' }"
-              ></div>
-            </div>
-          </div>
-
-          <div v-if="result.metrics.tbt" style="margin-top: 12px;">
-            <div>TBT: {{ result.metrics.tbt.toFixed(0) }}ms</div>
-            <div class="metric-bar">
-              <div
-                class="metric-fill"
-                :class="getMetricColor(result.metrics.tbt)"
-                :style="{ width: getMetricWidth(result.metrics.tbt) + '%' }"
-              ></div>
-            </div>
-          </div>
-
-          <div v-if="result.metrics.cls !== undefined" style="margin-top: 12px;">
-            <div>CLS: {{ result.metrics.cls.toFixed(3) }}</div>
-            <div class="metric-bar">
-              <div
-                class="metric-fill"
-                :class="getCLSColor(result.metrics.cls)"
-                :style="{ width: getCLSWidth(result.metrics.cls) + '%' }"
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Long Tasks 요약 -->
-        <div class="section-card" v-if="result && result.longTasks && result.longTasks.length > 0">
-          <h3>Long Tasks</h3>
-          <div>총 작업: {{ result.longTasks.length }}</div>
-          <div style="margin-top: 8px;">
-            평균: {{ averageLongTaskDuration.toFixed(0) }}ms
-          </div>
-          <div style="margin-top: 8px;">
-            최대: {{ maxLongTaskDuration.toFixed(0) }}ms
+          <!-- Long Tasks 요약 -->
+          <div
+            v-if="result && result.longTasks && result.longTasks.length > 0"
+            class="section-card"
+          >
+            <h3>Long Tasks</h3>
+            <div>총 작업: {{ result.longTasks.length }}</div>
+            <div style="margin-top: 8px">평균: {{ averageLongTaskDuration.toFixed(0) }}ms</div>
+            <div style="margin-top: 8px">최대: {{ maxLongTaskDuration.toFixed(0) }}ms</div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -164,9 +164,7 @@ const totalSize = computed(() => {
 
 const imageCount = computed(() => {
   if (!props.result) return 0;
-  return props.result.networkRequests.filter(req =>
-    req.type.toLowerCase() === 'image'
-  ).length;
+  return props.result.networkRequests.filter(req => req.type.toLowerCase() === 'image').length;
 });
 
 const averageLongTaskDuration = computed(() => {
@@ -254,10 +252,13 @@ onUnmounted(() => {
   stopPlaying();
 });
 
-watch(() => props.result, (newResult) => {
-  if (newResult) {
-    currentFrameIndex.value = 0;
-    stopPlaying();
+watch(
+  () => props.result,
+  newResult => {
+    if (newResult) {
+      currentFrameIndex.value = 0;
+      stopPlaying();
+    }
   }
-});
+);
 </script>

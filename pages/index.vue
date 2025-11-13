@@ -1,19 +1,21 @@
 <template>
-  <div style="margin: 40px; position: relative;">
+  <div style="margin: 40px; position: relative">
     <!-- 로딩 오버레이 -->
     <div v-if="isAnalyzing" class="loading-overlay">
       <div class="loading-content">
         <div class="spinner"></div>
-        <h2 style="margin: 20px 0 10px 0; color: #1f2937;">분석 중...</h2>
-        <p style="color: #6b7280; margin: 0;">페이지 성능을 분석하고 있습니다. 잠시만 기다려주세요.</p>
-        <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 14px;">{{ url }}</p>
+        <h2 style="margin: 20px 0 10px 0; color: #1f2937">분석 중...</h2>
+        <p style="color: #6b7280; margin: 0">
+          페이지 성능을 분석하고 있습니다. 잠시만 기다려주세요.
+        </p>
+        <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 14px">{{ url }}</p>
       </div>
     </div>
 
     <!-- 상단 제어바 -->
     <div class="topbar">
       <!-- 첫 번째 줄 -->
-      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
         <label>네트워크 속도:</label>
         <select v-model="networkSpeed">
           <option>3G</option>
@@ -44,52 +46,60 @@
 
         <template v-if="viewportPreset === 'custom'">
           <input
-            type="number"
             v-model.number="customViewportWidth"
+            type="number"
             placeholder="Width"
-            style="width: 80px;"
+            style="width: 80px"
             min="320"
             max="3840"
           />
           <span>×</span>
           <input
-            type="number"
             v-model.number="customViewportHeight"
+            type="number"
             placeholder="Height"
-            style="width: 80px;"
+            style="width: 80px"
             min="240"
             max="2160"
           />
         </template>
 
-        <label style="display: flex; align-items: center; gap: 4px;">
-          <input type="checkbox" v-model="useLighthouse" />
+        <label style="display: flex; align-items: center; gap: 4px">
+          <input v-model="useLighthouse" type="checkbox" />
           Lighthouse
         </label>
       </div>
 
       <!-- 두 번째 줄 -->
-      <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px">
         <label>URL:</label>
-        <input type="text" v-model="url" style="flex: 1; min-width: 300px;" placeholder="https://www.naver.com/" />
+        <input
+          v-model="url"
+          type="text"
+          style="flex: 1; min-width: 300px"
+          placeholder="https://www.naver.com/"
+        />
 
         <button class="btn" @click="reAnalyze">재분석</button>
-        <button class="btn btn-primary" @click="startAnalysis" :disabled="isAnalyzing">
+        <button class="btn btn-primary" :disabled="isAnalyzing" @click="startAnalysis">
           {{ isAnalyzing ? '분석 중...' : '시작' }}
         </button>
 
         <!-- 내보내기 버튼들 -->
-        <div v-if="analysisResult" style="margin-left: auto; display: flex; gap: 8px;">
-          <button class="btn" @click="exportJSON" title="JSON 형식으로 내보내기">
-            📄 JSON
-          </button>
-          <button class="btn" @click="exportReport" title="텍스트 리포트로 내보내기">
+        <div v-if="analysisResult" style="margin-left: auto; display: flex; gap: 8px">
+          <button class="btn" title="JSON 형식으로 내보내기" @click="exportJSON">📄 JSON</button>
+          <button class="btn" title="텍스트 리포트로 내보내기" @click="exportReport">
             📝 Report
           </button>
-          <button class="btn" @click="exportCSV" title="네트워크 요청을 CSV로 내보내기">
+          <button class="btn" title="네트워크 요청을 CSV로 내보내기" @click="exportCSV">
             📊 CSV
           </button>
-          <button class="btn btn-primary" @click="exportPDF" :disabled="isGeneratingPDF" title="PDF 리포트로 내보내기">
+          <button
+            class="btn btn-primary"
+            :disabled="isGeneratingPDF"
+            title="PDF 리포트로 내보내기"
+            @click="exportPDF"
+          >
             {{ isGeneratingPDF ? '⏳ 생성 중...' : '📑 PDF' }}
           </button>
         </div>
@@ -98,51 +108,27 @@
 
     <!-- 탭 네비게이션 -->
     <div class="tabs-wrapper">
-      <div
-        class="tab"
-        :class="{ active: activeTab === 'frame' }"
-        @click="activeTab = 'frame'"
-      >
+      <div class="tab" :class="{ active: activeTab === 'frame' }" @click="activeTab = 'frame'">
         프레임 분석
       </div>
       <span class="divider">|</span>
-      <div
-        class="tab"
-        :class="{ active: activeTab === 'network' }"
-        @click="activeTab = 'network'"
-      >
+      <div class="tab" :class="{ active: activeTab === 'network' }" @click="activeTab = 'network'">
         네트워크 타임라인
       </div>
       <span class="divider">|</span>
-      <div
-        class="tab"
-        :class="{ active: activeTab === 'loading' }"
-        @click="activeTab = 'loading'"
-      >
+      <div class="tab" :class="{ active: activeTab === 'loading' }" @click="activeTab = 'loading'">
         로딩 분포
       </div>
       <span class="divider">|</span>
-      <div
-        class="tab"
-        :class="{ active: activeTab === 'batch' }"
-        @click="activeTab = 'batch'"
-      >
+      <div class="tab" :class="{ active: activeTab === 'batch' }" @click="activeTab = 'batch'">
         일괄 분석
       </div>
       <span class="divider">|</span>
-      <div
-        class="tab"
-        :class="{ active: activeTab === 'history' }"
-        @click="activeTab = 'history'"
-      >
+      <div class="tab" :class="{ active: activeTab === 'history' }" @click="activeTab = 'history'">
         분석 이력
       </div>
       <span class="divider">|</span>
-      <div
-        class="tab"
-        :class="{ active: activeTab === 'budget' }"
-        @click="activeTab = 'budget'"
-      >
+      <div class="tab" :class="{ active: activeTab === 'budget' }" @click="activeTab = 'budget'">
         성능 예산
       </div>
       <span class="divider">|</span>
@@ -154,52 +140,48 @@
         Lighthouse
       </div>
       <span class="divider">|</span>
-      <div
-        class="tab"
-        :class="{ active: activeTab === 'custom' }"
-        @click="activeTab = 'custom'"
-      >
+      <div class="tab" :class="{ active: activeTab === 'custom' }" @click="activeTab = 'custom'">
         커스텀 메트릭
       </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
-    <div v-show="activeTab === 'frame'" style="margin-top: 20px;">
+    <div v-show="activeTab === 'frame'" style="margin-top: 20px">
       <FrameAnalysisTab :result="analysisResult" />
     </div>
 
     <!-- 네트워크 타임라인 탭 -->
-    <div v-show="activeTab === 'network'" style="margin-top: 20px;">
+    <div v-show="activeTab === 'network'" style="margin-top: 20px">
       <NetworkTimelineTab :result="analysisResult" />
     </div>
 
     <!-- 로딩 분포 탭 -->
-    <div v-show="activeTab === 'loading'" style="margin-top: 20px;">
+    <div v-show="activeTab === 'loading'" style="margin-top: 20px">
       <LoadingDistributionTab :result="analysisResult" />
     </div>
 
     <!-- 일괄 분석 탭 -->
-    <div v-show="activeTab === 'batch'" style="margin-top: 20px;">
+    <div v-show="activeTab === 'batch'" style="margin-top: 20px">
       <BatchAnalysis />
     </div>
 
     <!-- 분석 이력 탭 -->
-    <div v-show="activeTab === 'history'" style="margin-top: 20px;">
+    <div v-show="activeTab === 'history'" style="margin-top: 20px">
       <HistoryViewer />
     </div>
 
     <!-- 성능 예산 탭 -->
-    <div v-show="activeTab === 'budget'" style="margin-top: 20px;">
+    <div v-show="activeTab === 'budget'" style="margin-top: 20px">
       <PerformanceBudget :result="analysisResult" />
     </div>
 
     <!-- Lighthouse 탭 -->
-    <div v-show="activeTab === 'lighthouse'" style="margin-top: 20px;">
+    <div v-show="activeTab === 'lighthouse'" style="margin-top: 20px">
       <LighthouseTab :result="analysisResult" />
     </div>
 
     <!-- 커스텀 메트릭 탭 -->
-    <div v-show="activeTab === 'custom'" style="margin-top: 20px;">
+    <div v-show="activeTab === 'custom'" style="margin-top: 20px">
       <CustomMetricsTab :result="analysisResult" />
     </div>
   </div>
@@ -228,8 +210,8 @@ const viewportPresets: Record<string, { width: number; height: number }> = {
   'desktop-1366': { width: 1366, height: 768 },
   'desktop-1280': { width: 1280, height: 720 },
   'ipad-pro': { width: 1024, height: 1366 },
-  'ipad': { width: 768, height: 1024 },
-  'iphone13': { width: 390, height: 844 },
+  ipad: { width: 768, height: 1024 },
+  iphone13: { width: 390, height: 844 },
   'galaxy-s21': { width: 360, height: 800 }
 };
 
@@ -317,7 +299,7 @@ function getNetworkThrottling(speed: string): 'none' | 'slow-3g' | 'fast-3g' | '
 
 function getCPUThrottling(device: string): number {
   const mapping: Record<string, number> = {
-    'Desktop': 1,
+    Desktop: 1,
     'Mobile (High-end)': 2,
     'Mobile (Mid-range)': 4,
     'Mobile (Low-end)': 6

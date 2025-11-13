@@ -4,7 +4,11 @@
     <CustomMetricsManager ref="metricsManager" />
 
     <!-- 커스텀 메트릭 결과 -->
-    <div v-if="result && result.customMetrics && result.customMetrics.length > 0" class="card" style="margin-top: 20px;">
+    <div
+      v-if="result && result.customMetrics && result.customMetrics.length > 0"
+      class="card"
+      style="margin-top: 20px"
+    >
       <h3>커스텀 메트릭 결과</h3>
 
       <!-- 메트릭 카드 그리드 -->
@@ -38,59 +42,83 @@
       </div>
 
       <!-- 시간별 추이 차트 (히스토리가 있을 경우) -->
-      <div v-if="hasHistory" style="margin-top: 30px;">
+      <div v-if="hasHistory" style="margin-top: 30px">
         <h3>커스텀 메트릭 추이</h3>
         <canvas ref="trendChart"></canvas>
       </div>
     </div>
 
     <!-- 결과가 없을 때 -->
-    <div v-else-if="result" class="card" style="margin-top: 20px; text-align: center; padding: 40px; color: #999;">
+    <div
+      v-else-if="result"
+      class="card"
+      style="margin-top: 20px; text-align: center; padding: 40px; color: #999"
+    >
       커스텀 메트릭이 정의되지 않았거나 측정된 데이터가 없습니다.
       <br />
       위에서 커스텀 메트릭을 추가하고 분석을 다시 실행하세요.
     </div>
 
     <!-- 도움말 -->
-    <div class="card" style="margin-top: 20px; background: #f0f9ff; border-left: 4px solid #3b82f6;">
-      <h4 style="margin: 0 0 12px 0; color: #1e40af;">💡 커스텀 메트릭 사용 팁</h4>
-      <ul style="margin: 0; padding-left: 20px; color: #1e40af;">
-        <li><strong>User Timing API:</strong> 웹사이트 코드에서 <code>performance.mark()</code> 또는 <code>performance.measure()</code>를 사용하여 측정한 메트릭을 추적할 수 있습니다.</li>
-        <li><strong>Element Timing:</strong> 특정 요소(이미지, 텍스트 등)의 렌더링 시간을 측정합니다. 요소에 <code>elementtiming</code> 속성이 필요합니다.</li>
-        <li><strong>계산된 메트릭:</strong> 기존 메트릭을 조합하여 새로운 메트릭을 만듭니다 (예: LCP - FCP = 컨텐츠 렌더링 시간).</li>
-        <li><strong>임계값:</strong> 각 메트릭에 대한 양호/개선필요/나쁨 기준을 설정하여 성능을 평가할 수 있습니다.</li>
+    <div class="card" style="margin-top: 20px; background: #f0f9ff; border-left: 4px solid #3b82f6">
+      <h4 style="margin: 0 0 12px 0; color: #1e40af">💡 커스텀 메트릭 사용 팁</h4>
+      <ul style="margin: 0; padding-left: 20px; color: #1e40af">
+        <li>
+          <strong>User Timing API:</strong> 웹사이트 코드에서 <code>performance.mark()</code> 또는
+          <code>performance.measure()</code>를 사용하여 측정한 메트릭을 추적할 수 있습니다.
+        </li>
+        <li>
+          <strong>Element Timing:</strong> 특정 요소(이미지, 텍스트 등)의 렌더링 시간을 측정합니다.
+          요소에 <code>elementtiming</code> 속성이 필요합니다.
+        </li>
+        <li>
+          <strong>계산된 메트릭:</strong> 기존 메트릭을 조합하여 새로운 메트릭을 만듭니다 (예: LCP -
+          FCP = 컨텐츠 렌더링 시간).
+        </li>
+        <li>
+          <strong>임계값:</strong> 각 메트릭에 대한 양호/개선필요/나쁨 기준을 설정하여 성능을 평가할
+          수 있습니다.
+        </li>
       </ul>
     </div>
 
     <!-- 커스텀 메트릭 예제 -->
-    <div class="card" style="margin-top: 20px;">
-      <h4 style="margin: 0 0 12px 0;">📋 커스텀 메트릭 예제</h4>
+    <div class="card" style="margin-top: 20px">
+      <h4 style="margin: 0 0 12px 0">📋 커스텀 메트릭 예제</h4>
 
-      <div style="display: grid; gap: 16px;">
-        <div style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+      <div style="display: grid; gap: 16px">
+        <div
+          style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb"
+        >
           <strong>히어로 이미지 로딩 시간</strong>
-          <div style="font-size: 12px; color: #666; margin-top: 4px;">
+          <div style="font-size: 12px; color: #666; margin-top: 4px">
             타입: Element Timing | 선택자: <code>.hero-image</code> | 임계값: 1000ms / 2500ms
           </div>
         </div>
 
-        <div style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div
+          style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb"
+        >
           <strong>API 응답 시간</strong>
-          <div style="font-size: 12px; color: #666; margin-top: 4px;">
+          <div style="font-size: 12px; color: #666; margin-top: 4px">
             타입: User Timing | Measure: <code>api-response</code> | 임계값: 500ms / 1000ms
           </div>
         </div>
 
-        <div style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div
+          style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb"
+        >
           <strong>컨텐츠 렌더링 시간</strong>
-          <div style="font-size: 12px; color: #666; margin-top: 4px;">
+          <div style="font-size: 12px; color: #666; margin-top: 4px">
             타입: 계산 | 수식: <code>lcp - fcp</code> | 임계값: 500ms / 1500ms
           </div>
         </div>
 
-        <div style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div
+          style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb"
+        >
           <strong>리소스 개수</strong>
-          <div style="font-size: 12px; color: #666; margin-top: 4px;">
+          <div style="font-size: 12px; color: #666; margin-top: 4px">
             타입: 계산 | 수식: <code>networkRequests.length</code> | 임계값: 50 / 100
           </div>
         </div>
@@ -126,17 +154,20 @@ onUnmounted(() => {
   }
 });
 
-watch(() => props.result, (newResult) => {
-  if (chartInstance) {
-    chartInstance.destroy();
-    chartInstance = null;
+watch(
+  () => props.result,
+  newResult => {
+    if (chartInstance) {
+      chartInstance.destroy();
+      chartInstance = null;
+    }
+    if (newResult) {
+      nextTick(() => {
+        initTrendChart();
+      });
+    }
   }
-  if (newResult) {
-    nextTick(() => {
-      initTrendChart();
-    });
-  }
-});
+);
 
 function initTrendChart() {
   if (!trendChart.value || !hasHistory.value) return;
@@ -183,18 +214,18 @@ function formatBytes(bytes: number): string {
 
 function getStatusLabel(status: string): string {
   const labels: Record<string, string> = {
-    'good': '양호',
+    good: '양호',
     'needs-improvement': '개선 필요',
-    'poor': '나쁨'
+    poor: '나쁨'
   };
   return labels[status] || status;
 }
 
 function getStatusClass(status: string): string {
   const classes: Record<string, string> = {
-    'good': 'status-good',
+    good: 'status-good',
     'needs-improvement': 'status-warning',
-    'poor': 'status-poor'
+    poor: 'status-poor'
   };
   return classes[status] || '';
 }

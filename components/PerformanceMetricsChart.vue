@@ -34,10 +34,13 @@
           <div class="flex justify-between items-center">
             <div class="flex items-center space-x-2">
               <span class="font-medium text-gray-700">{{ metric.label }}</span>
-              <span class="text-xs px-2 py-1 rounded" :style="{
-                backgroundColor: getMetricBadgeColor(metric.value, metric.thresholds),
-                color: 'white'
-              }">
+              <span
+                class="text-xs px-2 py-1 rounded"
+                :style="{
+                  backgroundColor: getMetricBadgeColor(metric.value, metric.thresholds),
+                  color: 'white'
+                }"
+              >
                 {{ formatMetricValue(metric.value, metric.unit) }}
               </span>
             </div>
@@ -120,7 +123,8 @@ const metricsData = computed(() => {
       value: props.result.metrics.cls !== undefined ? props.result.metrics.cls * 1000 : 0,
       unit: '',
       thresholds: { good: 100, needsImprovement: 250 },
-      displayValue: props.result.metrics.cls !== undefined ? props.result.metrics.cls.toFixed(3) : '0'
+      displayValue:
+        props.result.metrics.cls !== undefined ? props.result.metrics.cls.toFixed(3) : '0'
     },
     {
       name: 'ttfb',
@@ -140,14 +144,18 @@ onUnmounted(() => {
   destroyCharts();
 });
 
-watch(() => props.result, (newResult) => {
-  destroyCharts();
-  if (newResult) {
-    nextTick(() => {
-      initCharts();
-    });
-  }
-}, { deep: true });
+watch(
+  () => props.result,
+  newResult => {
+    destroyCharts();
+    if (newResult) {
+      nextTick(() => {
+        initCharts();
+      });
+    }
+  },
+  { deep: true }
+);
 
 function initCharts() {
   if (!props.result) return;
@@ -170,18 +178,20 @@ function initRadarChart() {
     type: 'radar',
     data: {
       labels: metrics.map(m => m.name.toUpperCase()),
-      datasets: [{
-        label: '성능 점수',
-        data: scores,
-        fill: true,
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-        borderColor: 'rgb(59, 130, 246)',
-        pointBackgroundColor: 'rgb(59, 130, 246)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(59, 130, 246)',
-        borderWidth: 2
-      }]
+      datasets: [
+        {
+          label: '성능 점수',
+          data: scores,
+          fill: true,
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: 'rgb(59, 130, 246)',
+          pointBackgroundColor: 'rgb(59, 130, 246)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgb(59, 130, 246)',
+          borderWidth: 2
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -204,7 +214,7 @@ function initRadarChart() {
         },
         tooltip: {
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               return `점수: ${context.parsed.r.toFixed(0)}/100`;
             }
           }
@@ -223,14 +233,13 @@ function initScoreChart() {
   scoreChartInstance = new Chart(scoreChart.value, {
     type: 'doughnut',
     data: {
-      datasets: [{
-        data: [score, remaining],
-        backgroundColor: [
-          getScoreColor(score),
-          'rgba(229, 231, 235, 0.3)'
-        ],
-        borderWidth: 0
-      }]
+      datasets: [
+        {
+          data: [score, remaining],
+          backgroundColor: [getScoreColor(score), 'rgba(229, 231, 235, 0.3)'],
+          borderWidth: 0
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -264,12 +273,14 @@ function initTimelineChart() {
     type: 'bar',
     data: {
       labels: events.map(e => e.label),
-      datasets: [{
-        label: '시간 (ms)',
-        data: events.map(e => e.value),
-        backgroundColor: events.map(e => e.color),
-        borderRadius: 6
-      }]
+      datasets: [
+        {
+          label: '시간 (ms)',
+          data: events.map(e => e.value),
+          backgroundColor: events.map(e => e.color),
+          borderRadius: 6
+        }
+      ]
     },
     options: {
       indexAxis: 'y',
@@ -281,7 +292,7 @@ function initTimelineChart() {
         },
         tooltip: {
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               return `${context.parsed.x.toFixed(0)}ms`;
             }
           }
@@ -315,7 +326,10 @@ function destroyCharts() {
   }
 }
 
-function getMetricScore(value: number, thresholds: { good: number; needsImprovement: number }): number {
+function getMetricScore(
+  value: number,
+  thresholds: { good: number; needsImprovement: number }
+): number {
   if (value <= thresholds.good) {
     return 100;
   } else if (value <= thresholds.needsImprovement) {
@@ -323,16 +337,25 @@ function getMetricScore(value: number, thresholds: { good: number; needsImprovem
     const position = value - thresholds.good;
     return Math.max(50, 100 - (position / range) * 50);
   } else {
-    return Math.max(0, 50 - ((value - thresholds.needsImprovement) / thresholds.needsImprovement) * 50);
+    return Math.max(
+      0,
+      50 - ((value - thresholds.needsImprovement) / thresholds.needsImprovement) * 50
+    );
   }
 }
 
-function getMetricPercentage(value: number, thresholds: { good: number; needsImprovement: number }): number {
+function getMetricPercentage(
+  value: number,
+  thresholds: { good: number; needsImprovement: number }
+): number {
   const max = thresholds.needsImprovement * 1.5;
   return Math.min((value / max) * 100, 100);
 }
 
-function getMetricBarColor(value: number, thresholds: { good: number; needsImprovement: number }): string {
+function getMetricBarColor(
+  value: number,
+  thresholds: { good: number; needsImprovement: number }
+): string {
   if (value <= thresholds.good) {
     return '#10b981'; // Green
   } else if (value <= thresholds.needsImprovement) {
@@ -342,7 +365,10 @@ function getMetricBarColor(value: number, thresholds: { good: number; needsImpro
   }
 }
 
-function getMetricBadgeColor(value: number, thresholds: { good: number; needsImprovement: number }): string {
+function getMetricBadgeColor(
+  value: number,
+  thresholds: { good: number; needsImprovement: number }
+): string {
   if (value <= thresholds.good) {
     return '#10b981';
   } else if (value <= thresholds.needsImprovement) {

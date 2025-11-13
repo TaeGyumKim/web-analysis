@@ -16,8 +16,7 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
 
   test('should load homepage with all UI elements', async ({ page }) => {
     // Check topbar exists (contains network speed selector)
-    const topbar = page.locator('.topbar');
-    await expect(topbar).toBeVisible();
+    await expect(page.locator('.topbar')).toBeVisible();
 
     // Check URL input in topbar (avoid strict mode violation)
     const urlInput = page.locator('.topbar input[type="text"]');
@@ -76,7 +75,7 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
     for (const tabName of tabNames) {
       const tab = page.locator('.tab').filter({ hasText: tabName });
 
-      if (await tab.count() > 0) {
+      if ((await tab.count()) > 0) {
         await tab.click();
         await page.waitForTimeout(500);
 
@@ -109,9 +108,6 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
   });
 
   test('should have export buttons visible', async ({ page }) => {
-    // These buttons might be in the topbar
-    const topbar = page.locator('body');
-
     // Just check that the page rendered, export buttons may be disabled until analysis
     await page.screenshot({
       path: 'test-results/screenshots/11-export-area.png',
@@ -120,12 +116,7 @@ test.describe('Web Performance Analyzer - UI Tests', () => {
   });
 
   test('should have Lighthouse checkbox', async ({ page }) => {
-    // Look for Lighthouse checkbox
-    const lighthouseLabel = page.locator('label').filter({ hasText: 'Lighthouse' });
-
-    // It might exist
-    const exists = await lighthouseLabel.count() > 0;
-
+    // Look for Lighthouse checkbox - it might exist
     await page.screenshot({
       path: 'test-results/screenshots/12-lighthouse-checkbox-area.png',
       fullPage: true
@@ -184,7 +175,7 @@ test.describe('Web Performance Analyzer - Analysis Tests', () => {
     for (const tabName of tabNames) {
       try {
         const tab = page.locator('.tab').filter({ hasText: tabName });
-        if (await tab.count() > 0) {
+        if ((await tab.count()) > 0) {
           await tab.click();
           await page.waitForTimeout(2000);
 

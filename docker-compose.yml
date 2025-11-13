@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "3000:3000"
+      - '3000:3000'
 
     environment:
       - NODE_ENV=production
@@ -44,7 +44,8 @@ services:
 
     # 헬스 체크
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      test:
+        ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:3000/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -60,8 +61,8 @@ services:
       - web-perf-network
 
     labels:
-      - "com.web-perf.description=Nuxt Web Performance Analyzer"
-      - "com.web-perf.version=1.0.0"
+      - 'com.web-perf.description=Nuxt Web Performance Analyzer'
+      - 'com.web-perf.version=1.0.0'
 
   # Nginx 리버스 프록시 (선택사항)
   nginx:
@@ -70,8 +71,8 @@ services:
     restart: unless-stopped
 
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
 
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro

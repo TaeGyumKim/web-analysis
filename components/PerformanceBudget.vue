@@ -1,15 +1,22 @@
 <template>
   <div class="card">
     <h3>성능 예산 설정</h3>
-    <p style="font-size: 14px; color: #666; margin-top: 8px;">
+    <p style="font-size: 14px; color: #666; margin-top: 8px">
       각 메트릭의 목표 값을 설정하고 실제 성능과 비교합니다
     </p>
 
     <!-- Budget Settings -->
-    <div style="margin-top: 24px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+    <div style="margin-top: 24px">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        "
+      >
         <h4>예산 설정</h4>
-        <div style="display: flex; gap: 8px;">
+        <div style="display: flex; gap: 8px">
           <button class="btn" @click="loadPreset('strict')">엄격한 기준</button>
           <button class="btn" @click="loadPreset('moderate')">보통 기준</button>
           <button class="btn" @click="loadPreset('relaxed')">여유 기준</button>
@@ -17,126 +24,136 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 16px;
+        "
+      >
         <!-- FCP Budget -->
         <div class="budget-item">
           <label>FCP (First Contentful Paint)</label>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
-              type="number"
               v-model.number="budget.fcp"
+              type="number"
               min="0"
               step="100"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px;"
+              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
             />
-            <span style="font-size: 14px; color: #666;">ms</span>
+            <span style="font-size: 14px; color: #666">ms</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">권장: ≤ 1000ms</div>
+          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 1000ms</div>
         </div>
 
         <!-- LCP Budget -->
         <div class="budget-item">
           <label>LCP (Largest Contentful Paint)</label>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
-              type="number"
               v-model.number="budget.lcp"
+              type="number"
               min="0"
               step="100"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px;"
+              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
             />
-            <span style="font-size: 14px; color: #666;">ms</span>
+            <span style="font-size: 14px; color: #666">ms</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">권장: ≤ 2500ms</div>
+          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 2500ms</div>
         </div>
 
         <!-- TBT Budget -->
         <div class="budget-item">
           <label>TBT (Total Blocking Time)</label>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
-              type="number"
               v-model.number="budget.tbt"
+              type="number"
               min="0"
               step="50"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px;"
+              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
             />
-            <span style="font-size: 14px; color: #666;">ms</span>
+            <span style="font-size: 14px; color: #666">ms</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">권장: ≤ 200ms</div>
+          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 200ms</div>
         </div>
 
         <!-- CLS Budget -->
         <div class="budget-item">
           <label>CLS (Cumulative Layout Shift)</label>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
-              type="number"
               v-model.number="budget.cls"
+              type="number"
               min="0"
               step="0.01"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px;"
+              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
             />
-            <span style="font-size: 14px; color: #666;">점수</span>
+            <span style="font-size: 14px; color: #666">점수</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">권장: ≤ 0.1</div>
+          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 0.1</div>
         </div>
 
         <!-- Request Count Budget -->
         <div class="budget-item">
           <label>최대 요청 수</label>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
-              type="number"
               v-model.number="budget.requestCount"
+              type="number"
               min="0"
               step="10"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px;"
+              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
             />
-            <span style="font-size: 14px; color: #666;">개</span>
+            <span style="font-size: 14px; color: #666">개</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">권장: ≤ 50개</div>
+          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 50개</div>
         </div>
 
         <!-- Total Size Budget -->
         <div class="budget-item">
           <label>최대 전송 크기</label>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
-              type="number"
               v-model.number="budget.totalSize"
+              type="number"
               min="0"
               step="100"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px;"
+              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
             />
-            <span style="font-size: 14px; color: #666;">KB</span>
+            <span style="font-size: 14px; color: #666">KB</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">권장: ≤ 2000KB</div>
+          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 2000KB</div>
         </div>
       </div>
     </div>
 
     <!-- Budget Comparison (if result is provided) -->
-    <div v-if="result" style="margin-top: 32px;">
+    <div v-if="result" style="margin-top: 32px">
       <h4>예산 대비 실제 성능</h4>
 
-      <div style="margin-top: 16px;">
-        <table style="width: 100%; border-collapse: collapse;">
+      <div style="margin-top: 16px">
+        <table style="width: 100%; border-collapse: collapse">
           <thead>
-            <tr style="border-bottom: 2px solid #e0e0e0;">
-              <th style="padding: 12px 8px; text-align: left; font-weight: 600;">메트릭</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">예산</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">실제</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">상태</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">차이</th>
+            <tr style="border-bottom: 2px solid #e0e0e0">
+              <th style="padding: 12px 8px; text-align: left; font-weight: 600">메트릭</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">예산</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">실제</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">상태</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">차이</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in budgetComparison" :key="item.name" style="border-bottom: 1px solid #e0e0e0;">
-              <td style="padding: 8px; font-weight: 600;">{{ item.name }}</td>
-              <td style="padding: 8px; text-align: center;">{{ item.budgetValue }}</td>
-              <td style="padding: 8px; text-align: center;">{{ item.actualValue }}</td>
-              <td style="padding: 8px; text-align: center;">
+            <tr
+              v-for="item in budgetComparison"
+              :key="item.name"
+              style="border-bottom: 1px solid #e0e0e0"
+            >
+              <td style="padding: 8px; font-weight: 600">{{ item.name }}</td>
+              <td style="padding: 8px; text-align: center">{{ item.budgetValue }}</td>
+              <td style="padding: 8px; text-align: center">{{ item.actualValue }}</td>
+              <td style="padding: 8px; text-align: center">
                 <span
                   :style="{
                     display: 'inline-block',
@@ -151,8 +168,10 @@
                   {{ item.isWithinBudget ? '✓ 통과' : '✗ 초과' }}
                 </span>
               </td>
-              <td style="padding: 8px; text-align: center;">
-                <span :style="{ color: item.isWithinBudget ? '#48d178' : '#e67e22', fontWeight: '600' }">
+              <td style="padding: 8px; text-align: center">
+                <span
+                  :style="{ color: item.isWithinBudget ? '#48d178' : '#e67e22', fontWeight: '600' }"
+                >
                   {{ item.isWithinBudget ? '' : '+' }}{{ item.difference }}
                 </span>
               </td>
@@ -162,41 +181,69 @@
       </div>
 
       <!-- Summary -->
-      <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-        <div style="padding: 16px; background: #f6f7f9; border-radius: 8px;">
-          <div style="font-size: 12px; color: #666;">총 메트릭 수</div>
-          <div style="font-size: 24px; font-weight: 600; margin-top: 4px;">{{ budgetComparison.length }}</div>
+      <div
+        style="
+          margin-top: 24px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+        "
+      >
+        <div style="padding: 16px; background: #f6f7f9; border-radius: 8px">
+          <div style="font-size: 12px; color: #666">총 메트릭 수</div>
+          <div style="font-size: 24px; font-weight: 600; margin-top: 4px">
+            {{ budgetComparison.length }}
+          </div>
         </div>
-        <div style="padding: 16px; background: #e8f5e9; border-radius: 8px;">
-          <div style="font-size: 12px; color: #666;">통과한 메트릭</div>
-          <div style="font-size: 24px; font-weight: 600; margin-top: 4px; color: #48d178;">
+        <div style="padding: 16px; background: #e8f5e9; border-radius: 8px">
+          <div style="font-size: 12px; color: #666">통과한 메트릭</div>
+          <div style="font-size: 24px; font-weight: 600; margin-top: 4px; color: #48d178">
             {{ passedCount }}
           </div>
         </div>
-        <div style="padding: 16px; background: #fff3e0; border-radius: 8px;">
-          <div style="font-size: 12px; color: #666;">초과한 메트릭</div>
-          <div style="font-size: 24px; font-weight: 600; margin-top: 4px; color: #e67e22;">
+        <div style="padding: 16px; background: #fff3e0; border-radius: 8px">
+          <div style="font-size: 12px; color: #666">초과한 메트릭</div>
+          <div style="font-size: 24px; font-weight: 600; margin-top: 4px; color: #e67e22">
             {{ failedCount }}
           </div>
         </div>
-        <div style="padding: 16px; background: #f3e5f5; border-radius: 8px;">
-          <div style="font-size: 12px; color: #666;">통과율</div>
-          <div style="font-size: 24px; font-weight: 600; margin-top: 4px; color: #9c27b0;">
+        <div style="padding: 16px; background: #f3e5f5; border-radius: 8px">
+          <div style="font-size: 12px; color: #666">통과율</div>
+          <div style="font-size: 24px; font-weight: 600; margin-top: 4px; color: #9c27b0">
             {{ ((passedCount / budgetComparison.length) * 100).toFixed(0) }}%
           </div>
         </div>
       </div>
 
       <!-- Recommendations -->
-      <div v-if="failedCount > 0" style="margin-top: 24px; padding: 16px; background: #fff3e0; border-left: 4px solid #e67e22; border-radius: 8px;">
-        <h4 style="margin-bottom: 12px;">⚠️ 개선 권장 사항</h4>
-        <ul style="margin: 0; padding-left: 20px;">
-          <li v-for="rec in recommendations" :key="rec" style="margin-bottom: 8px;">{{ rec }}</li>
+      <div
+        v-if="failedCount > 0"
+        style="
+          margin-top: 24px;
+          padding: 16px;
+          background: #fff3e0;
+          border-left: 4px solid #e67e22;
+          border-radius: 8px;
+        "
+      >
+        <h4 style="margin-bottom: 12px">⚠️ 개선 권장 사항</h4>
+        <ul style="margin: 0; padding-left: 20px">
+          <li v-for="rec in recommendations" :key="rec" style="margin-bottom: 8px">{{ rec }}</li>
         </ul>
       </div>
     </div>
 
-    <div v-else style="margin-top: 24px; text-align: center; padding: 40px; background: #f6f7f9; border-radius: 8px; color: #999;">
+    <div
+      v-else
+      style="
+        margin-top: 24px;
+        text-align: center;
+        padding: 40px;
+        background: #f6f7f9;
+        border-radius: 8px;
+        color: #999;
+      "
+    >
       분석 결과가 있을 때 예산 대비 실제 성능을 비교할 수 있습니다
     </div>
   </div>

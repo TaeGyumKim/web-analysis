@@ -24,11 +24,7 @@
 
           <!-- Heatmap Rows -->
           <div class="space-y-2">
-            <div
-              v-for="type in resourceTypes"
-              :key="type"
-              class="flex items-center"
-            >
+            <div v-for="type in resourceTypes" :key="type" class="flex items-center">
               <!-- Type Label -->
               <div class="w-32 flex-shrink-0 font-medium text-sm text-gray-700 pr-4">
                 <div class="flex items-center space-x-2">
@@ -53,7 +49,9 @@
                   :title="`${type}: ${getRequestCount(type, bucket.min, bucket.max)}개 요청 (${bucket.label})`"
                   @click="showBucketDetails(type, bucket)"
                 >
-                  <div class="flex items-center justify-center h-full text-xs font-medium text-gray-700">
+                  <div
+                    class="flex items-center justify-center h-full text-xs font-medium text-gray-700"
+                  >
                     {{ getRequestCount(type, bucket.min, bucket.max) || '' }}
                   </div>
                 </div>
@@ -70,10 +68,7 @@
                 :key="index"
                 class="flex items-center space-x-1"
               >
-                <div
-                  class="w-6 h-6 rounded"
-                  :style="{ backgroundColor: color.color }"
-                ></div>
+                <div class="w-6 h-6 rounded" :style="{ backgroundColor: color.color }"></div>
                 <span class="text-xs text-gray-600">{{ color.label }}</span>
               </div>
             </div>
@@ -102,19 +97,25 @@
           <h3 class="text-lg font-bold text-gray-900">
             {{ selectedBucket.type }} ({{ selectedBucket.bucket.label }})
           </h3>
-          <button
-            @click="selectedBucket = null"
-            class="text-gray-400 hover:text-gray-600"
-          >
+          <button class="text-gray-400 hover:text-gray-600" @click="selectedBucket = null">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
         <div class="space-y-2">
           <div
-            v-for="(request, index) in getBucketRequests(selectedBucket.type, selectedBucket.bucket.min, selectedBucket.bucket.max)"
+            v-for="(request, index) in getBucketRequests(
+              selectedBucket.type,
+              selectedBucket.bucket.min,
+              selectedBucket.bucket.max
+            )"
             :key="index"
             class="p-3 bg-gray-50 rounded text-sm"
           >
@@ -144,7 +145,16 @@ let sizeChartInstance: Chart | null = null;
 
 const selectedBucket = ref<{ type: string; bucket: any } | null>(null);
 
-const resourceTypes = ['document', 'stylesheet', 'script', 'image', 'font', 'xhr', 'fetch', 'other'];
+const resourceTypes = [
+  'document',
+  'stylesheet',
+  'script',
+  'image',
+  'font',
+  'xhr',
+  'fetch',
+  'other'
+];
 
 const timeBuckets = computed(() => {
   if (props.requests.length === 0) {
@@ -193,28 +203,30 @@ onUnmounted(() => {
   }
 });
 
-watch(() => props.requests, () => {
-  if (sizeChartInstance) {
-    sizeChartInstance.destroy();
-  }
-  nextTick(() => {
-    initSizeChart();
-  });
-}, { deep: true });
+watch(
+  () => props.requests,
+  () => {
+    if (sizeChartInstance) {
+      sizeChartInstance.destroy();
+    }
+    nextTick(() => {
+      initSizeChart();
+    });
+  },
+  { deep: true }
+);
 
 function getRequestCount(type: string, minTime: number, maxTime: number): number {
-  return props.requests.filter(r =>
-    r.type.toLowerCase() === type.toLowerCase() &&
-    r.startTime >= minTime &&
-    r.startTime < maxTime
+  return props.requests.filter(
+    r =>
+      r.type.toLowerCase() === type.toLowerCase() && r.startTime >= minTime && r.startTime < maxTime
   ).length;
 }
 
 function getBucketRequests(type: string, minTime: number, maxTime: number): NetworkRequest[] {
-  return props.requests.filter(r =>
-    r.type.toLowerCase() === type.toLowerCase() &&
-    r.startTime >= minTime &&
-    r.startTime < maxTime
+  return props.requests.filter(
+    r =>
+      r.type.toLowerCase() === type.toLowerCase() && r.startTime >= minTime && r.startTime < maxTime
   );
 }
 
@@ -261,12 +273,14 @@ function initSizeChart() {
     type: 'bar',
     data: {
       labels: resourceTypes.map(t => t.charAt(0).toUpperCase() + t.slice(1)),
-      datasets: [{
-        label: '크기 (KB)',
-        data: resourceTypes.map(t => typeSizes[t] / 1024),
-        backgroundColor: resourceTypes.map(t => getTypeColor(t)),
-        borderRadius: 6
-      }]
+      datasets: [
+        {
+          label: '크기 (KB)',
+          data: resourceTypes.map(t => typeSizes[t] / 1024),
+          backgroundColor: resourceTypes.map(t => getTypeColor(t)),
+          borderRadius: 6
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -277,7 +291,7 @@ function initSizeChart() {
         },
         tooltip: {
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               return `${context.parsed.y.toFixed(2)} KB`;
             }
           }

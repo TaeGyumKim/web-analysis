@@ -1,16 +1,22 @@
 <template>
   <div class="card">
     <h3>과거 데이터 비교 및 추이 분석</h3>
-    <p style="font-size: 14px; color: #666; margin-top: 8px;">
+    <p style="font-size: 14px; color: #666; margin-top: 8px">
       저장된 분석 결과를 확인하고 시간에 따른 성능 변화를 추적합니다
     </p>
 
     <!-- URL 선택 -->
-    <div style="margin-top: 20px;">
-      <label style="display: block; font-weight: 600; margin-bottom: 8px;">분석할 URL 선택:</label>
+    <div style="margin-top: 20px">
+      <label style="display: block; font-weight: 600; margin-bottom: 8px">분석할 URL 선택:</label>
       <select
         v-model="selectedUrl"
-        style="width: 100%; max-width: 500px; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 8px;"
+        style="
+          width: 100%;
+          max-width: 500px;
+          padding: 8px 12px;
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+        "
         @change="loadHistoryForUrl"
       >
         <option value="">URL을 선택하세요</option>
@@ -19,36 +25,41 @@
     </div>
 
     <!-- History Table -->
-    <div v-if="selectedUrl && urlHistory.length > 0" style="margin-top: 24px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+    <div v-if="selectedUrl && urlHistory.length > 0" style="margin-top: 24px">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        "
+      >
         <h4>분석 이력 ({{ urlHistory.length }}건)</h4>
-        <button class="btn" @click="clearUrlHistory">
-          이력 삭제
-        </button>
+        <button class="btn" @click="clearUrlHistory">이력 삭제</button>
       </div>
 
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse">
           <thead>
-            <tr style="border-bottom: 2px solid #e0e0e0;">
-              <th style="padding: 12px 8px; text-align: left; font-weight: 600;">분석 일시</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">종합 점수</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">FCP</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">LCP</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">TBT</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">CLS</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600;">비교</th>
+            <tr style="border-bottom: 2px solid #e0e0e0">
+              <th style="padding: 12px 8px; text-align: left; font-weight: 600">분석 일시</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">종합 점수</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">FCP</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">LCP</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">TBT</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">CLS</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">비교</th>
             </tr>
           </thead>
           <tbody>
             <tr
-              v-for="(entry, index) in urlHistory"
+              v-for="entry in urlHistory"
               :key="entry.id"
-              style="border-bottom: 1px solid #e0e0e0;"
+              style="border-bottom: 1px solid #e0e0e0"
               :class="{ 'selected-row': selectedEntries.includes(entry.id) }"
             >
-              <td style="padding: 8px;">{{ formatDate(entry.timestamp) }}</td>
-              <td style="padding: 8px; text-align: center;">
+              <td style="padding: 8px">{{ formatDate(entry.timestamp) }}</td>
+              <td style="padding: 8px; text-align: center">
                 <span
                   :style="{
                     display: 'inline-block',
@@ -62,15 +73,23 @@
                   {{ entry.result.performanceScore.overall }}
                 </span>
               </td>
-              <td style="padding: 8px; text-align: center;">{{ entry.result.metrics.fcp?.toFixed(0) || '-' }}ms</td>
-              <td style="padding: 8px; text-align: center;">{{ entry.result.metrics.lcp?.toFixed(0) || '-' }}ms</td>
-              <td style="padding: 8px; text-align: center;">{{ entry.result.metrics.tbt?.toFixed(0) || '-' }}ms</td>
-              <td style="padding: 8px; text-align: center;">{{ entry.result.metrics.cls?.toFixed(3) || '-' }}</td>
-              <td style="padding: 8px; text-align: center;">
+              <td style="padding: 8px; text-align: center">
+                {{ entry.result.metrics.fcp?.toFixed(0) || '-' }}ms
+              </td>
+              <td style="padding: 8px; text-align: center">
+                {{ entry.result.metrics.lcp?.toFixed(0) || '-' }}ms
+              </td>
+              <td style="padding: 8px; text-align: center">
+                {{ entry.result.metrics.tbt?.toFixed(0) || '-' }}ms
+              </td>
+              <td style="padding: 8px; text-align: center">
+                {{ entry.result.metrics.cls?.toFixed(3) || '-' }}
+              </td>
+              <td style="padding: 8px; text-align: center">
                 <input
+                  v-model="selectedEntries"
                   type="checkbox"
                   :value="entry.id"
-                  v-model="selectedEntries"
                   :disabled="selectedEntries.length >= 2 && !selectedEntries.includes(entry.id)"
                 />
               </td>
@@ -80,58 +99,82 @@
       </div>
 
       <!-- Average Stats -->
-      <div v-if="averageStats" style="margin-top: 24px; padding: 16px; background: #f6f7f9; border-radius: 8px;">
-        <h4 style="margin-bottom: 12px;">평균 메트릭</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+      <div
+        v-if="averageStats"
+        style="margin-top: 24px; padding: 16px; background: #f6f7f9; border-radius: 8px"
+      >
+        <h4 style="margin-bottom: 12px">평균 메트릭</h4>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+          "
+        >
           <div v-if="averageStats.overall !== undefined">
-            <div style="font-size: 12px; color: #666;">평균 점수</div>
-            <div style="font-size: 20px; font-weight: 600;">{{ averageStats.overall.toFixed(0) }}/100</div>
+            <div style="font-size: 12px; color: #666">평균 점수</div>
+            <div style="font-size: 20px; font-weight: 600">
+              {{ averageStats.overall.toFixed(0) }}/100
+            </div>
           </div>
           <div v-if="averageStats.fcp !== undefined">
-            <div style="font-size: 12px; color: #666;">평균 FCP</div>
-            <div style="font-size: 20px; font-weight: 600;">{{ averageStats.fcp.toFixed(0) }}ms</div>
+            <div style="font-size: 12px; color: #666">평균 FCP</div>
+            <div style="font-size: 20px; font-weight: 600">{{ averageStats.fcp.toFixed(0) }}ms</div>
           </div>
           <div v-if="averageStats.lcp !== undefined">
-            <div style="font-size: 12px; color: #666;">평균 LCP</div>
-            <div style="font-size: 20px; font-weight: 600;">{{ averageStats.lcp.toFixed(0) }}ms</div>
+            <div style="font-size: 12px; color: #666">평균 LCP</div>
+            <div style="font-size: 20px; font-weight: 600">{{ averageStats.lcp.toFixed(0) }}ms</div>
           </div>
           <div v-if="averageStats.tbt !== undefined">
-            <div style="font-size: 12px; color: #666;">평균 TBT</div>
-            <div style="font-size: 20px; font-weight: 600;">{{ averageStats.tbt.toFixed(0) }}ms</div>
+            <div style="font-size: 12px; color: #666">평균 TBT</div>
+            <div style="font-size: 20px; font-weight: 600">{{ averageStats.tbt.toFixed(0) }}ms</div>
           </div>
           <div v-if="averageStats.cls !== undefined">
-            <div style="font-size: 12px; color: #666;">평균 CLS</div>
-            <div style="font-size: 20px; font-weight: 600;">{{ averageStats.cls.toFixed(3) }}</div>
+            <div style="font-size: 12px; color: #666">평균 CLS</div>
+            <div style="font-size: 20px; font-weight: 600">{{ averageStats.cls.toFixed(3) }}</div>
           </div>
         </div>
       </div>
 
       <!-- Comparison -->
-      <div v-if="selectedEntries.length === 2" style="margin-top: 24px;">
+      <div v-if="selectedEntries.length === 2" style="margin-top: 24px">
         <h4>비교 분석</h4>
-        <div style="overflow-x: auto; margin-top: 16px;">
-          <table style="width: 100%; border-collapse: collapse;">
+        <div style="overflow-x: auto; margin-top: 16px">
+          <table style="width: 100%; border-collapse: collapse">
             <thead>
-              <tr style="border-bottom: 2px solid #e0e0e0;">
-                <th style="padding: 12px 8px; text-align: left; font-weight: 600;">메트릭</th>
-                <th style="padding: 12px 8px; text-align: center; font-weight: 600;">이전</th>
-                <th style="padding: 12px 8px; text-align: center; font-weight: 600;">현재</th>
-                <th style="padding: 12px 8px; text-align: center; font-weight: 600;">변화</th>
-                <th style="padding: 12px 8px; text-align: center; font-weight: 600;">변화율</th>
+              <tr style="border-bottom: 2px solid #e0e0e0">
+                <th style="padding: 12px 8px; text-align: left; font-weight: 600">메트릭</th>
+                <th style="padding: 12px 8px; text-align: center; font-weight: 600">이전</th>
+                <th style="padding: 12px 8px; text-align: center; font-weight: 600">현재</th>
+                <th style="padding: 12px 8px; text-align: center; font-weight: 600">변화</th>
+                <th style="padding: 12px 8px; text-align: center; font-weight: 600">변화율</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(data, metric) in comparisonData" :key="metric" style="border-bottom: 1px solid #e0e0e0;">
-                <td style="padding: 8px; font-weight: 600;">{{ metric.toUpperCase() }}</td>
-                <td style="padding: 8px; text-align: center;">{{ formatMetricValue(metric, data.previous) }}</td>
-                <td style="padding: 8px; text-align: center;">{{ formatMetricValue(metric, data.current) }}</td>
-                <td style="padding: 8px; text-align: center;">
+              <tr
+                v-for="(data, metric) in comparisonData"
+                :key="metric"
+                style="border-bottom: 1px solid #e0e0e0"
+              >
+                <td style="padding: 8px; font-weight: 600">{{ metric.toUpperCase() }}</td>
+                <td style="padding: 8px; text-align: center">
+                  {{ formatMetricValue(metric, data.previous) }}
+                </td>
+                <td style="padding: 8px; text-align: center">
+                  {{ formatMetricValue(metric, data.current) }}
+                </td>
+                <td style="padding: 8px; text-align: center">
                   <span :style="{ color: data.change > 0 ? '#e67e22' : '#48d178' }">
                     {{ data.change > 0 ? '+' : '' }}{{ formatMetricValue(metric, data.change) }}
                   </span>
                 </td>
-                <td style="padding: 8px; text-align: center;">
-                  <span :style="{ color: data.changePercent > 0 ? '#e67e22' : '#48d178', fontWeight: '600' }">
+                <td style="padding: 8px; text-align: center">
+                  <span
+                    :style="{
+                      color: data.changePercent > 0 ? '#e67e22' : '#48d178',
+                      fontWeight: '600'
+                    }"
+                  >
                     {{ data.changePercent > 0 ? '+' : '' }}{{ data.changePercent.toFixed(1) }}%
                   </span>
                 </td>
@@ -142,19 +185,30 @@
       </div>
 
       <!-- Trend Chart -->
-      <div v-if="urlHistory.length >= 2" style="margin-top: 32px;">
+      <div v-if="urlHistory.length >= 2" style="margin-top: 32px">
         <h4>추이 차트</h4>
-        <div style="margin-top: 16px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0;">
+        <div
+          style="
+            margin-top: 16px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+          "
+        >
           <canvas ref="trendChart"></canvas>
         </div>
       </div>
     </div>
 
-    <div v-else-if="selectedUrl" style="margin-top: 24px; text-align: center; padding: 40px; color: #999;">
+    <div
+      v-else-if="selectedUrl"
+      style="margin-top: 24px; text-align: center; padding: 40px; color: #999"
+    >
       선택한 URL의 분석 이력이 없습니다
     </div>
 
-    <div v-else style="margin-top: 24px; text-align: center; padding: 40px; color: #999;">
+    <div v-else style="margin-top: 24px; text-align: center; padding: 40px; color: #999">
       URL을 선택하여 분석 이력을 확인하세요
     </div>
   </div>

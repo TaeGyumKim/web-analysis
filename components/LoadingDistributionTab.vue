@@ -2,10 +2,10 @@
   <div>
     <!-- 분석 전 초기 화면 -->
     <div v-if="!result" class="empty-state">
-      <div style="text-align: center; padding: 60px 20px;">
-        <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
-        <h3 style="color: #6b7280; margin: 0 0 8px 0;">로딩 분포 분석</h3>
-        <p style="color: #9ca3af; margin: 0;">
+      <div style="text-align: center; padding: 60px 20px">
+        <div style="font-size: 48px; margin-bottom: 16px">📊</div>
+        <h3 style="color: #6b7280; margin: 0 0 8px 0">로딩 분포 분석</h3>
+        <p style="color: #9ca3af; margin: 0">
           페이지 분석을 시작하면 네트워크 속도별, 장비별 로딩 시간 분포를 확인할 수 있습니다.
         </p>
       </div>
@@ -13,82 +13,82 @@
 
     <!-- 분석 결과 화면 -->
     <div v-else>
-    <!-- 차트 그리드 -->
-    <div class="chart-grid">
-      <div class="chart-container">
-        <h3>네트워크 속도별 로딩 시간 분포</h3>
-        <canvas ref="chartNetwork"></canvas>
+      <!-- 차트 그리드 -->
+      <div class="chart-grid">
+        <div class="chart-container">
+          <h3>네트워크 속도별 로딩 시간 분포</h3>
+          <canvas ref="chartNetwork"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3>장비별 로딩 시간 분포</h3>
+          <canvas ref="chartDevice"></canvas>
+        </div>
       </div>
-      <div class="chart-container">
-        <h3>장비별 로딩 시간 분포</h3>
-        <canvas ref="chartDevice"></canvas>
-      </div>
-    </div>
 
-    <!-- 추이 차트 -->
-    <div class="chart-container" style="margin-top: 20px;">
-      <h3>24시간 로딩 시간 추이</h3>
-      <canvas ref="chartTrend"></canvas>
-    </div>
+      <!-- 추이 차트 -->
+      <div class="chart-container" style="margin-top: 20px">
+        <h3>24시간 로딩 시간 추이</h3>
+        <canvas ref="chartTrend"></canvas>
+      </div>
 
-    <!-- 요약 카드 -->
-    <div class="summary-cards">
-      <div class="summary-card">
-        <strong>평균 로딩 시간</strong><br />
-        <div style="font-size: 24px; font-weight: bold; margin: 8px 0;">
-          {{ averageLoadTime }}
+      <!-- 요약 카드 -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <strong>평균 로딩 시간</strong><br />
+          <div style="font-size: 24px; font-weight: bold; margin: 8px 0">
+            {{ averageLoadTime }}
+          </div>
+          <span style="color: #48d178">12% 개선</span>
         </div>
-        <span style="color: #48d178;">12% 개선</span>
-      </div>
-      <div class="summary-card">
-        <strong>성능 점수</strong><br />
-        <div style="font-size: 24px; font-weight: bold; margin: 8px 0;">
-          {{ performanceScore }} / 100
+        <div class="summary-card">
+          <strong>성능 점수</strong><br />
+          <div style="font-size: 24px; font-weight: bold; margin: 8px 0">
+            {{ performanceScore }} / 100
+          </div>
+          양호
         </div>
-        양호
+        <div class="summary-card">
+          <strong>사용자 만족도</strong><br />
+          <div style="font-size: 24px; font-weight: bold; margin: 8px 0">76%</div>
+          목표 달성
+        </div>
+        <div class="summary-card">
+          <strong>최적화 가능성</strong><br />
+          <div style="font-size: 24px; font-weight: bold; margin: 8px 0">중간</div>
+          <span style="color: #e67e22">개선 필요</span>
+        </div>
       </div>
-      <div class="summary-card">
-        <strong>사용자 만족도</strong><br />
-        <div style="font-size: 24px; font-weight: bold; margin: 8px 0;">76%</div>
-        목표 달성
-      </div>
-      <div class="summary-card">
-        <strong>최적화 가능성</strong><br />
-        <div style="font-size: 24px; font-weight: bold; margin: 8px 0;">중간</div>
-        <span style="color: #e67e22;">개선 필요</span>
-      </div>
-    </div>
 
-    <!-- 성능 개선 제안 -->
-    <div class="card" style="margin-top: 20px;">
-      <h3>성능 개선 제안</h3>
-      <div v-if="result">
-        <div
-          v-for="(suggestion, index) in suggestions"
-          :key="index"
-          class="suggestion-card"
-          :class="suggestion.class"
-        >
-          <strong>{{ index + 1 }}. {{ suggestion.title }}</strong> – {{ suggestion.description }}
+      <!-- 성능 개선 제안 -->
+      <div class="card" style="margin-top: 20px">
+        <h3>성능 개선 제안</h3>
+        <div v-if="result">
+          <div
+            v-for="(suggestion, index) in suggestions"
+            :key="index"
+            class="suggestion-card"
+            :class="suggestion.class"
+          >
+            <strong>{{ index + 1 }}. {{ suggestion.title }}</strong> – {{ suggestion.description }}
+          </div>
+        </div>
+        <div v-else>
+          <div class="suggestion-card yellow-bg">
+            1. <strong>이미지 최적화</strong> – WebP 형식으로 변환 시 약 40% 절감 가능
+          </div>
+          <div class="suggestion-card blue-bg">
+            2. <strong>CSS 경량화</strong> – 중복 규칙 제거로 크기 절감 가능
+          </div>
+          <div class="suggestion-card green-bg">
+            3. <strong>리소스 사전 로딩</strong> – &lt;link rel="preload"&gt; 태그 권장
+          </div>
         </div>
       </div>
-      <div v-else>
-        <div class="suggestion-card yellow-bg">
-          1. <strong>이미지 최적화</strong> – WebP 형식으로 변환 시 약 40% 절감 가능
-        </div>
-        <div class="suggestion-card blue-bg">
-          2. <strong>CSS 경량화</strong> – 중복 규칙 제거로 크기 절감 가능
-        </div>
-        <div class="suggestion-card green-bg">
-          3. <strong>리소스 사전 로딩</strong> – &lt;link rel="preload"&gt; 태그 권장
-        </div>
-      </div>
-    </div>
 
-    <!-- Long Task 히스토그램 -->
-    <div v-if="result.longTasks" style="margin-top: 20px;">
-      <LongTaskHistogram :longTasks="result.longTasks" />
-    </div>
+      <!-- Long Task 히스토그램 -->
+      <div v-if="result.longTasks" style="margin-top: 20px">
+        <LongTaskHistogram :long-tasks="result.longTasks" />
+      </div>
     </div>
   </div>
 </template>
@@ -157,11 +157,21 @@ const suggestions = computed(() => {
     });
   }
 
-  return sug.length > 0 ? sug : [
-    { title: '이미지 최적화', description: 'WebP 형식으로 변환 시 약 40% 절감 가능', class: 'yellow-bg' },
-    { title: 'CSS 경량화', description: '중복 규칙 제거로 크기 절감 가능', class: 'blue-bg' },
-    { title: '리소스 사전 로딩', description: '<link rel="preload"> 태그 권장', class: 'green-bg' }
-  ];
+  return sug.length > 0
+    ? sug
+    : [
+        {
+          title: '이미지 최적화',
+          description: 'WebP 형식으로 변환 시 약 40% 절감 가능',
+          class: 'yellow-bg'
+        },
+        { title: 'CSS 경량화', description: '중복 규칙 제거로 크기 절감 가능', class: 'blue-bg' },
+        {
+          title: '리소스 사전 로딩',
+          description: '<link rel="preload"> 태그 권장',
+          class: 'green-bg'
+        }
+      ];
 });
 
 onMounted(() => {
@@ -174,14 +184,17 @@ onUnmounted(() => {
   destroyCharts();
 });
 
-watch(() => props.result, (newResult) => {
-  destroyCharts();
-  if (newResult) {
-    nextTick(() => {
-      initCharts();
-    });
+watch(
+  () => props.result,
+  newResult => {
+    destroyCharts();
+    if (newResult) {
+      nextTick(() => {
+        initCharts();
+      });
+    }
   }
-});
+);
 
 function initCharts() {
   if (!chartNetwork.value || !chartDevice.value || !chartTrend.value) return;
@@ -232,7 +245,20 @@ function initCharts() {
   trendChart = new Chart(chartTrend.value, {
     type: 'line',
     data: {
-      labels: ['0:00', '2:00', '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+      labels: [
+        '0:00',
+        '2:00',
+        '4:00',
+        '6:00',
+        '8:00',
+        '10:00',
+        '12:00',
+        '14:00',
+        '16:00',
+        '18:00',
+        '20:00',
+        '22:00'
+      ],
       datasets: [
         {
           label: '평균 로딩 시간',

@@ -105,7 +105,10 @@ export function getTrendData(url: string, metricKey: keyof PerformanceMetrics): 
 export function getComparisonData(result1: AnalysisResult, result2: AnalysisResult) {
   const metrics = ['fcp', 'lcp', 'tbt', 'cls', 'ttfb'] as const;
 
-  const comparison: Record<string, { current: number; previous: number; change: number; changePercent: number }> = {};
+  const comparison: Record<
+    string,
+    { current: number; previous: number; change: number; changePercent: number }
+  > = {};
 
   for (const metric of metrics) {
     const current = result1.metrics[metric];

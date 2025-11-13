@@ -10,11 +10,11 @@ export interface NetworkRequest {
 }
 
 export interface PerformanceMetrics {
-  fcp?: number;  // First Contentful Paint
-  lcp?: number;  // Largest Contentful Paint
-  tbt?: number;  // Total Blocking Time
-  cls?: number;  // Cumulative Layout Shift
-  fid?: number;  // First Input Delay
+  fcp?: number; // First Contentful Paint
+  lcp?: number; // Largest Contentful Paint
+  tbt?: number; // Total Blocking Time
+  cls?: number; // Cumulative Layout Shift
+  fid?: number; // First Input Delay
   ttfb?: number; // Time to First Byte
   domContentLoaded?: number;
   loadComplete?: number;
@@ -22,7 +22,7 @@ export interface PerformanceMetrics {
 
 export interface FrameCapture {
   timestamp: number;
-  screenshot: string;  // base64 encoded
+  screenshot: string; // base64 encoded
   metadata?: {
     visibleElements?: number;
     domNodes?: number;
@@ -31,8 +31,8 @@ export interface FrameCapture {
 
 export interface LongTask {
   name: string;
-  startTime: number;  // ms
-  duration: number;   // ms
+  startTime: number; // ms
+  duration: number; // ms
   attribution?: string;
 }
 

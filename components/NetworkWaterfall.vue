@@ -6,10 +6,7 @@
         <div class="text-sm text-gray-600">
           Total: {{ totalSize }} | {{ requests.length }} requests
         </div>
-        <select
-          v-model="filterType"
-          class="px-3 py-1 border border-gray-300 rounded-lg text-sm"
-        >
+        <select v-model="filterType" class="px-3 py-1 border border-gray-300 rounded-lg text-sm">
           <option value="all">All Types</option>
           <option value="document">Document</option>
           <option value="stylesheet">Stylesheet</option>
@@ -56,7 +53,7 @@
         <!-- Request Rows -->
         <div class="space-y-1">
           <div
-            v-for="(request, index) in filteredRequests"
+            v-for="request in filteredRequests"
             :key="request.id"
             class="flex items-center group hover:bg-gray-50 rounded-lg p-2 transition-colors"
             @click="selectedRequest = request"
@@ -68,10 +65,7 @@
                   class="w-2 h-2 rounded-full flex-shrink-0"
                   :class="getTypeColor(request.type)"
                 ></span>
-                <span
-                  class="text-sm truncate"
-                  :title="request.url"
-                >
+                <span class="text-sm truncate" :title="request.url">
                   {{ getFileName(request.url) }}
                 </span>
               </div>
@@ -85,7 +79,9 @@
                 :style="getBarStyle(request)"
                 :title="`${request.url}\nDuration: ${request.duration.toFixed(2)}ms\nSize: ${formatSize(request.size)}`"
               >
-                <span class="text-xs text-white px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span
+                  class="text-xs text-white px-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
                   {{ request.duration.toFixed(0) }}ms
                 </span>
               </div>
@@ -107,12 +103,14 @@
       >
         <div class="flex justify-between items-start mb-4">
           <h3 class="text-lg font-bold text-gray-900">Request Details</h3>
-          <button
-            @click="selectedRequest = null"
-            class="text-gray-400 hover:text-gray-600"
-          >
+          <button class="text-gray-400 hover:text-gray-600" @click="selectedRequest = null">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -178,7 +176,8 @@ const totalSize = computed(() => {
 
 const averageDuration = computed(() => {
   if (filteredRequests.value.length === 0) return '0ms';
-  const avg = filteredRequests.value.reduce((sum, r) => sum + r.duration, 0) / filteredRequests.value.length;
+  const avg =
+    filteredRequests.value.reduce((sum, r) => sum + r.duration, 0) / filteredRequests.value.length;
   return `${avg.toFixed(2)}ms`;
 });
 

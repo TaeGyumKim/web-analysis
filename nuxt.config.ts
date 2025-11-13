@@ -1,5 +1,5 @@
-import { writeFileSync, existsSync, readFileSync } from 'fs'
-import { resolve } from 'path'
+import { writeFileSync, existsSync, readFileSync } from 'fs';
+import { resolve } from 'path';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -13,7 +13,10 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Analyze web page loading performance for designers and non-developers' }
+        {
+          name: 'description',
+          content: 'Analyze web page loading performance for designers and non-developers'
+        }
       ]
     }
   },
@@ -31,23 +34,23 @@ export default defineNuxtConfig({
   },
   hooks: {
     'build:before': () => {
-      const tsconfigPath = resolve('.nuxt/tsconfig.json')
+      const tsconfigPath = resolve('.nuxt/tsconfig.json');
       const tsconfigFiles = [
         '.nuxt/tsconfig.app.json',
         '.nuxt/tsconfig.shared.json',
         '.nuxt/tsconfig.node.json'
-      ]
+      ];
 
       if (existsSync(tsconfigPath)) {
-        const tsconfig = readFileSync(tsconfigPath, 'utf-8')
+        const tsconfig = readFileSync(tsconfigPath, 'utf-8');
 
         tsconfigFiles.forEach(file => {
-          const filePath = resolve(file)
+          const filePath = resolve(file);
           if (!existsSync(filePath)) {
-            writeFileSync(filePath, tsconfig)
+            writeFileSync(filePath, tsconfig);
           }
-        })
+        });
       }
     }
   }
-})
+});
