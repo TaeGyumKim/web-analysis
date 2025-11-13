@@ -382,7 +382,7 @@ docker-compose up -d
 docker-compose --profile with-nginx up -d
 
 # 단일 컨테이너 실행
-docker build -t web-perf-analyzer ./nuxt-web-perf
+docker build -t web-perf-analyzer .
 docker run -p 3000:3000 web-perf-analyzer
 
 # GitHub Container Registry에서 Pull
@@ -469,10 +469,13 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 **코드 품질 개선 (최근 세션)**:
 
 - ✅ 코드 중복 제거 (pages/index.vue에서 ~150줄 삭제)
-- ✅ 레거시 컴포넌트 정리 (4개 삭제)
+- ✅ 레거시 컴포넌트 정리 (4개 삭제: FrameTimeline, MetricBadge, MetricsCard, PerformanceOverview)
 - ✅ API 문서 업데이트 (PDF, 커스텀 메트릭, viewport 추가)
 - ✅ SUMMARY 문서 최신화 (8탭 시스템 반영)
 - ✅ 프로젝트 구조 개편 (nuxt-web-perf를 루트로 이동)
+- ✅ 린팅 및 포맷팅 도구 설정 (ESLint v9, Prettier, Husky, lint-staged)
+- ✅ VS Code 설정 추가 (자동 포맷팅, ESLint 자동 수정)
+- ✅ Git pre-commit 훅 설정 (자동 품질 검사)
 
 **아키텍처**:
 

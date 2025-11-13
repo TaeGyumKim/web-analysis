@@ -93,7 +93,7 @@ Build and run with Docker:
 
 ```bash
 # 단일 컨테이너 실행
-docker build -t web-perf-analyzer ./nuxt-web-perf
+docker build -t web-perf-analyzer .
 docker run -p 3000:3000 web-perf-analyzer
 
 # Docker Compose 사용
@@ -337,7 +337,7 @@ chore: 빌드 설정, 패키지 등 기타 변경
 ## Project Structure
 
 ```
-nuxt-web-perf/
+web-analysis/
 ├── app.vue                        # App entry point
 ├── assets/
 │   └── css/
@@ -355,11 +355,7 @@ nuxt-web-perf/
 │   ├── NetworkHeatmap.vue           # 네트워크 요청 히트맵 시각화 ⭐ NEW
 │   ├── NetworkWaterfall.vue         # 네트워크 워터폴 차트 (Enhanced)
 │   ├── CustomMetricsManager.vue     # 커스텀 메트릭 관리 컴포넌트 ⭐ NEW
-│   ├── CustomMetricsTab.vue         # 커스텀 메트릭 결과 시각화 탭 ⭐ NEW
-│   ├── FrameTimeline.vue            # 프레임 타임라인 뷰어 (레거시)
-│   ├── MetricBadge.vue              # 메트릭 배지 (레거시)
-│   ├── MetricsCard.vue              # 메트릭 카드 (레거시)
-│   └── PerformanceOverview.vue      # 성능 개요 (레거시)
+│   └── CustomMetricsTab.vue         # 커스텀 메트릭 결과 시각화 탭 ⭐ NEW
 ├── pages/
 │   └── index.vue                 # 메인 페이지 (상단 제어바 + 8탭)
 ├── server/
@@ -440,7 +436,7 @@ C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 
 - ✅ **크로스 플랫폼**: Windows 전용 → 모든 브라우저에서 접근
 - ✅ **모던 UI**: HTML 디자인 파일 기반의 깔끔한 인터페이스
-- ✅ **3탭 시스템**: 프레임/네트워크/분포를 분리된 탭으로 제공
+- ✅ **8탭 시스템**: 프레임/네트워크/로딩 분포/일괄 분석/이력/예산/Lighthouse/커스텀 메트릭
 - ✅ **RESTful API**: 다른 도구와 통합 가능
 - ✅ **동일한 알고리즘**: 점수 계산 로직 유지
 - ✅ **Chart.js**: 고급 차트 시각화
@@ -540,8 +536,8 @@ curl http://localhost:3000/api/health
 **UI Tests** (Always Run):
 
 - **Homepage Load**: Verifies all UI elements are visible
-- **7 Tabs Display**: Checks all tabs exist and are visible
-- **Tab Navigation**: Tests switching between empty tabs (7 screenshots)
+- **8 Tabs Display**: Checks all tabs exist and are visible
+- **Tab Navigation**: Tests switching between empty tabs (8 screenshots)
 - **URL Input**: Validates URL input and button enabling
 - **Export Buttons**: Checks export UI area
 - **Lighthouse Checkbox**: Validates Lighthouse option
@@ -555,8 +551,6 @@ curl http://localhost:3000/api/health
 **Running Tests Locally**:
 
 ```bash
-cd nuxt-web-perf
-
 # Install Playwright browsers (first time only)
 npx playwright install chromium
 
@@ -582,8 +576,8 @@ npm run test:ui
 **Screenshots Captured in CI**:
 
 1. Homepage with all UI elements (01)
-2. All 7 tabs visible verification (02)
-   3-9. Individual tab navigation (03-09):
+2. All 8 tabs visible verification (02)
+   3-10. Individual tab navigation (03-10):
    - Frame Analysis
    - Network Timeline
    - Loading Distribution
@@ -591,9 +585,10 @@ npm run test:ui
    - History
    - Performance Budget
    - Lighthouse
-3. URL input test (10)
-4. Export area (11)
-5. Lighthouse checkbox area (12)
+   - Custom Metrics
+3. URL input test (11)
+4. Export area (12)
+5. Lighthouse checkbox area (13)
 
 **Local Analysis Tests** (npm run test:headed):
 
