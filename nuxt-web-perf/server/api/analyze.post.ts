@@ -43,7 +43,9 @@ export default defineEventHandler(async (event) => {
       waitUntil: options?.waitUntil ?? 'networkidle0',
       useLighthouse: options?.useLighthouse ?? false,
       lighthouseFormFactor: options?.lighthouseFormFactor ?? 'desktop',
-      customMetrics: options?.customMetrics ?? []
+      customMetrics: options?.customMetrics ?? [],
+      viewportWidth: options?.viewportWidth ?? 1920,
+      viewportHeight: options?.viewportHeight ?? 1080
     };
 
     // Perform analysis

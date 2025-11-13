@@ -12,49 +12,87 @@
 
     <!-- 상단 제어바 -->
     <div class="topbar">
-      <label>네트워크 속도:</label>
-      <select v-model="networkSpeed">
-        <option>3G</option>
-        <option selected>4G</option>
-        <option>Wi-Fi</option>
-        <option>Slow 3G</option>
-      </select>
+      <!-- 첫 번째 줄 -->
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <label>네트워크 속도:</label>
+        <select v-model="networkSpeed">
+          <option>3G</option>
+          <option selected>4G</option>
+          <option>Wi-Fi</option>
+          <option>Slow 3G</option>
+        </select>
 
-      <label>장비 사양:</label>
-      <select v-model="deviceSpec">
-        <option selected>Desktop</option>
-        <option>Mobile (High-end)</option>
-        <option>Mobile (Mid-range)</option>
-        <option>Mobile (Low-end)</option>
-      </select>
+        <label>장비 사양:</label>
+        <select v-model="deviceSpec">
+          <option selected>Desktop</option>
+          <option>Mobile (High-end)</option>
+          <option>Mobile (Mid-range)</option>
+          <option>Mobile (Low-end)</option>
+        </select>
 
-      <label>URL:</label>
-      <input type="text" v-model="url" style="width:280px;" placeholder="https://www.naver.com/" />
+        <label>Viewport:</label>
+        <select v-model="viewportPreset" @change="onViewportPresetChange">
+          <option value="desktop-1920">Desktop 1920x1080</option>
+          <option value="desktop-1366">Desktop 1366x768</option>
+          <option value="desktop-1280">Desktop 1280x720</option>
+          <option value="ipad-pro">iPad Pro 1024x1366</option>
+          <option value="ipad">iPad 768x1024</option>
+          <option value="iphone13">iPhone 13 390x844</option>
+          <option value="galaxy-s21">Galaxy S21 360x800</option>
+          <option value="custom">Custom</option>
+        </select>
 
-      <label style="display: flex; align-items: center; gap: 4px;">
-        <input type="checkbox" v-model="useLighthouse" />
-        Lighthouse 사용
-      </label>
+        <template v-if="viewportPreset === 'custom'">
+          <input
+            type="number"
+            v-model.number="customViewportWidth"
+            placeholder="Width"
+            style="width: 80px;"
+            min="320"
+            max="3840"
+          />
+          <span>×</span>
+          <input
+            type="number"
+            v-model.number="customViewportHeight"
+            placeholder="Height"
+            style="width: 80px;"
+            min="240"
+            max="2160"
+          />
+        </template>
 
-      <button class="btn" @click="reAnalyze">재분석</button>
-      <button class="btn btn-primary" @click="startAnalysis" :disabled="isAnalyzing">
-        {{ isAnalyzing ? '분석 중...' : '시작' }}
-      </button>
+        <label style="display: flex; align-items: center; gap: 4px;">
+          <input type="checkbox" v-model="useLighthouse" />
+          Lighthouse
+        </label>
+      </div>
 
-      <!-- 내보내기 버튼들 -->
-      <div v-if="analysisResult" style="margin-left: auto; display: flex; gap: 8px;">
-        <button class="btn" @click="exportJSON" title="JSON 형식으로 내보내기">
-          📄 JSON
+      <!-- 두 번째 줄 -->
+      <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+        <label>URL:</label>
+        <input type="text" v-model="url" style="flex: 1; min-width: 300px;" placeholder="https://www.naver.com/" />
+
+        <button class="btn" @click="reAnalyze">재분석</button>
+        <button class="btn btn-primary" @click="startAnalysis" :disabled="isAnalyzing">
+          {{ isAnalyzing ? '분석 중...' : '시작' }}
         </button>
-        <button class="btn" @click="exportReport" title="텍스트 리포트로 내보내기">
-          📝 Report
-        </button>
-        <button class="btn" @click="exportCSV" title="네트워크 요청을 CSV로 내보내기">
-          📊 CSV
-        </button>
-        <button class="btn btn-primary" @click="exportPDF" :disabled="isGeneratingPDF" title="PDF 리포트로 내보내기">
-          {{ isGeneratingPDF ? '⏳ 생성 중...' : '📑 PDF' }}
-        </button>
+
+        <!-- 내보내기 버튼들 -->
+        <div v-if="analysisResult" style="margin-left: auto; display: flex; gap: 8px;">
+          <button class="btn" @click="exportJSON" title="JSON 형식으로 내보내기">
+            📄 JSON
+          </button>
+          <button class="btn" @click="exportReport" title="텍스트 리포트로 내보내기">
+            📝 Report
+          </button>
+          <button class="btn" @click="exportCSV" title="네트워크 요청을 CSV로 내보내기">
+            📊 CSV
+          </button>
+          <button class="btn btn-primary" @click="exportPDF" :disabled="isGeneratingPDF" title="PDF 리포트로 내보내기">
+            {{ isGeneratingPDF ? '⏳ 생성 중...' : '📑 PDF' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -179,6 +217,41 @@ const isAnalyzing = ref(false);
 const isGeneratingPDF = ref(false);
 const analysisResult = ref<AnalysisResult | null>(null);
 
+// Viewport settings
+const viewportPreset = ref('desktop-1920');
+const customViewportWidth = ref(1920);
+const customViewportHeight = ref(1080);
+
+const viewportPresets: Record<string, { width: number; height: number }> = {
+  'desktop-1920': { width: 1920, height: 1080 },
+  'desktop-1366': { width: 1366, height: 768 },
+  'desktop-1280': { width: 1280, height: 720 },
+  'ipad-pro': { width: 1024, height: 1366 },
+  'ipad': { width: 768, height: 1024 },
+  'iphone13': { width: 390, height: 844 },
+  'galaxy-s21': { width: 360, height: 800 }
+};
+
+function onViewportPresetChange() {
+  if (viewportPreset.value !== 'custom') {
+    const preset = viewportPresets[viewportPreset.value];
+    if (preset) {
+      customViewportWidth.value = preset.width;
+      customViewportHeight.value = preset.height;
+    }
+  }
+}
+
+function getViewportSize(): { width: number; height: number } {
+  if (viewportPreset.value === 'custom') {
+    return {
+      width: customViewportWidth.value || 1920,
+      height: customViewportHeight.value || 1080
+    };
+  }
+  return viewportPresets[viewportPreset.value] || { width: 1920, height: 1080 };
+}
+
 async function startAnalysis() {
   if (!url.value || isAnalyzing.value) return;
 
@@ -191,6 +264,9 @@ async function startAnalysis() {
     // Load custom metrics from localStorage
     const customMetrics = loadCustomMetrics();
 
+    // Get viewport size
+    const viewport = getViewportSize();
+
     const response = await $fetch('/api/analyze', {
       method: 'POST',
       body: {
@@ -202,7 +278,9 @@ async function startAnalysis() {
           waitUntil: 'networkidle0',
           useLighthouse: useLighthouse.value,
           lighthouseFormFactor: deviceSpec.value.includes('Mobile') ? 'mobile' : 'desktop',
-          customMetrics: customMetrics
+          customMetrics: customMetrics,
+          viewportWidth: viewport.width,
+          viewportHeight: viewport.height
         }
       }
     });

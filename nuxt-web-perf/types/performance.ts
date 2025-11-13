@@ -147,4 +147,6 @@ export interface AnalysisOptions {
   useLighthouse?: boolean;
   lighthouseFormFactor?: 'mobile' | 'desktop';
   customMetrics?: CustomMetricDefinition[];
+  viewportWidth?: number;
+  viewportHeight?: number;
 }

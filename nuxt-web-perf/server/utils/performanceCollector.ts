@@ -67,6 +67,15 @@ export class PerformanceCollector {
         });
       }
 
+      // Set viewport size
+      const viewportWidth = options.viewportWidth || 1920;
+      const viewportHeight = options.viewportHeight || 1080;
+      await page.setViewport({
+        width: viewportWidth,
+        height: viewportHeight,
+        deviceScaleFactor: 1
+      });
+
       // Set up network monitoring
       this.setupNetworkMonitoring(client);
 
