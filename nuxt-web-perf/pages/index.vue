@@ -1,5 +1,15 @@
 <template>
-  <div style="margin: 40px;">
+  <div style="margin: 40px; position: relative;">
+    <!-- 로딩 오버레이 -->
+    <div v-if="isAnalyzing" class="loading-overlay">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <h2 style="margin: 20px 0 10px 0; color: #1f2937;">분석 중...</h2>
+        <p style="color: #6b7280; margin: 0;">페이지 성능을 분석하고 있습니다. 잠시만 기다려주세요.</p>
+        <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 14px;">{{ url }}</p>
+      </div>
+    </div>
+
     <!-- 상단 제어바 -->
     <div class="topbar">
       <label>네트워크 속도:</label>
@@ -171,6 +181,9 @@ const analysisResult = ref<AnalysisResult | null>(null);
 
 async function startAnalysis() {
   if (!url.value || isAnalyzing.value) return;
+
+  // UI 초기화 - 이전 분석 결과 제거
+  analysisResult.value = null;
 
   isAnalyzing.value = true;
 
@@ -479,3 +492,44 @@ function saveResultToHistory(result: AnalysisResult) {
   }
 }
 </script>
+
+<style scoped>
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-content {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
