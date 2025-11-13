@@ -27,6 +27,11 @@
   - **Element Timing**: 특정 요소의 렌더링 시간 측정
   - **계산된 메트릭**: 기존 메트릭 조합으로 새로운 지표 생성
   - **임계값 설정**: 양호/개선 필요/나쁨 기준 커스터마이징
+- ❓ **Help Tooltip 시스템**: 비개발자를 위한 용어 설명
+  - **인터랙티브 툴팁**: 모든 전문 용어에 물음표 아이콘 추가
+  - **한글 용어 사전**: FCP, LCP, TBT, CLS 등 핵심 메트릭 설명
+  - **호버 액션**: 마우스 오버 시 자동으로 설명 표시
+  - **디자이너 친화적**: 기술 용어를 쉬운 한국어로 설명
 
 ## Tech Stack
 
@@ -151,9 +156,13 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
   - 필터링: 타입별 요청 필터 (All/Document/Stylesheet/Script/Image/Font/XHR/Fetch)
   - 요약 통계: 총 크기, 요청 수, 평균/최장 지속시간
   - 상세 정보 모달: 클릭 시 URL, 타입, 상태, 크기, 지속시간, 시간대 표시
-- 리소스별 요청 타임라인 테이블
-- 리소스 타입별 색상 구분 (Document, CSS, JS, Image)
-- 각 요청의 시작/종료 시간, 크기 표시
+  - **세로 스크롤**: max-height 600px, sticky 헤더로 빠른 탐색
+- **네트워크 요청 타임라인 테이블** (Enhanced):
+  - **테이블 해설 박스**: 각 열(리소스 이름, 요청 구간, 크기)에 대한 상세 설명
+  - **리소스 이름 말줄임**: max-width 250px, 마우스 오버 시 전체 URL 표시
+  - **세로 스크롤**: max-height 500px, sticky 헤더로 많은 요청도 쉽게 탐색
+  - 리소스 타입별 색상 구분 (Document, CSS, JS, Image)
+  - 각 요청의 시작/종료 시간, 크기 표시
 - 요약 통계: 총 요청 수, 전송 크기, DCL, Load 시간
 
 **📊 로딩 분포 탭**
@@ -355,7 +364,8 @@ web-analysis/
 │   ├── NetworkHeatmap.vue           # 네트워크 요청 히트맵 시각화 ⭐ NEW
 │   ├── NetworkWaterfall.vue         # 네트워크 워터폴 차트 (Enhanced)
 │   ├── CustomMetricsManager.vue     # 커스텀 메트릭 관리 컴포넌트 ⭐ NEW
-│   └── CustomMetricsTab.vue         # 커스텀 메트릭 결과 시각화 탭 ⭐ NEW
+│   ├── CustomMetricsTab.vue         # 커스텀 메트릭 결과 시각화 탭 ⭐ NEW
+│   └── HelpTooltip.vue              # 용어 설명 툴팁 컴포넌트 ⭐ NEW
 ├── pages/
 │   └── index.vue                 # 메인 페이지 (상단 제어바 + 8탭)
 ├── server/
@@ -372,7 +382,8 @@ web-analysis/
 ├── utils/
 │   ├── scoreCalculator.ts        # 성능 점수 계산 로직
 │   ├── exportUtils.ts            # 결과 내보내기 유틸리티
-│   └── historyManager.ts         # 분석 이력 관리 유틸리티
+│   ├── historyManager.ts         # 분석 이력 관리 유틸리티
+│   └── glossary.ts               # 전문 용어 한글 설명 사전 ⭐ NEW
 └── nuxt.config.ts                # Nuxt 설정
 ```
 
@@ -621,6 +632,11 @@ npm run test:ui
   - **임계값 커스터마이징**: 양호/개선 필요/나쁨 기준 사용자 정의
   - **메트릭 관리 UI**: 메트릭 추가/편집/삭제/활성화/비활성화
   - **시각화**: 상태별 색상 코딩, 점수 표시, 진행 바
+- [x] **Help Tooltip 시스템** ✨ NEW:
+  - **HelpTooltip 컴포넌트**: 물음표 아이콘 + 호버 툴팁
+  - **Glossary 시스템**: 15+ 전문 용어 한글 설명 (FCP, LCP, TBT, CLS, TTFB, FID, 네트워크 스로틀링, Lighthouse 등)
+  - **전역 적용**: 모든 탭과 메트릭 상세에 툴팁 추가
+  - **비개발자 친화적**: 디자이너도 쉽게 이해할 수 있는 설명
 
 ## Future Enhancements
 

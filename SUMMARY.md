@@ -231,6 +231,60 @@
   - UI 2줄 레이아웃으로 재구성
 - **커밋**: `f2a1930`
 
+#### 4.12 Help Tooltip 시스템 ✅
+
+- **구현 내용**:
+  - `HelpTooltip.vue` 컴포넌트 생성:
+    - 물음표 아이콘 (SVG) + 호버 툴팁
+    - 4방향 위치 지정 (top, bottom, left, right)
+    - 페이드 애니메이션 효과
+    - 다크 테마 툴팁 스타일링
+  - `utils/glossary.ts` 용어 사전 생성:
+    - Core Web Vitals: FCP, LCP, TBT, CLS, TTFB, FID
+    - 네트워크: 네트워크/CPU 스로틀링, DOMContentLoaded, Load Complete
+    - Lighthouse 카테고리: Performance, Accessibility, Best Practices, SEO, PWA
+    - 기타: Viewport, Long Tasks, 성능 예산, 커스텀 메트릭, 성능 점수
+  - 전역 적용 (11개 컴포넌트):
+    - pages/index.vue: 상단 제어바 (네트워크 속도, 장비 사양, Viewport, Lighthouse)
+    - FrameAnalysisTab.vue: Core Web Vitals 메트릭, Long Tasks
+    - NetworkTimelineTab.vue: DOMContentLoaded, Load Complete, 테이블 해설 박스
+    - LighthouseTab.vue: 5개 카테고리 점수
+    - PerformanceBudget.vue: 메트릭 예산 설정 (FCP, LCP, TBT, CLS)
+    - CustomMetricsTab.vue: 커스텀 메트릭 결과
+    - LoadingDistributionTab.vue: 네트워크/장비별 분포 차트
+    - BatchAnalysis.vue: 비교 테이블 헤더
+    - HistoryViewer.vue: 이력 테이블 헤더
+    - PerformanceMetricsChart.vue: 메트릭 상세 (FCP, LCP, TBT, CLS, TTFB)
+  - 비개발자 친화적 설명:
+    - 모든 설명이 한국어로 작성
+    - 기술 용어를 쉬운 말로 풀이
+    - 권장 임계값 포함 (예: FCP 1초 이하 권장)
+- **커밋**: `60008b9`
+
+#### 4.13 네트워크 타임라인 UX 개선 ✅
+
+- **구현 내용**:
+  - **테이블 해설 박스 추가**:
+    - 각 열(리소스 이름, 요청 구간, 크기)에 대한 상세 설명
+    - 파란색 배경 + 아이콘으로 시각적 강조
+    - 팁: 타임라인 바에 마우스 오버 시 상세 정보 안내
+  - **리소스 이름 말줄임 처리**:
+    - max-width 250px 제한으로 긴 URL 잘림
+    - text-overflow: ellipsis + white-space: nowrap
+    - :title 속성으로 마우스 오버 시 전체 URL 표시
+    - 가로 스크롤 방지 완료
+  - **NetworkWaterfall 세로 스크롤**:
+    - max-height 600px, overflow-y: auto
+    - sticky 헤더로 스크롤 시에도 타임라인 축 유지
+    - 빠른 탐색 가능
+  - **네트워크 요청 타임라인 테이블 세로 스크롤**:
+    - max-height 500px, overflow-y: auto
+    - sticky 헤더로 많은 요청도 쉽게 탐색
+  - **메트릭 상세에 Help 툴팁 추가**:
+    - PerformanceMetricsChart: FCP, LCP, TBT, CLS, TTFB 툴팁
+    - PerformanceBudget: 예산 설정 메트릭 툴팁
+- **커밋**: `5c14ae6`
+
 ---
 
 ## 📊 메트릭 및 점수 계산
@@ -275,7 +329,8 @@ web-analysis/
 │   ├── PerformanceMetricsChart.vue     # Core Web Vitals 차트 ⭐
 │   ├── NetworkHeatmap.vue              # 네트워크 히트맵 ⭐
 │   ├── NetworkWaterfall.vue            # 네트워크 워터폴 ⭐
-│   └── LongTaskHistogram.vue           # Long Task 히스토그램 ⭐
+│   ├── LongTaskHistogram.vue           # Long Task 히스토그램 ⭐
+│   └── HelpTooltip.vue                 # 용어 설명 툴팁 ⭐ NEW
 ├── pages/index.vue                     # 메인 페이지 (8탭 시스템)
 ├── server/
 │   ├── api/
@@ -290,7 +345,8 @@ web-analysis/
 ├── utils/
 │   ├── scoreCalculator.ts              # 성능 점수 계산
 │   ├── exportUtils.ts                  # 결과 내보내기 ⭐
-│   └── historyManager.ts               # 분석 이력 관리 ⭐
+│   ├── historyManager.ts               # 분석 이력 관리 ⭐
+│   └── glossary.ts                     # 전문 용어 한글 설명 사전 ⭐ NEW
 ├── tests/e2e/
 │   └── analyzer.spec.ts                # E2E 테스트 (Playwright) ⭐
 ├── Dockerfile                          # Docker 이미지 빌드 ⭐
@@ -452,7 +508,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 
 **현재 상태**: ✅ 프로덕션 준비 완료
 
-**주요 기능 (11개)**:
+**주요 기능 (13개)**:
 
 1. ✅ CLS 메트릭 추가
 2. ✅ Long Task 히스토그램 시각화
@@ -465,6 +521,8 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 9. ✅ PDF 리포트 생성
 10. ✅ 커스텀 메트릭 시스템
 11. ✅ Viewport 설정 기능
+12. ✅ Help Tooltip 시스템 (비개발자용 용어 설명) ⭐ NEW
+13. ✅ 네트워크 타임라인 UX 개선 (스크롤, 말줄임) ⭐ NEW
 
 **코드 품질 개선 (최근 세션)**:
 
@@ -476,6 +534,9 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - ✅ 린팅 및 포맷팅 도구 설정 (ESLint v9, Prettier, Husky, lint-staged)
 - ✅ VS Code 설정 추가 (자동 포맷팅, ESLint 자동 수정)
 - ✅ Git pre-commit 훅 설정 (자동 품질 검사)
+- ✅ Help Tooltip 시스템 구축 (HelpTooltip.vue, glossary.ts)
+- ✅ 전역 용어 설명 적용 (11개 컴포넌트, 15+ 용어)
+- ✅ 네트워크 타임라인 UX 개선 (테이블 해설, 스크롤, 말줄임)
 
 **아키텍처**:
 

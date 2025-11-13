@@ -39,58 +39,60 @@
         </ul>
       </div>
 
-      <table
+      <div
         v-if="result && result.networkRequests.length > 0"
-        style="width: 100%; border-collapse: collapse; margin-top: 20px"
+        style="max-height: 500px; overflow-y: auto; margin-top: 20px"
       >
-        <thead>
-          <tr style="border-bottom: 2px solid #e0e0e0">
-            <th style="padding: 12px 8px; text-align: left; font-weight: 600">리소스 이름</th>
-            <th style="padding: 12px 8px; text-align: left; font-weight: 600; width: 50%">
-              요청 구간
-            </th>
-            <th style="padding: 12px 8px; text-align: right; font-weight: 600">크기</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="request in sortedRequests"
-            :key="request.id"
-            style="border-bottom: 1px solid #e0e0e0"
-          >
-            <td style="padding: 8px; max-width: 250px">
-              <div
-                style="
-                  font-weight: 500;
-                  color: #333;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                "
-                :title="request.url"
-              >
-                {{ getFileName(request.url) }}
-              </div>
-              <div style="font-size: 12px; color: #999; margin-top: 2px">{{ request.type }}</div>
-            </td>
-            <td style="padding: 8px">
-              <div
-                class="bar"
-                :class="getBarClass(request.type)"
-                :style="getBarStyle(request)"
-                :title="`${request.duration.toFixed(0)}ms (${request.startTime.toFixed(2)}s ~ ${request.endTime.toFixed(2)}s)`"
-              >
-                <span style="font-size: 11px; color: #fff; padding: 0 6px">
-                  {{ request.duration.toFixed(0) }}ms
-                </span>
-              </div>
-            </td>
-            <td style="padding: 8px; text-align: right; font-weight: 500">
-              {{ formatBytes(request.size) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <table style="width: 100%; border-collapse: collapse">
+          <thead style="position: sticky; top: 0; background: white; z-index: 10">
+            <tr style="border-bottom: 2px solid #e0e0e0">
+              <th style="padding: 12px 8px; text-align: left; font-weight: 600">리소스 이름</th>
+              <th style="padding: 12px 8px; text-align: left; font-weight: 600; width: 50%">
+                요청 구간
+              </th>
+              <th style="padding: 12px 8px; text-align: right; font-weight: 600">크기</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="request in sortedRequests"
+              :key="request.id"
+              style="border-bottom: 1px solid #e0e0e0"
+            >
+              <td style="padding: 8px; max-width: 250px">
+                <div
+                  style="
+                    font-weight: 500;
+                    color: #333;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  "
+                  :title="request.url"
+                >
+                  {{ getFileName(request.url) }}
+                </div>
+                <div style="font-size: 12px; color: #999; margin-top: 2px">{{ request.type }}</div>
+              </td>
+              <td style="padding: 8px">
+                <div
+                  class="bar"
+                  :class="getBarClass(request.type)"
+                  :style="getBarStyle(request)"
+                  :title="`${request.duration.toFixed(0)}ms (${request.startTime.toFixed(2)}s ~ ${request.endTime.toFixed(2)}s)`"
+                >
+                  <span style="font-size: 11px; color: #fff; padding: 0 6px">
+                    {{ request.duration.toFixed(0) }}ms
+                  </span>
+                </div>
+              </td>
+              <td style="padding: 8px; text-align: right; font-weight: 500">
+                {{ formatBytes(request.size) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div v-else style="text-align: center; padding: 40px; color: #999">
         분석 결과가 없습니다. 상단에서 URL을 입력하고 분석을 시작하세요.
