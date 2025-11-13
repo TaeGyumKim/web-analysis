@@ -13,7 +13,7 @@ export interface LighthouseScore {
   accessibility: number;
   bestPractices: number;
   seo: number;
-  pwa: number;
+  pwa?: number; // Optional: PWA is not available in Lighthouse v13+
 }
 
 export interface LighthouseMetrics {
@@ -65,7 +65,7 @@ export class LighthouseCollector {
       const options = {
         logLevel: 'error' as const,
         output: 'json' as const,
-        onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo', 'pwa'],
+        onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],
         port: chrome.port,
         formFactor: config.formFactor || 'desktop',
         throttling: this.getThrottlingConfig(config.throttling || 'none'),
@@ -100,9 +100,13 @@ export class LighthouseCollector {
         performance: Math.round((lhr.categories.performance?.score || 0) * 100),
         accessibility: Math.round((lhr.categories.accessibility?.score || 0) * 100),
         bestPractices: Math.round((lhr.categories['best-practices']?.score || 0) * 100),
-        seo: Math.round((lhr.categories.seo?.score || 0) * 100),
-        pwa: Math.round((lhr.categories.pwa?.score || 0) * 100)
+        seo: Math.round((lhr.categories.seo?.score || 0) * 100)
       };
+
+      // Add PWA score if available (not available in Lighthouse v13+)
+      if (lhr.categories.pwa) {
+        scores.pwa = Math.round((lhr.categories.pwa.score || 0) * 100);
+      }
 
       // Extract metrics
       const audits = lhr.audits;

@@ -26,7 +26,7 @@
           "
         >
           <div
-            v-for="(score, category) in result.lighthouse.scores"
+            v-for="(score, category) in filteredScores"
             :key="category"
             style="text-align: center"
           >
@@ -248,6 +248,19 @@ import { glossary } from '~/utils/glossary';
 const props = defineProps<{
   result: AnalysisResult | null;
 }>();
+
+// Filter out undefined scores (e.g., PWA in Lighthouse v13+)
+const filteredScores = computed(() => {
+  if (!props.result?.lighthouse?.scores) return {};
+  const scores = props.result.lighthouse.scores;
+  const filtered: Record<string, number> = {};
+  for (const [key, value] of Object.entries(scores)) {
+    if (value !== undefined) {
+      filtered[key] = value;
+    }
+  }
+  return filtered;
+});
 
 function getScoreColor(score: number): string {
   if (score >= 90) return '#48d178'; // Green

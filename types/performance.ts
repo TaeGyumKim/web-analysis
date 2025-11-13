@@ -41,7 +41,7 @@ export interface LighthouseScore {
   accessibility: number;
   bestPractices: number;
   seo: number;
-  pwa: number;
+  pwa?: number; // Optional: PWA is not available in Lighthouse v13+
 }
 
 export interface LighthouseMetrics {
