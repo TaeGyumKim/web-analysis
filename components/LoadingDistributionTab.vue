@@ -1,5 +1,18 @@
 <template>
   <div>
+    <!-- 분석 전 초기 화면 -->
+    <div v-if="!result" class="empty-state">
+      <div style="text-align: center; padding: 60px 20px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+        <h3 style="color: #6b7280; margin: 0 0 8px 0;">로딩 분포 분석</h3>
+        <p style="color: #9ca3af; margin: 0;">
+          페이지 분석을 시작하면 네트워크 속도별, 장비별 로딩 시간 분포를 확인할 수 있습니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- 분석 결과 화면 -->
+    <div v-else>
     <!-- 차트 그리드 -->
     <div class="chart-grid">
       <div class="chart-container">
@@ -73,8 +86,9 @@
     </div>
 
     <!-- Long Task 히스토그램 -->
-    <div v-if="result && result.longTasks" style="margin-top: 20px;">
+    <div v-if="result.longTasks" style="margin-top: 20px;">
       <LongTaskHistogram :longTasks="result.longTasks" />
+    </div>
     </div>
   </div>
 </template>
@@ -151,7 +165,9 @@ const suggestions = computed(() => {
 });
 
 onMounted(() => {
-  initCharts();
+  if (props.result) {
+    initCharts();
+  }
 });
 
 onUnmounted(() => {
