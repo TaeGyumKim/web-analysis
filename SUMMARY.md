@@ -28,15 +28,13 @@
 ### 2. UI/UX 구현 (완료)
 
 - ✅ HTML 디자인 파일 기반 UI 재작성
-- ✅ 8개 탭 시스템 구현:
+- ✅ 6개 탭 시스템 구현:
   1. **프레임 분석 탭** (`FrameAnalysisTab.vue`)
   2. **네트워크 타임라인 탭** (`NetworkTimelineTab.vue`)
   3. **로딩 분포 탭** (`LoadingDistributionTab.vue`)
-  4. **일괄 분석 탭** (`BatchAnalysis.vue`) ⭐
-  5. **분석 이력 탭** (`HistoryViewer.vue`) ⭐
-  6. **성능 예산 탭** (`PerformanceBudget.vue`) ⭐
-  7. **Lighthouse 탭** (`LighthouseTab.vue`) ⭐
-  8. **커스텀 메트릭 탭** (`CustomMetricsTab.vue`) ⭐ NEW
+  4. **성능 예산 탭** (`PerformanceBudget.vue`) ⭐
+  5. **Lighthouse 탭** (`LighthouseTab.vue`) ⭐
+  6. **커스텀 메트릭 탭** (`CustomMetricsTab.vue`) ⭐ NEW
 - ✅ 색상 팔레트 및 디자인 시스템 적용
 - ✅ 반응형 레이아웃 (카드 기반)
 - ✅ 고급 시각화 컴포넌트:
@@ -104,33 +102,7 @@
   - 타임스탬프 기반 파일명 자동 생성
 - **커밋**: `d6d2056`
 
-#### 4.4 여러 URL 일괄 분석 ✅
-
-- **구현 내용**:
-  - `BatchAnalysis.vue` 컴포넌트 생성
-  - URL 큐 관리 (추가/삭제)
-  - 순차 분석 및 진행률 표시
-  - 비교 테이블 (모든 메트릭 나란히 표시)
-  - 통계 요약 (평균 점수, 평균 LCP, 평균 요청 수, 최고 성능 사이트)
-  - 일괄 결과 내보내기 (JSON/텍스트)
-  - 스크린샷 캡처 생략으로 빠른 분석
-- **커밋**: `0ed45d3`
-
-#### 4.5 과거 데이터 비교 및 추이 분석 ✅
-
-- **구현 내용**:
-  - `historyManager.ts` 유틸리티 생성
-  - `HistoryViewer.vue` 컴포넌트 생성
-  - localStorage 기반 이력 저장 (최대 50개)
-  - URL별 이력 필터링
-  - 2개 결과 선택 비교 기능
-  - 메트릭 변화 % 계산
-  - 평균 메트릭 통계
-  - Chart.js 추이 차트 (Overall Score, FCP, LCP)
-  - 색상 코딩 (green=개선, orange=악화)
-- **커밋**: `d1f90b3`
-
-#### 4.6 성능 예산 설정 ✅
+#### 4.4 성능 예산 설정 ✅
 
 - **구현 내용**:
   - `PerformanceBudget.vue` 컴포넌트 생성
@@ -149,7 +121,7 @@
     - 전송 크기: 압축 및 최적화
 - **커밋**: `e1b55ec`
 
-#### 4.7 Lighthouse API 통합 ✅
+#### 4.5 Lighthouse API 통합 ✅
 
 - **구현 내용**:
   - `lighthouseCollector.ts` 수집기 생성
@@ -164,7 +136,7 @@
   - 선택적 활성화 (체크박스)
 - **커밋**: `0f4ef83`
 
-#### 4.8 CI/CD 파이프라인 통합 ✅
+#### 4.6 CI/CD 파이프라인 통합 ✅
 
 - **구현 내용**:
   - **GitHub Actions 워크플로우**:
@@ -187,7 +159,7 @@
     - Docker 컨테이너 헬스 체크 지원
 - **커밋**: `0f4ef83`
 
-#### 4.9 PDF 리포트 생성 ✅
+#### 4.7 PDF 리포트 생성 ✅
 
 - **구현 내용**:
   - `generate-pdf.post.ts`: PDF 생성 API 엔드포인트
@@ -199,7 +171,7 @@
   - 로딩 상태 표시 (⏳ 생성 중...)
 - **커밋**: `5f8a923`
 
-#### 4.10 커스텀 메트릭 시스템 ✅
+#### 4.8 커스텀 메트릭 시스템 ✅
 
 - **구현 내용**:
   - `CustomMetricsManager.vue`: 메트릭 정의 및 관리 UI
@@ -218,7 +190,7 @@
   - 타입 정의: `CustomMetricDefinition`, `CustomMetricResult`
 - **커밋**: `ec28ce5`
 
-#### 4.11 Viewport 설정 기능 ✅
+#### 4.9 Viewport 설정 기능 ✅
 
 - **구현 내용**:
   - 7개 디바이스 프리셋:
@@ -231,7 +203,7 @@
   - UI 2줄 레이아웃으로 재구성
 - **커밋**: `f2a1930`
 
-#### 4.12 Help Tooltip 시스템 ✅
+#### 4.10 Help Tooltip 시스템 ✅
 
 - **구현 내용**:
   - `HelpTooltip.vue` 컴포넌트 생성:
@@ -261,7 +233,7 @@
     - 권장 임계값 포함 (예: FCP 1초 이하 권장)
 - **커밋**: `60008b9`
 
-#### 4.13 네트워크 타임라인 UX 개선 ✅
+#### 4.11 네트워크 타임라인 UX 개선 ✅
 
 - **구현 내용**:
   - **테이블 해설 박스 추가**:
@@ -345,7 +317,6 @@ web-analysis/
 ├── utils/
 │   ├── scoreCalculator.ts              # 성능 점수 계산
 │   ├── exportUtils.ts                  # 결과 내보내기 ⭐
-│   ├── historyManager.ts               # 분석 이력 관리 ⭐
 │   └── glossary.ts                     # 전문 용어 한글 설명 사전 ⭐ NEW
 ├── tests/e2e/
 │   └── analyzer.spec.ts                # E2E 테스트 (Playwright) ⭐

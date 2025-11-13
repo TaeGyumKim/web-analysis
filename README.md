@@ -4,7 +4,7 @@
 
 ## Features
 
-- 🎯 **8개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, 일괄 분석, 분석 이력, 성능 예산, Lighthouse, 커스텀 메트릭
+- 🎯 **6개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, 성능 예산, Lighthouse, 커스텀 메트릭
 - 📊 **종합 성능 분석**: FCP, LCP, TBT, CLS, TTFB 등 핵심 메트릭 측정
 - 🎬 **프레임별 렌더링 과정**: 페이지 로드 과정을 프레임 단위로 캡처 및 재생
 - 🌊 **네트워크 워터폴 차트**: 모든 네트워크 요청을 타임라인으로 시각화
@@ -18,8 +18,6 @@
 - ⚙️ **설정 가능한 테스트 환경**: 네트워크 속도(3G/4G/Wi-Fi), 장비 사양(Desktop/Mobile) 선택
 - 📉 **Long Task 히스토그램**: 메인 스레드 차단 작업 시각화 및 분석
 - 💾 **결과 내보내기**: JSON, 텍스트 리포트, CSV, **PDF 리포트** 형식으로 분석 결과 저장
-- 🔄 **일괄 분석**: 여러 URL을 동시에 분석하고 성능 비교
-- 📜 **분석 이력**: 과거 데이터 저장 및 추이 차트 생성 (최대 50개)
 - 💰 **성능 예산**: 목표 메트릭 설정 및 실제 성능 비교
 - 🔍 **Lighthouse 통합**: Google Lighthouse 기반 성능, 접근성, SEO, PWA 분석
 - 🎛️ **커스텀 메트릭**: 사용자 정의 성능 지표 생성 및 추적
@@ -175,20 +173,6 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - 4개 요약 카드: 평균 로딩 시간, 성능 점수, 사용자 만족도, 최적화 가능성
 - 성능 개선 제안 (이미지 최적화, CSS 경량화, 리소스 사전 로딩)
 - Long Task 히스토그램 (지속시간 분포, 상위 작업)
-
-**🔄 일괄 분석 탭**
-
-- 여러 URL 추가 및 동시 분석
-- 진행률 표시 및 결과 비교 테이블
-- 평균 통계 및 최고 성능 사이트 표시
-- 비교 결과 JSON/텍스트로 내보내기
-
-**📜 분석 이력 탭**
-
-- URL별 분석 이력 조회 (최대 50개 저장)
-- 2개 결과 선택하여 메트릭 변화 비교
-- 평균 메트릭 통계
-- 추이 차트 (Overall Score, FCP, LCP)
 
 **💰 성능 예산 탭**
 
@@ -355,8 +339,6 @@ web-analysis/
 │   ├── FrameAnalysisTab.vue         # 프레임 분석 탭 (좌우 레이아웃)
 │   ├── NetworkTimelineTab.vue       # 네트워크 타임라인 탭 (워터폴 차트)
 │   ├── LoadingDistributionTab.vue   # 로딩 분포 탭 (Chart.js)
-│   ├── BatchAnalysis.vue            # 일괄 분석 탭 (여러 URL 비교)
-│   ├── HistoryViewer.vue            # 분석 이력 탭 (추이 차트)
 │   ├── PerformanceBudget.vue        # 성능 예산 탭 (목표 설정)
 │   ├── LighthouseTab.vue            # Lighthouse 탭 (5개 카테고리 점수) ⭐
 │   ├── LongTaskHistogram.vue        # Long Task 히스토그램 컴포넌트
@@ -367,7 +349,7 @@ web-analysis/
 │   ├── CustomMetricsTab.vue         # 커스텀 메트릭 결과 시각화 탭 ⭐ NEW
 │   └── HelpTooltip.vue              # 용어 설명 툴팁 컴포넌트 ⭐ NEW
 ├── pages/
-│   └── index.vue                 # 메인 페이지 (상단 제어바 + 8탭)
+│   └── index.vue                 # 메인 페이지 (상단 제어바 + 6탭)
 ├── server/
 │   ├── api/
 │   │   ├── analyze.post.ts        # POST /api/analyze 엔드포인트
@@ -382,7 +364,6 @@ web-analysis/
 ├── utils/
 │   ├── scoreCalculator.ts        # 성능 점수 계산 로직
 │   ├── exportUtils.ts            # 결과 내보내기 유틸리티
-│   ├── historyManager.ts         # 분석 이력 관리 유틸리티
 │   └── glossary.ts               # 전문 용어 한글 설명 사전 ⭐ NEW
 └── nuxt.config.ts                # Nuxt 설정
 ```
@@ -447,7 +428,7 @@ C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 
 - ✅ **크로스 플랫폼**: Windows 전용 → 모든 브라우저에서 접근
 - ✅ **모던 UI**: HTML 디자인 파일 기반의 깔끔한 인터페이스
-- ✅ **8탭 시스템**: 프레임/네트워크/로딩 분포/일괄 분석/이력/예산/Lighthouse/커스텀 메트릭
+- ✅ **6탭 시스템**: 프레임/네트워크/로딩 분포/성능 예산/Lighthouse/커스텀 메트릭
 - ✅ **RESTful API**: 다른 도구와 통합 가능
 - ✅ **동일한 알고리즘**: 점수 계산 로직 유지
 - ✅ **Chart.js**: 고급 차트 시각화
@@ -612,8 +593,6 @@ npm run test:ui
 - [x] **CLS 메트릭 추가**: Cumulative Layout Shift 측정 및 시각화
 - [x] **Long Task 히스토그램**: 50ms 이상 차단 작업 분석 및 통계
 - [x] **결과 내보내기**: JSON, 텍스트 리포트, CSV, PDF 리포트 형식 지원
-- [x] **여러 URL 일괄 분석**: 동시 분석 및 성능 비교 테이블
-- [x] **과거 데이터 비교**: 분석 이력 저장 및 추이 차트 (Chart.js)
 - [x] **성능 예산 설정**: 목표 값 설정 및 실제 성능 대비 분석
 - [x] **Lighthouse API 통합**: Performance, Accessibility, SEO, PWA, Best Practices 분석
 - [x] **CI/CD 파이프라인**: GitHub Actions 기반 자동 빌드/테스트/배포

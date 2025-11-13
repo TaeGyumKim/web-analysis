@@ -148,14 +148,6 @@
       <div class="tab" :class="{ active: activeTab === 'loading' }" @click="activeTab = 'loading'">
         로딩 분포
       </div>
-      <!-- <span class="divider">|</span>
-      <div class="tab" :class="{ active: activeTab === 'batch' }" @click="activeTab = 'batch'">
-        일괄 분석
-      </div>
-      <span class="divider">|</span>
-      <div class="tab" :class="{ active: activeTab === 'history' }" @click="activeTab = 'history'">
-        분석 이력
-      </div> -->
       <span class="divider">|</span>
       <div class="tab" :class="{ active: activeTab === 'budget' }" @click="activeTab = 'budget'">
         성능 예산
@@ -188,16 +180,6 @@
     <div v-show="activeTab === 'loading'" style="margin-top: 20px">
       <LoadingDistributionTab :result="analysisResult" />
     </div>
-
-    <!-- 일괄 분석 탭 (비활성화됨) -->
-    <!-- <div v-show="activeTab === 'batch'" style="margin-top: 20px">
-      <BatchAnalysis />
-    </div> -->
-
-    <!-- 분석 이력 탭 (비활성화됨) -->
-    <!-- <div v-show="activeTab === 'history'" style="margin-top: 20px">
-      <HistoryViewer />
-    </div> -->
 
     <!-- 성능 예산 탭 -->
     <div v-show="activeTab === 'budget'" style="margin-top: 20px">
