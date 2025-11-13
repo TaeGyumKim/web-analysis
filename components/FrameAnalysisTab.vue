@@ -254,8 +254,10 @@ onUnmounted(() => {
   stopPlaying();
 });
 
-watch(() => props.result, () => {
-  currentFrameIndex.value = 0;
-  stopPlaying();
+watch(() => props.result, (newResult) => {
+  if (newResult) {
+    currentFrameIndex.value = 0;
+    stopPlaying();
+  }
 });
 </script>

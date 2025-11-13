@@ -140,11 +140,13 @@ onUnmounted(() => {
   destroyCharts();
 });
 
-watch(() => props.result, () => {
+watch(() => props.result, (newResult) => {
   destroyCharts();
-  nextTick(() => {
-    initCharts();
-  });
+  if (newResult) {
+    nextTick(() => {
+      initCharts();
+    });
+  }
 }, { deep: true });
 
 function initCharts() {

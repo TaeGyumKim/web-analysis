@@ -126,13 +126,16 @@ onUnmounted(() => {
   }
 });
 
-watch(() => props.result, () => {
+watch(() => props.result, (newResult) => {
   if (chartInstance) {
     chartInstance.destroy();
+    chartInstance = null;
   }
-  nextTick(() => {
-    initTrendChart();
-  });
+  if (newResult) {
+    nextTick(() => {
+      initTrendChart();
+    });
+  }
 });
 
 function initTrendChart() {
