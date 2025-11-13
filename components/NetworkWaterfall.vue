@@ -40,10 +40,12 @@
     </div>
 
     <!-- Waterfall Chart -->
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto" style="max-height: 600px; overflow-y: auto">
       <div class="min-w-[800px]">
         <!-- Timeline Header -->
-        <div class="flex items-center mb-2 text-xs text-gray-500 px-4">
+        <div
+          class="flex items-center mb-2 text-xs text-gray-500 px-4 sticky top-0 bg-white z-10 py-2 border-b border-gray-200"
+        >
           <div class="w-1/3">URL</div>
           <div class="flex-1 flex justify-between px-4">
             <span v-for="tick in timelineTicks" :key="tick">{{ tick }}s</span>

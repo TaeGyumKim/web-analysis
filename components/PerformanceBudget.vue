@@ -40,7 +40,14 @@
       >
         <!-- FCP Budget -->
         <div class="budget-item">
-          <label>FCP (First Contentful Paint)</label>
+          <label style="display: flex; align-items: center">
+            FCP (First Contentful Paint)
+            <HelpTooltip
+              :text="glossary.fcp.description"
+              :title="glossary.fcp.title"
+              position="right"
+            />
+          </label>
           <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
               v-model.number="budget.fcp"
@@ -56,7 +63,14 @@
 
         <!-- LCP Budget -->
         <div class="budget-item">
-          <label>LCP (Largest Contentful Paint)</label>
+          <label style="display: flex; align-items: center">
+            LCP (Largest Contentful Paint)
+            <HelpTooltip
+              :text="glossary.lcp.description"
+              :title="glossary.lcp.title"
+              position="right"
+            />
+          </label>
           <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
               v-model.number="budget.lcp"
@@ -72,7 +86,14 @@
 
         <!-- TBT Budget -->
         <div class="budget-item">
-          <label>TBT (Total Blocking Time)</label>
+          <label style="display: flex; align-items: center">
+            TBT (Total Blocking Time)
+            <HelpTooltip
+              :text="glossary.tbt.description"
+              :title="glossary.tbt.title"
+              position="right"
+            />
+          </label>
           <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
               v-model.number="budget.tbt"
@@ -88,7 +109,14 @@
 
         <!-- CLS Budget -->
         <div class="budget-item">
-          <label>CLS (Cumulative Layout Shift)</label>
+          <label style="display: flex; align-items: center">
+            CLS (Cumulative Layout Shift)
+            <HelpTooltip
+              :text="glossary.cls.description"
+              :title="glossary.cls.title"
+              position="right"
+            />
+          </label>
           <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px">
             <input
               v-model.number="budget.cls"

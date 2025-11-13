@@ -34,6 +34,12 @@
           <div class="flex justify-between items-center">
             <div class="flex items-center space-x-2">
               <span class="font-medium text-gray-700">{{ metric.label }}</span>
+              <HelpTooltip
+                v-if="glossary[metric.name]"
+                :text="glossary[metric.name].description"
+                :title="glossary[metric.name].title"
+                position="top"
+              />
               <span
                 class="text-xs px-2 py-1 rounded"
                 :style="{
@@ -72,6 +78,7 @@
 <script setup lang="ts">
 import { Chart, registerables } from 'chart.js';
 import type { AnalysisResult } from '~/types/performance';
+import { glossary } from '~/utils/glossary';
 
 Chart.register(...registerables);
 

@@ -13,6 +13,32 @@
     <div class="card">
       <h3>네트워크 요청 타임라인</h3>
 
+      <div
+        style="
+          margin-top: 12px;
+          padding: 12px;
+          background: #f0f9ff;
+          border-left: 4px solid #3b82f6;
+          border-radius: 4px;
+          font-size: 14px;
+          color: #1e40af;
+          line-height: 1.6;
+        "
+      >
+        <strong>📊 테이블 해설:</strong>
+        <ul style="margin: 8px 0 0 20px; padding: 0">
+          <li><strong>리소스 이름</strong>: 로딩된 파일의 이름과 타입 (이미지, CSS, JS 등)</li>
+          <li>
+            <strong>요청 구간</strong>: 페이지 로딩 중 해당 리소스가 요청된 시점과 완료 시점을
+            시각화한 타임라인 바
+          </li>
+          <li><strong>크기</strong>: 전송된 리소스의 파일 크기</li>
+          <li style="margin-top: 4px; color: #666">
+            💡 Tip: 타임라인 바에 마우스를 올리면 상세 정보를 확인할 수 있습니다
+          </li>
+        </ul>
+      </div>
+
       <table
         v-if="result && result.networkRequests.length > 0"
         style="width: 100%; border-collapse: collapse; margin-top: 20px"
@@ -32,8 +58,19 @@
             :key="request.id"
             style="border-bottom: 1px solid #e0e0e0"
           >
-            <td style="padding: 8px">
-              <div style="font-weight: 500; color: #333">{{ getFileName(request.url) }}</div>
+            <td style="padding: 8px; max-width: 250px">
+              <div
+                style="
+                  font-weight: 500;
+                  color: #333;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                "
+                :title="request.url"
+              >
+                {{ getFileName(request.url) }}
+              </div>
               <div style="font-size: 12px; color: #999; margin-top: 2px">{{ request.type }}</div>
             </td>
             <td style="padding: 8px">
