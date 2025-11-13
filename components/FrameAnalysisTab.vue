@@ -83,7 +83,14 @@
             <h3>핵심 메트릭</h3>
 
             <div v-if="result.metrics.fcp">
-              <div>FCP: {{ result.metrics.fcp.toFixed(0) }}ms</div>
+              <div style="display: flex; align-items: center">
+                FCP: {{ result.metrics.fcp.toFixed(0) }}ms
+                <HelpTooltip
+                  :text="glossary.fcp.description"
+                  :title="glossary.fcp.title"
+                  position="right"
+                />
+              </div>
               <div class="metric-bar">
                 <div
                   class="metric-fill"
@@ -94,7 +101,14 @@
             </div>
 
             <div v-if="result.metrics.lcp" style="margin-top: 12px">
-              <div>LCP: {{ result.metrics.lcp.toFixed(0) }}ms</div>
+              <div style="display: flex; align-items: center">
+                LCP: {{ result.metrics.lcp.toFixed(0) }}ms
+                <HelpTooltip
+                  :text="glossary.lcp.description"
+                  :title="glossary.lcp.title"
+                  position="right"
+                />
+              </div>
               <div class="metric-bar">
                 <div
                   class="metric-fill"
@@ -105,7 +119,14 @@
             </div>
 
             <div v-if="result.metrics.tbt" style="margin-top: 12px">
-              <div>TBT: {{ result.metrics.tbt.toFixed(0) }}ms</div>
+              <div style="display: flex; align-items: center">
+                TBT: {{ result.metrics.tbt.toFixed(0) }}ms
+                <HelpTooltip
+                  :text="glossary.tbt.description"
+                  :title="glossary.tbt.title"
+                  position="right"
+                />
+              </div>
               <div class="metric-bar">
                 <div
                   class="metric-fill"
@@ -116,7 +137,14 @@
             </div>
 
             <div v-if="result.metrics.cls !== undefined" style="margin-top: 12px">
-              <div>CLS: {{ result.metrics.cls.toFixed(3) }}</div>
+              <div style="display: flex; align-items: center">
+                CLS: {{ result.metrics.cls.toFixed(3) }}
+                <HelpTooltip
+                  :text="glossary.cls.description"
+                  :title="glossary.cls.title"
+                  position="right"
+                />
+              </div>
               <div class="metric-bar">
                 <div
                   class="metric-fill"
@@ -132,7 +160,14 @@
             v-if="result && result.longTasks && result.longTasks.length > 0"
             class="section-card"
           >
-            <h3>Long Tasks</h3>
+            <h3 style="display: flex; align-items: center">
+              Long Tasks
+              <HelpTooltip
+                :text="glossary.longTask.description"
+                :title="glossary.longTask.title"
+                position="right"
+              />
+            </h3>
             <div>총 작업: {{ result.longTasks.length }}</div>
             <div style="margin-top: 8px">평균: {{ averageLongTaskDuration.toFixed(0) }}ms</div>
             <div style="margin-top: 8px">최대: {{ maxLongTaskDuration.toFixed(0) }}ms</div>
@@ -145,6 +180,7 @@
 
 <script setup lang="ts">
 import type { AnalysisResult } from '~/types/performance';
+import { glossary } from '~/utils/glossary';
 
 const props = defineProps<{
   result: AnalysisResult | null;

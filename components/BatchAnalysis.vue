@@ -81,14 +81,68 @@
           <thead>
             <tr style="border-bottom: 2px solid #e0e0e0">
               <th style="padding: 12px 8px; text-align: left; font-weight: 600">URL</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600">종합 점수</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600">FCP</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600">LCP</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600">TBT</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600">CLS</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">
+                <div style="display: flex; align-items: center; justify-content: center">
+                  종합 점수
+                  <HelpTooltip
+                    :text="glossary.performanceScore.description"
+                    :title="glossary.performanceScore.title"
+                    position="top"
+                  />
+                </div>
+              </th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">
+                <div style="display: flex; align-items: center; justify-content: center">
+                  FCP
+                  <HelpTooltip
+                    :text="glossary.fcp.description"
+                    :title="glossary.fcp.title"
+                    position="top"
+                  />
+                </div>
+              </th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">
+                <div style="display: flex; align-items: center; justify-content: center">
+                  LCP
+                  <HelpTooltip
+                    :text="glossary.lcp.description"
+                    :title="glossary.lcp.title"
+                    position="top"
+                  />
+                </div>
+              </th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">
+                <div style="display: flex; align-items: center; justify-content: center">
+                  TBT
+                  <HelpTooltip
+                    :text="glossary.tbt.description"
+                    :title="glossary.tbt.title"
+                    position="top"
+                  />
+                </div>
+              </th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">
+                <div style="display: flex; align-items: center; justify-content: center">
+                  CLS
+                  <HelpTooltip
+                    :text="glossary.cls.description"
+                    :title="glossary.cls.title"
+                    position="top"
+                  />
+                </div>
+              </th>
               <th style="padding: 12px 8px; text-align: center; font-weight: 600">요청 수</th>
               <th style="padding: 12px 8px; text-align: center; font-weight: 600">전송 크기</th>
-              <th style="padding: 12px 8px; text-align: center; font-weight: 600">Long Tasks</th>
+              <th style="padding: 12px 8px; text-align: center; font-weight: 600">
+                <div style="display: flex; align-items: center; justify-content: center">
+                  Long Tasks
+                  <HelpTooltip
+                    :text="glossary.longTask.description"
+                    :title="glossary.longTask.title"
+                    position="top"
+                  />
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -200,6 +254,7 @@
 
 <script setup lang="ts">
 import type { AnalysisResult } from '~/types/performance';
+import { glossary } from '~/utils/glossary';
 
 const newUrl = ref('');
 const urls = ref<string[]>([]);

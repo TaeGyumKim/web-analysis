@@ -57,8 +57,24 @@
                 <span style="font-size: 32px; font-weight: 700">{{ score }}</span>
               </div>
             </div>
-            <div style="margin-top: 12px; font-weight: 600; text-transform: capitalize">
+            <div
+              style="
+                margin-top: 12px;
+                font-weight: 600;
+                text-transform: capitalize;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+              "
+            >
               {{ getCategoryName(category) }}
+              <HelpTooltip
+                v-if="getCategoryHelpText(category)"
+                :text="getCategoryHelpText(category).description"
+                :title="getCategoryHelpText(category).title"
+                position="top"
+              />
             </div>
           </div>
         </div>
@@ -227,6 +243,7 @@
 
 <script setup lang="ts">
 import type { AnalysisResult } from '~/types/performance';
+import { glossary } from '~/utils/glossary';
 
 const props = defineProps<{
   result: AnalysisResult | null;
@@ -247,6 +264,17 @@ function getCategoryName(category: string): string {
     pwa: 'PWA'
   };
   return names[category] || category;
+}
+
+function getCategoryHelpText(category: string): { title: string; description: string } | null {
+  const helpTexts: Record<string, { title: string; description: string }> = {
+    performance: glossary.performance,
+    accessibility: glossary.accessibility,
+    bestPractices: glossary.bestPractices,
+    seo: glossary.seo,
+    pwa: glossary.pwa
+  };
+  return helpTexts[category] || null;
 }
 
 function getMetricName(metric: string): string {

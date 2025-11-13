@@ -1,6 +1,13 @@
 <template>
   <div class="card">
-    <h3>성능 예산 설정</h3>
+    <h3 style="display: flex; align-items: center">
+      성능 예산 설정
+      <HelpTooltip
+        :text="glossary.performanceBudget.description"
+        :title="glossary.performanceBudget.title"
+        position="right"
+      />
+    </h3>
     <p style="font-size: 14px; color: #666; margin-top: 8px">
       각 메트릭의 목표 값을 설정하고 실제 성능과 비교합니다
     </p>
@@ -251,6 +258,7 @@
 
 <script setup lang="ts">
 import type { AnalysisResult } from '~/types/performance';
+import { glossary } from '~/utils/glossary';
 
 const props = defineProps<{
   result?: AnalysisResult | null;

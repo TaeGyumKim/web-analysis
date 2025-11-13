@@ -16,7 +16,15 @@
     <div class="topbar">
       <!-- 첫 번째 줄 -->
       <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
-        <label>네트워크 속도:</label>
+        <label style="display: flex; align-items: center">
+          네트워크 속도
+          <HelpTooltip
+            :text="glossary.networkThrottling.description"
+            :title="glossary.networkThrottling.title"
+            position="bottom"
+          />
+          :
+        </label>
         <select v-model="networkSpeed">
           <option>3G</option>
           <option selected>4G</option>
@@ -24,7 +32,15 @@
           <option>Slow 3G</option>
         </select>
 
-        <label>장비 사양:</label>
+        <label style="display: flex; align-items: center">
+          장비 사양
+          <HelpTooltip
+            :text="glossary.cpuThrottling.description"
+            :title="glossary.cpuThrottling.title"
+            position="bottom"
+          />
+          :
+        </label>
         <select v-model="deviceSpec">
           <option selected>Desktop</option>
           <option>Mobile (High-end)</option>
@@ -32,7 +48,15 @@
           <option>Mobile (Low-end)</option>
         </select>
 
-        <label>Viewport:</label>
+        <label style="display: flex; align-items: center">
+          Viewport
+          <HelpTooltip
+            :text="glossary.viewport.description"
+            :title="glossary.viewport.title"
+            position="bottom"
+          />
+          :
+        </label>
         <select v-model="viewportPreset" @change="onViewportPresetChange">
           <option value="desktop-1920">Desktop 1920x1080</option>
           <option value="desktop-1366">Desktop 1366x768</option>
@@ -67,6 +91,11 @@
         <label style="display: flex; align-items: center; gap: 4px">
           <input v-model="useLighthouse" type="checkbox" />
           Lighthouse
+          <HelpTooltip
+            :text="glossary.lighthouse.description"
+            :title="glossary.lighthouse.title"
+            position="bottom"
+          />
         </label>
       </div>
 
@@ -190,6 +219,7 @@
 <script setup lang="ts">
 import type { AnalysisResult, CustomMetricDefinition } from '~/types/performance';
 import { exportAsJSON, exportAsTextReport, exportNetworkAsCSV } from '~/utils/exportUtils';
+import { glossary } from '~/utils/glossary';
 
 const url = ref('https://www.naver.com/');
 const networkSpeed = ref('4G');

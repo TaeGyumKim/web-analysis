@@ -77,11 +77,25 @@
         <div>
           총 전송 크기: <strong>{{ formatBytes(totalSize) }}</strong>
         </div>
-        <div v-if="result.metrics.domContentLoaded">
-          DOMContentLoaded: <strong>{{ result.metrics.domContentLoaded.toFixed(0) }} ms</strong>
+        <div v-if="result.metrics.domContentLoaded" style="display: flex; align-items: center">
+          DOMContentLoaded:
+          <HelpTooltip
+            :text="glossary.domContentLoaded.description"
+            :title="glossary.domContentLoaded.title"
+            position="top"
+          />
+          <strong style="margin-left: 4px"
+            >{{ result.metrics.domContentLoaded.toFixed(0) }} ms</strong
+          >
         </div>
-        <div v-if="result.metrics.loadComplete">
-          Load: <strong>{{ result.metrics.loadComplete.toFixed(0) }} ms</strong>
+        <div v-if="result.metrics.loadComplete" style="display: flex; align-items: center">
+          Load:
+          <HelpTooltip
+            :text="glossary.loadComplete.description"
+            :title="glossary.loadComplete.title"
+            position="top"
+          />
+          <strong style="margin-left: 4px">{{ result.metrics.loadComplete.toFixed(0) }} ms</strong>
         </div>
       </div>
     </div>
@@ -90,6 +104,7 @@
 
 <script setup lang="ts">
 import type { AnalysisResult, NetworkRequest } from '~/types/performance';
+import { glossary } from '~/utils/glossary';
 
 const props = defineProps<{
   result: AnalysisResult | null;

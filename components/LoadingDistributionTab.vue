@@ -16,11 +16,25 @@
       <!-- 차트 그리드 -->
       <div class="chart-grid">
         <div class="chart-container">
-          <h3>네트워크 속도별 로딩 시간 분포</h3>
+          <h3 style="display: flex; align-items: center">
+            네트워크 속도별 로딩 시간 분포
+            <HelpTooltip
+              :text="glossary.networkThrottling.description"
+              :title="glossary.networkThrottling.title"
+              position="top"
+            />
+          </h3>
           <canvas ref="chartNetwork"></canvas>
         </div>
         <div class="chart-container">
-          <h3>장비별 로딩 시간 분포</h3>
+          <h3 style="display: flex; align-items: center">
+            장비별 로딩 시간 분포
+            <HelpTooltip
+              :text="glossary.cpuThrottling.description"
+              :title="glossary.cpuThrottling.title"
+              position="top"
+            />
+          </h3>
           <canvas ref="chartDevice"></canvas>
         </div>
       </div>
@@ -96,6 +110,7 @@
 <script setup lang="ts">
 import { Chart, registerables } from 'chart.js';
 import type { AnalysisResult } from '~/types/performance';
+import { glossary } from '~/utils/glossary';
 
 Chart.register(...registerables);
 

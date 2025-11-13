@@ -9,7 +9,14 @@
       class="card"
       style="margin-top: 20px"
     >
-      <h3>커스텀 메트릭 결과</h3>
+      <h3 style="display: flex; align-items: center">
+        커스텀 메트릭 결과
+        <HelpTooltip
+          :text="glossary.customMetrics.description"
+          :title="glossary.customMetrics.title"
+          position="right"
+        />
+      </h3>
 
       <!-- 메트릭 카드 그리드 -->
       <div class="metrics-grid">
@@ -130,6 +137,7 @@
 <script setup lang="ts">
 import { Chart, registerables } from 'chart.js';
 import type { AnalysisResult, CustomMetricResult } from '~/types/performance';
+import { glossary } from '~/utils/glossary';
 
 Chart.register(...registerables);
 
