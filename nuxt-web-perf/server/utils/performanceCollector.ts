@@ -83,7 +83,7 @@ export class PerformanceCollector {
       });
 
       // Wait a bit more for animations and late resources
-      await page.waitForTimeout(2000);
+      await new Promise<void>(resolve => setTimeout(resolve, 2000));
 
       // Collect performance metrics
       const metrics = await this.collectMetrics(page, client);
