@@ -66,6 +66,7 @@ npm install puppeteer
 ### Development
 
 Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -75,11 +76,13 @@ The application will be available at `http://localhost:3000`
 ### Production
 
 Build for production:
+
 ```bash
 npm run build
 ```
 
 Start the production server:
+
 ```bash
 npm run preview
 ```
@@ -87,6 +90,7 @@ npm run preview
 ### Docker Deployment
 
 Build and run with Docker:
+
 ```bash
 # 단일 컨테이너 실행
 docker build -t web-perf-analyzer ./nuxt-web-perf
@@ -100,6 +104,7 @@ docker-compose --profile with-nginx up -d
 ```
 
 Pull from GitHub Container Registry:
+
 ```bash
 docker pull ghcr.io/TaeGyumKim/web-analysis:latest
 docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
@@ -108,7 +113,9 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 ### Using the Analyzer
 
 #### 1. 분석 시작
+
 상단 제어바에서:
+
 - **네트워크 속도** 선택: 3G, 4G, Wi-Fi, Slow 3G
 - **장비 사양** 선택: Desktop, Mobile (High-end/Mid-range/Low-end)
 - **URL 입력**: 분석할 웹 페이지 주소 입력
@@ -118,6 +125,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 #### 2. 결과 확인 - 8개 탭 시스템
 
 **📸 프레임 분석 탭**
+
 - **PerformanceMetricsChart 시각화** (NEW ✨):
   - **Radar Chart**: FCP, LCP, TBT, CLS, TTFB 성능 점수 분포
   - **Doughnut Chart**: 종합 성능 점수 (0-100) 중앙 오버레이
@@ -133,6 +141,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
   - Long Tasks 요약 (개수, 평균, 최대)
 
 **🌐 네트워크 타임라인 탭**
+
 - **NetworkHeatmap 히트맵** (NEW ✨):
   - **인터랙티브 히트맵**: 리소스 타입별(document, stylesheet, script, image, font, xhr, fetch) / 시간대별(10 구간) 요청 분포
   - **클릭 상세 정보**: 히트맵 셀 클릭 시 해당 시간대의 요청 목록 모달 표시
@@ -148,6 +157,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - 요약 통계: 총 요청 수, 전송 크기, DCL, Load 시간
 
 **📊 로딩 분포 탭**
+
 - Chart.js 차트 3종:
   - 네트워크 속도별 로딩 시간 분포 (바 차트)
   - 장비별 로딩 시간 분포 (바 차트)
@@ -158,18 +168,21 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - Long Task 히스토그램 (지속시간 분포, 상위 작업)
 
 **🔄 일괄 분석 탭**
+
 - 여러 URL 추가 및 동시 분석
 - 진행률 표시 및 결과 비교 테이블
 - 평균 통계 및 최고 성능 사이트 표시
 - 비교 결과 JSON/텍스트로 내보내기
 
 **📜 분석 이력 탭**
+
 - URL별 분석 이력 조회 (최대 50개 저장)
 - 2개 결과 선택하여 메트릭 변화 비교
 - 평균 메트릭 통계
 - 추이 차트 (Overall Score, FCP, LCP)
 
 **💰 성능 예산 탭**
+
 - 메트릭별 목표 값 설정 (FCP, LCP, TBT, CLS, 요청 수, 전송 크기)
 - 3가지 프리셋 (엄격한/보통/여유 기준)
 - 예산 vs 실제 성능 비교 테이블
@@ -177,6 +190,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - 실패한 메트릭에 대한 개선 권장사항
 
 **🔍 Lighthouse 탭**
+
 - 5개 카테고리 점수 (Performance, Accessibility, Best Practices, SEO, PWA)
 - 원형 게이지 차트로 각 점수 시각화
 - Lighthouse 메트릭 (FCP, LCP, TBT, CLS, Speed Index, TTI, FMP)
@@ -185,6 +199,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - Mobile/Desktop 선택에 따른 자동 Form Factor 설정
 
 **🎛️ 커스텀 메트릭 탭** (NEW ✨)
+
 - **메트릭 관리**:
   - 커스텀 메트릭 추가/편집/삭제
   - 메트릭 활성화/비활성화 토글
@@ -202,6 +217,122 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
   - User Timing API 사용법
   - Element Timing 설정 방법
   - 계산된 메트릭 예제 (히어로 이미지 로딩 시간, API 응답 시간, 컨텐츠 렌더링 시간, 리소스 개수)
+
+## Development
+
+### Code Quality Tools
+
+이 프로젝트는 코드 품질과 일관성을 유지하기 위해 다음 도구들을 사용합니다:
+
+#### ESLint
+
+TypeScript와 Vue 코드의 정적 분석 도구입니다.
+
+```bash
+# 코드 린팅
+npm run lint
+
+# 자동 수정
+npm run lint:fix
+```
+
+#### Prettier
+
+코드 포맷팅 도구입니다.
+
+```bash
+# 코드 포맷팅
+npm run format
+
+# 포맷 검사만 수행
+npm run format:check
+```
+
+#### Husky + lint-staged
+
+Git pre-commit hook을 통해 커밋 전 자동으로 린트와 포맷팅을 실행합니다.
+
+```bash
+# 자동으로 실행됨 (git commit 시)
+# 스테이징된 파일만 린트/포맷팅
+```
+
+### VS Code Setup
+
+프로젝트에는 VS Code 설정이 포함되어 있습니다 (`.vscode/`):
+
+**권장 확장 프로그램:**
+
+- ESLint (`dbaeumer.vscode-eslint`)
+- Prettier (`esbenp.prettier-vscode`)
+- Volar (`vue.volar`)
+- Tailwind CSS IntelliSense (`bradlc.vscode-tailwindcss`)
+- Playwright Test (`ms-playwright.playwright`)
+
+**자동 설정:**
+
+- 저장 시 자동 포맷팅
+- 저장 시 ESLint 자동 수정
+- 일관된 줄 끝 문자 (LF)
+- 파일 끝에 빈 줄 추가
+
+### Development Workflow
+
+1. **코드 작성**
+
+   ```bash
+   npm run dev
+   ```
+
+2. **코드 린팅/포맷팅**
+
+   ```bash
+   npm run lint:fix
+   npm run format
+   ```
+
+3. **커밋 전 자동 체크**
+
+   ```bash
+   git add .
+   git commit -m "feat: add new feature"
+   # Husky가 자동으로 lint-staged 실행
+   ```
+
+4. **테스트 실행**
+
+   ```bash
+   npm run test        # Playwright E2E 테스트
+   npm run test:ui     # UI 모드로 테스트
+   ```
+
+5. **프로덕션 빌드**
+   ```bash
+   npm run build
+   npm run preview
+   ```
+
+### Code Style Guidelines
+
+- **TypeScript**: 모든 `.ts`, `.vue` 파일에서 타입 안전성 유지
+- **Vue 3 Composition API**: `<script setup>` 패턴 사용
+- **Single Quotes**: 문자열은 작은따옴표 사용
+- **Semicolons**: 세미콜론 사용
+- **Tab Width**: 2 spaces
+- **Line Length**: 최대 100자
+- **No console**: 프로덕션에서 console.log 제거
+
+### Git Commit Convention
+
+```
+feat: 새로운 기능 추가
+fix: 버그 수정
+docs: 문서 수정
+style: 코드 포맷팅, 세미콜론 누락 등
+refactor: 코드 리팩토링
+test: 테스트 코드 추가/수정
+chore: 빌드 설정, 패키지 등 기타 변경
+```
 
 ## Project Structure
 
@@ -254,20 +385,26 @@ nuxt-web-perf/
 성능 점수는 세 가지 요소의 가중 평균으로 계산됩니다 (0-100점):
 
 ### 메트릭 점수 (50% 가중치)
+
 FCP, LCP, TBT, TTFB, DOM 타이밍 평가:
+
 - **≤1000ms**: 100점 (녹색 바)
 - **1000-3000ms**: 선형 감소 → 75점 (노란색 바)
 - **3000-7000ms**: 선형 감소 → 30점 (주황색 바)
 - **>7000ms**: 느린 감소
 
 ### 네트워크 점수 (35% 가중치)
+
 패널티 기준:
+
 - 총 전송 크기 > 5MB
 - 요청 수 > 40개
 - 최장 요청 시간 > 2000ms
 
 ### 프레임 점수 (15% 가중치)
+
 프레임 캡처 일관성 기준:
+
 - 평균 간격 ≤100ms: 100점
 - 평균 간격 ≤200ms: 90점
 - 평균 간격 ≤400ms: 75점
@@ -276,6 +413,7 @@ FCP, LCP, TBT, TTFB, DOM 타이밍 평가:
 ## UI Design
 
 ### 색상 테마
+
 - **배경**: `#f6f7f9` (밝은 회색)
 - **카드**: 흰색 배경, 16px 보더 라디우스, 부드러운 섀도우
 - **메트릭 색상**:
@@ -289,6 +427,7 @@ FCP, LCP, TBT, TTFB, DOM 타이밍 평가:
   - Image: `#60c989`
 
 ### 레이아웃
+
 - **상단 제어바**: 네트워크/장비 선택, URL 입력, 버튼
 - **탭 네비게이션**: 3개 탭 (프레임 분석 | 네트워크 타임라인 | 로딩 분포)
 - **프레임 분석**: 좌우 분할 (프레임 뷰어 + 메트릭 사이드바 340px)
@@ -313,39 +452,47 @@ C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 이 프로젝트는 자동화된 CI/CD 파이프라인을 제공합니다:
 
 #### 🔄 CI (Continuous Integration)
+
 자동 실행 조건: PR 생성, `main`/`master`/`develop`/`claude/**` 브랜치에 푸시
 
 **Build and Test Job**
+
 - Node.js 20.x 테스트
 - 의존성 설치 (npm ci)
 - 프로덕션 빌드 검증
 - 빌드 아티팩트 업로드 (7일 보관)
 
 **Code Quality Job**
+
 - TypeScript 타입 체크 (`nuxi typecheck`)
 - 보안 취약점 스캔 (`npm audit`)
 
 **Lighthouse Integration Check**
+
 - Chromium 의존성 설치
 - Lighthouse 패키지 검증
 - Puppeteer 통합 테스트
 
 #### 🚀 CD (Continuous Deployment)
+
 자동 배포 조건: `main`/`master` 브랜치에 푸시, 태그 생성 (`v*`)
 
 **Docker Build & Push**
+
 - 멀티 스테이지 빌드로 최적화된 이미지 생성
 - GitHub Container Registry (ghcr.io)에 자동 푸시
 - 이미지 태그: `latest`, `브랜치명`, `SHA`, 버전 태그
 - GitHub Actions 캐시로 빌드 속도 향상
 
 **GitHub Pages 배포**
+
 - Static Site Generation (SSG)
 - `npm run generate`로 정적 사이트 생성
 - GitHub Pages에 자동 배포
 - 배포 URL: `https://[username].github.io/[repo]`
 
 **Release 자동 생성**
+
 - 버전 태그 푸시 시 자동 릴리즈 생성
 - 변경 로그 자동 생성
 - Docker 이미지 pull 명령어 포함
@@ -358,11 +505,13 @@ C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
 ### Health Check Endpoint
 
 Docker 컨테이너 헬스 체크를 위한 API:
+
 ```bash
 curl http://localhost:3000/api/health
 ```
 
 응답 예시:
+
 ```json
 {
   "status": "healthy",
@@ -389,6 +538,7 @@ curl http://localhost:3000/api/health
 **Test Suite** (`tests/e2e/analyzer.spec.ts`):
 
 **UI Tests** (Always Run):
+
 - **Homepage Load**: Verifies all UI elements are visible
 - **7 Tabs Display**: Checks all tabs exist and are visible
 - **Tab Navigation**: Tests switching between empty tabs (7 screenshots)
@@ -397,11 +547,13 @@ curl http://localhost:3000/api/health
 - **Lighthouse Checkbox**: Validates Lighthouse option
 
 **Analysis Tests** (Skipped in CI):
+
 - **Full Analysis Flow**: Tests actual performance analysis
 - Note: Skipped in CI due to Puppeteer reliability in headless environments
 - Can be run locally with `npm run test:headed`
 
 **Running Tests Locally**:
+
 ```bash
 cd nuxt-web-perf
 
@@ -419,6 +571,7 @@ npm run test:ui
 ```
 
 **CI/CD Integration**:
+
 - UI tests run automatically on every commit (fast, reliable)
 - Analysis tests skipped in CI (can run locally)
 - 3 artifacts uploaded (30-day retention):
@@ -427,9 +580,10 @@ npm run test:ui
   - **test-results**: Complete results including videos
 
 **Screenshots Captured in CI**:
+
 1. Homepage with all UI elements (01)
 2. All 7 tabs visible verification (02)
-3-9. Individual tab navigation (03-09):
+   3-9. Individual tab navigation (03-09):
    - Frame Analysis
    - Network Timeline
    - Loading Distribution
@@ -437,11 +591,12 @@ npm run test:ui
    - History
    - Performance Budget
    - Lighthouse
-10. URL input test (10)
-11. Export area (11)
-12. Lighthouse checkbox area (12)
+3. URL input test (10)
+4. Export area (11)
+5. Lighthouse checkbox area (12)
 
 **Local Analysis Tests** (npm run test:headed):
+
 - Captures full analysis flow with 20-30 second wait
 - Screenshots before, during, and after analysis
 - Tests actual Puppeteer-based performance collection
@@ -475,15 +630,18 @@ npm run test:ui
 ## Future Enhancements
 
 ### High Priority
+
 - [x] **PDF 리포트 생성**: ✅ Puppeteer 기반 고품질 PDF 리포트 구현 완료
 - [x] **커스텀 메트릭**: ✅ 사용자 정의 성능 지표 추적 시스템 구현 완료
 
 ### Medium Priority (추천 기능 #8 완료)
+
 - [x] **고급 시각화**: ✅ Radar, Doughnut, Heatmap, Animated Charts 구현 완료
 - [ ] **로딩 분포 실제 데이터 연동**: 현재 mock 데이터 사용, 히스토리 데이터 활용 필요
 - [ ] **인터랙티브 차트 추가 개선**: D3.js 도입, 줌/팬 기능
 
 ### Low Priority
+
 - [ ] 실시간 모니터링 대시보드
 - [ ] 다국어 지원 (현재 한국어만)
 - [ ] Kubernetes 배포 매니페스트
