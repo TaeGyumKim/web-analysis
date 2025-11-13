@@ -1,5 +1,6 @@
 import lighthouse from 'lighthouse';
 import { launch } from 'chrome-launcher';
+import puppeteer from 'puppeteer';
 
 export interface LighthouseConfig {
   url: string;
@@ -52,7 +53,11 @@ export interface LighthouseResult {
 
 export class LighthouseCollector {
   async analyze(config: LighthouseConfig): Promise<LighthouseResult> {
+    // Use Puppeteer's bundled Chromium to avoid "No Chrome installations found" error
+    const chromePath = puppeteer.executablePath();
+
     const chrome = await launch({
+      chromePath,
       chromeFlags: ['--headless', '--no-sandbox', '--disable-dev-shm-usage']
     });
 
