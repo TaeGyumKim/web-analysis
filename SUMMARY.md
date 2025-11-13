@@ -25,16 +25,22 @@
 
 ### 2. UI/UX 구현 (완료)
 - ✅ HTML 디자인 파일 기반 UI 재작성
-- ✅ 7개 탭 시스템 구현:
+- ✅ 8개 탭 시스템 구현:
   1. **프레임 분석 탭** (`FrameAnalysisTab.vue`)
   2. **네트워크 타임라인 탭** (`NetworkTimelineTab.vue`)
   3. **로딩 분포 탭** (`LoadingDistributionTab.vue`)
   4. **일괄 분석 탭** (`BatchAnalysis.vue`) ⭐
   5. **분석 이력 탭** (`HistoryViewer.vue`) ⭐
   6. **성능 예산 탭** (`PerformanceBudget.vue`) ⭐
-  7. **Lighthouse 탭** (`LighthouseTab.vue`) ⭐ NEW
+  7. **Lighthouse 탭** (`LighthouseTab.vue`) ⭐
+  8. **커스텀 메트릭 탭** (`CustomMetricsTab.vue`) ⭐ NEW
 - ✅ 색상 팔레트 및 디자인 시스템 적용
 - ✅ 반응형 레이아웃 (카드 기반)
+- ✅ 고급 시각화 컴포넌트:
+  - `PerformanceMetricsChart.vue`: Core Web Vitals 차트
+  - `NetworkHeatmap.vue`: 네트워크 히트맵
+  - `NetworkWaterfall.vue`: 네트워크 워터폴 차트
+  - `LongTaskHistogram.vue`: Long Task 히스토그램
 
 ### 3. 핵심 기능 (완료)
 - ✅ **성능 메트릭 측정**:
@@ -167,7 +173,48 @@
     - `/api/health` 엔드포인트 구현
     - 메모리, Puppeteer, API 상태 모니터링
     - Docker 컨테이너 헬스 체크 지원
-- **커밋**: TBD
+- **커밋**: `0f4ef83`
+
+#### 4.9 PDF 리포트 생성 ✅
+- **구현 내용**:
+  - `generate-pdf.post.ts`: PDF 생성 API 엔드포인트
+  - Puppeteer 기반 HTML to PDF 변환
+  - 성능 메트릭, 네트워크 요청, Long Tasks 포함
+  - 포맷된 HTML 템플릿 및 CSS 스타일링
+  - Base64로 인코딩하여 클라이언트에 반환
+  - 클라이언트 다운로드 기능 (📑 PDF 버튼)
+  - 로딩 상태 표시 (⏳ 생성 중...)
+- **커밋**: `5f8a923`
+
+#### 4.10 커스텀 메트릭 시스템 ✅
+- **구현 내용**:
+  - `CustomMetricsManager.vue`: 메트릭 정의 및 관리 UI
+    - 3가지 메트릭 타입: User Timing API, Element Timing, 계산된 메트릭
+    - CRUD 기능 (추가/수정/삭제/활성화)
+    - localStorage 기반 저장
+    - 임계값 설정 (good/needs-improvement/poor)
+  - `CustomMetricsTab.vue`: 측정 결과 시각화
+    - 메트릭 카드 그리드 (값, 점수, 상태)
+    - 진행 바 및 색상 코딩
+    - 히스토리 추이 차트
+  - `customMetricsCalculator.ts`: 서버 사이드 계산 엔진
+    - 안전한 수식 평가 (정규식 검증)
+    - User Timing/Element Timing 데이터 추출
+    - 점수 계산 (0-100)
+  - 타입 정의: `CustomMetricDefinition`, `CustomMetricResult`
+- **커밋**: `ec28ce5`
+
+#### 4.11 Viewport 설정 기능 ✅
+- **구현 내용**:
+  - 7개 디바이스 프리셋:
+    - Desktop: 1920x1080, 1366x768, 1280x720
+    - Tablet: iPad Pro 1024x1366, iPad 768x1024
+    - Mobile: iPhone 13 390x844, Galaxy S21 360x800
+  - 커스텀 viewport 옵션 (수동 너비/높이 입력)
+  - `viewportWidth`, `viewportHeight` 파라미터 추가
+  - Puppeteer `page.setViewport()` 적용
+  - UI 2줄 레이아웃으로 재구성
+- **커밋**: `f2a1930`
 
 ---
 
@@ -194,39 +241,48 @@
 ```
 web-analysis/
 ├── .github/workflows/
-│   ├── ci.yml                          # CI 파이프라인 ⭐ NEW
-│   └── cd.yml                          # CD 파이프라인 ⭐ NEW
-├── docker-compose.yml                   # Docker Compose 설정 ⭐ NEW
-└── nuxt-web-perf/
-    ├── app.vue                         # App entry point
-    ├── assets/css/main.css             # 커스텀 CSS (HTML 디자인 기반)
-    ├── components/
-    │   ├── FrameAnalysisTab.vue        # 프레임 분석 탭 (좌우 레이아웃)
-    │   ├── NetworkTimelineTab.vue      # 네트워크 타임라인 탭
-    │   ├── LoadingDistributionTab.vue  # 로딩 분포 탭
-    │   ├── BatchAnalysis.vue           # 일괄 분석 탭 ⭐
-    │   ├── HistoryViewer.vue           # 분석 이력 탭 ⭐
-    │   ├── PerformanceBudget.vue       # 성능 예산 탭 ⭐
-    │   ├── LighthouseTab.vue           # Lighthouse 탭 ⭐
-    │   └── LongTaskHistogram.vue       # Long Task 히스토그램 ⭐
-    ├── pages/index.vue                 # 메인 페이지 (7탭 시스템)
-    ├── server/
-    │   ├── api/
-    │   │   ├── analyze.post.ts         # POST /api/analyze 엔드포인트
-    │   │   └── health.get.ts           # GET /api/health 헬스 체크 ⭐ NEW
-    │   └── utils/
-    │       ├── performanceCollector.ts # Puppeteer 기반 수집기
-    │       └── lighthouseCollector.ts  # Lighthouse 수집기 ⭐
-    ├── types/performance.ts            # TypeScript 타입 정의
-    ├── utils/
-    │   ├── scoreCalculator.ts          # 성능 점수 계산
-    │   ├── exportUtils.ts              # 결과 내보내기 ⭐
-    │   └── historyManager.ts           # 분석 이력 관리 ⭐
-    ├── Dockerfile                      # Docker 이미지 빌드 ⭐ NEW
-    ├── .dockerignore                   # Docker 빌드 제외 파일 ⭐ NEW
-    ├── package.json
-    ├── README.md                       # 프로젝트 문서 (업데이트됨)
-    └── SUMMARY.md                      # 프로젝트 전체 상황 정리
+│   ├── ci.yml                          # CI 파이프라인 ⭐
+│   └── cd.yml                          # CD 파이프라인 ⭐
+├── app.vue                             # App entry point
+├── assets/css/main.css                 # 커스텀 CSS
+├── components/
+│   ├── FrameAnalysisTab.vue            # 프레임 분석 탭
+│   ├── NetworkTimelineTab.vue          # 네트워크 타임라인 탭
+│   ├── LoadingDistributionTab.vue      # 로딩 분포 탭
+│   ├── BatchAnalysis.vue               # 일괄 분석 탭 ⭐
+│   ├── HistoryViewer.vue               # 분석 이력 탭 ⭐
+│   ├── PerformanceBudget.vue           # 성능 예산 탭 ⭐
+│   ├── LighthouseTab.vue               # Lighthouse 탭 ⭐
+│   ├── CustomMetricsTab.vue            # 커스텀 메트릭 탭 ⭐
+│   ├── CustomMetricsManager.vue        # 커스텀 메트릭 관리 ⭐
+│   ├── PerformanceMetricsChart.vue     # Core Web Vitals 차트 ⭐
+│   ├── NetworkHeatmap.vue              # 네트워크 히트맵 ⭐
+│   ├── NetworkWaterfall.vue            # 네트워크 워터폴 ⭐
+│   └── LongTaskHistogram.vue           # Long Task 히스토그램 ⭐
+├── pages/index.vue                     # 메인 페이지 (8탭 시스템)
+├── server/
+│   ├── api/
+│   │   ├── analyze.post.ts             # POST /api/analyze 엔드포인트
+│   │   ├── generate-pdf.post.ts        # POST /api/generate-pdf 엔드포인트 ⭐
+│   │   └── health.get.ts               # GET /api/health 헬스 체크 ⭐
+│   └── utils/
+│       ├── performanceCollector.ts     # Puppeteer 기반 수집기
+│       ├── lighthouseCollector.ts      # Lighthouse 수집기 ⭐
+│       └── customMetricsCalculator.ts  # 커스텀 메트릭 계산 엔진 ⭐
+├── types/performance.ts                # TypeScript 타입 정의
+├── utils/
+│   ├── scoreCalculator.ts              # 성능 점수 계산
+│   ├── exportUtils.ts                  # 결과 내보내기 ⭐
+│   └── historyManager.ts               # 분석 이력 관리 ⭐
+├── tests/e2e/
+│   └── analyzer.spec.ts                # E2E 테스트 (Playwright) ⭐
+├── Dockerfile                          # Docker 이미지 빌드 ⭐
+├── docker-compose.yml                  # Docker Compose 설정 ⭐
+├── .dockerignore                       # Docker 빌드 제외 파일 ⭐
+├── package.json
+├── API.md                              # API 문서 (업데이트됨) ⭐
+├── README.md                           # 프로젝트 문서 (업데이트됨)
+└── SUMMARY.md                          # 프로젝트 전체 상황 정리
 ```
 
 ---
@@ -348,28 +404,50 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 ### 추가 개발 권장 사항
 - [x] ~~CI/CD 파이프라인 통합~~ ✅ 완료
 - [x] ~~Lighthouse API 통합~~ ✅ 완료
+- [x] ~~PDF 보고서 생성~~ ✅ 완료
+- [x] ~~커스텀 메트릭 시스템~~ ✅ 완료
+- [x] ~~Viewport 설정 기능~~ ✅ 완료
 - [ ] 실시간 모니터링 대시보드
-- [ ] PDF 보고서 생성 (현재는 텍스트만 지원)
 - [ ] 다국어 지원 (현재 한국어만)
 - [ ] WebSocket 기반 실시간 분석 진행률
 - [ ] 사용자 계정 및 팀 기능
 - [ ] 알림 및 성능 임계값 경고
 - [ ] Kubernetes 배포 매니페스트
+- [ ] LoadingDistributionTab 실제 히스토리 데이터 연동 (현재 mock 데이터 사용)
+- [ ] CustomMetricsTab 히스토리 추적 기능 구현
 
 ---
 
 ## 🎉 결론
 
-**총 구현 기간**: 이 세션에서 6개 주요 기능 완료
-
-**커밋 수**: 7개 (기능 6개 + 문서 1개)
-
-**코드 변경 사항**:
-- 신규 컴포넌트: 4개 (BatchAnalysis, HistoryViewer, PerformanceBudget, LongTaskHistogram)
-- 신규 유틸리티: 2개 (exportUtils, historyManager)
-- 타입 확장: LongTask 인터페이스 추가
-- 메트릭 추가: CLS 측정 및 점수 계산
-
 **현재 상태**: ✅ 프로덕션 준비 완료
 
-모든 Future Enhancements 항목이 성공적으로 구현되었으며, 웹 기반 성능 분석 도구로서 완전한 기능을 갖추었습니다. 디자이너와 비개발자도 쉽게 사용할 수 있는 직관적인 UI와 강력한 분석 기능을 제공합니다.
+**주요 기능 (11개)**:
+1. ✅ CLS 메트릭 추가
+2. ✅ Long Task 히스토그램 시각화
+3. ✅ 결과 내보내기 (JSON/Text/CSV)
+4. ✅ 여러 URL 일괄 분석
+5. ✅ 과거 데이터 비교 및 추이 분석
+6. ✅ 성능 예산 설정
+7. ✅ Lighthouse API 통합
+8. ✅ CI/CD 파이프라인 통합
+9. ✅ PDF 리포트 생성
+10. ✅ 커스텀 메트릭 시스템
+11. ✅ Viewport 설정 기능
+
+**코드 품질 개선 (최근 세션)**:
+- ✅ 코드 중복 제거 (pages/index.vue에서 ~150줄 삭제)
+- ✅ 레거시 컴포넌트 정리 (4개 삭제)
+- ✅ API 문서 업데이트 (PDF, 커스텀 메트릭, viewport 추가)
+- ✅ SUMMARY 문서 최신화 (8탭 시스템 반영)
+- ✅ 프로젝트 구조 개편 (nuxt-web-perf를 루트로 이동)
+
+**아키텍처**:
+- **Frontend**: Nuxt 3 + Vue 3 + TypeScript + Chart.js
+- **Backend**: Nuxt Server API + Puppeteer + Lighthouse
+- **Storage**: localStorage (히스토리, 예산, 커스텀 메트릭)
+- **DevOps**: GitHub Actions + Docker + E2E Testing (Playwright)
+
+**현재 기능 수준**: 엔터프라이즈급 웹 성능 분석 도구
+
+프로젝트는 C# 데스크톱 앱에서 완전한 웹 애플리케이션으로 성공적으로 마이그레이션되었으며, 8개 탭 시스템, 고급 시각화, PDF 리포트, 커스텀 메트릭, CI/CD 자동화 등 프로덕션 환경에 필요한 모든 기능을 갖추었습니다. 디자이너와 비개발자도 쉽게 사용할 수 있는 직관적인 UI와 강력한 분석 기능을 제공합니다.

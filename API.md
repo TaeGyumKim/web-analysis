@@ -41,6 +41,11 @@ Content-Type: application/json
 | `networkThrottling` | string | `"none"` | 네트워크 스로틀링: `"none"`, `"slow-3g"`, `"fast-3g"`, `"4g"` |
 | `cpuThrottling` | number | `1` | CPU 스로틀링 배율: `1` (없음), `2`, `4`, `6` |
 | `waitUntil` | string | `"networkidle0"` | 로드 완료 조건: `"load"`, `"domcontentloaded"`, `"networkidle0"`, `"networkidle2"` |
+| `viewportWidth` | number | `1920` | 뷰포트 너비 (픽셀) |
+| `viewportHeight` | number | `1080` | 뷰포트 높이 (픽셀) |
+| `useLighthouse` | boolean | `false` | Google Lighthouse 분석 실행 여부 |
+| `lighthouseFormFactor` | string | `"desktop"` | Lighthouse 폼 팩터: `"mobile"`, `"desktop"` |
+| `customMetrics` | CustomMetricDefinition[] | `[]` | 사용자 정의 커스텀 메트릭 목록 |
 
 ### Response
 
@@ -138,6 +143,8 @@ Content-Type: application/json
 | `frames` | FrameCapture[] | 캡처된 프레임 목록 |
 | `longTasks` | LongTask[] | Long Task 목록 (50ms 이상 차단 작업) |
 | `performanceScore` | PerformanceScore | 성능 점수 |
+| `lighthouse` | LighthouseResult | Lighthouse 분석 결과 (useLighthouse가 true일 때) |
+| `customMetrics` | CustomMetricResult[] | 커스텀 메트릭 측정 결과 |
 
 ### PerformanceMetrics
 
@@ -280,9 +287,156 @@ API는 다음과 같은 HTTP 상태 코드를 반환합니다:
 
 현재 Rate Limiting이 적용되지 않았습니다. 프로덕션 환경에서는 적절한 제한을 설정하는 것을 권장합니다.
 
+### CustomMetricDefinition
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | 메트릭 고유 ID |
+| `name` | string | 메트릭 이름 |
+| `description` | string | 메트릭 설명 |
+| `type` | string | 메트릭 타입: `"user-timing"`, `"element-timing"`, `"calculated"` |
+| `markName` | string | User Timing API 마크 이름 (type이 "user-timing"일 때) |
+| `measureName` | string | User Timing API 측정 이름 (type이 "user-timing"일 때) |
+| `elementSelector` | string | CSS 선택자 (type이 "element-timing"일 때) |
+| `formula` | string | 계산 수식 (type이 "calculated"일 때, 예: "lcp - fcp") |
+| `thresholds` | object | 임계값 설정 { good, needsImprovement, poor } |
+| `unit` | string | 단위: `"ms"`, `"s"`, `"score"`, `"bytes"`, `"count"` |
+| `enabled` | boolean | 활성화 여부 |
+
+### CustomMetricResult
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | 메트릭 ID (CustomMetricDefinition의 id와 일치) |
+| `name` | string | 메트릭 이름 |
+| `value` | number | 측정된 값 |
+| `unit` | string | 단위 |
+| `score` | number | 점수 (0-100) |
+| `status` | string | 상태: `"good"`, `"needs-improvement"`, `"poor"` |
+| `timestamp` | number | 측정 시간 타임스탬프 |
+
+### LighthouseResult
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `scores` | object | 카테고리별 점수 { performance, accessibility, bestPractices, seo, pwa } |
+| `audits` | object | 상세 감사 항목 결과 |
+
+---
+
+## POST /api/generate-pdf
+
+분석 결과를 PDF 리포트로 생성합니다.
+
+### Request
+
+**Endpoint**: `POST /api/generate-pdf`
+
+**Headers**:
+```
+Content-Type: application/json
+```
+
+**Body**:
+```json
+{
+  "result": {
+    "url": "https://www.example.com",
+    "timestamp": 1699876543210,
+    "runningTime": 5432,
+    "metrics": { ... },
+    "networkRequests": [ ... ],
+    "frames": [ ... ],
+    "longTasks": [ ... ],
+    "performanceScore": { ... }
+  }
+}
+```
+
+### Request Parameters
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `result` | AnalysisResult | ✅ | 분석 결과 객체 (POST /api/analyze의 응답 데이터) |
+
+### Response
+
+**Success (200 OK)**:
+```json
+{
+  "pdfBase64": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL...",
+  "filename": "performance-report-2024-11-13.pdf"
+}
+```
+
+**Error (400 Bad Request)**:
+```json
+{
+  "statusCode": 400,
+  "statusMessage": "No result data provided"
+}
+```
+
+**Error (500 Internal Server Error)**:
+```json
+{
+  "statusCode": 500,
+  "statusMessage": "Failed to generate PDF",
+  "data": {
+    "message": "Error details..."
+  }
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `pdfBase64` | string | Base64로 인코딩된 PDF 파일 데이터 |
+| `filename` | string | 생성된 PDF 파일명 |
+
+### Usage Example
+
+```javascript
+// 1. 먼저 분석 수행
+const analyzeResponse = await fetch('/api/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    url: 'https://www.example.com',
+    options: { captureScreenshots: true }
+  })
+});
+const analyzeResult = await analyzeResponse.json();
+
+// 2. PDF 생성
+const pdfResponse = await fetch('/api/generate-pdf', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    result: analyzeResult.data
+  })
+});
+const pdfData = await pdfResponse.json();
+
+// 3. PDF 다운로드
+const pdfBlob = Uint8Array.from(atob(pdfData.pdfBase64), c => c.charCodeAt(0));
+const blob = new Blob([pdfBlob], { type: 'application/pdf' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = pdfData.filename;
+a.click();
+URL.revokeObjectURL(url);
+```
+
+---
+
 ## Notes
 
 - 분석 시간은 페이지 복잡도와 네트워크 상태에 따라 5초~60초 소요될 수 있습니다
 - `captureScreenshots: true`는 메모리 사용량을 증가시킵니다
 - Puppeteer는 Chromium 브라우저가 필요합니다
 - 동시 요청 수가 많을 경우 서버 리소스를 고려해야 합니다
+- Lighthouse 분석은 추가로 10-30초 소요될 수 있습니다
+- PDF 생성은 분석 결과 크기에 따라 5-15초 소요됩니다
