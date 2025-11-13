@@ -99,11 +99,6 @@ export class PerformanceCollector {
       // Collect long tasks
       const longTasks = await this.collectLongTasks(page);
 
-      // Stop frame capture
-      if (this.captureInterval) {
-        clearInterval(this.captureInterval);
-      }
-
       // Calculate running time
       const runningTime = Date.now() - this.startTime;
 
@@ -115,8 +110,6 @@ export class PerformanceCollector {
         m.computePerformanceScore(metrics, networkRequests, this.frames)
       );
 
-      await page.close();
-
       return {
         url,
         timestamp: this.startTime,
@@ -127,9 +120,10 @@ export class PerformanceCollector {
         longTasks,
         performanceScore
       };
-    } catch (error) {
+    } finally {
+      // Always stop frame capture before closing page
+      this.stopFrameCapture();
       await page.close();
-      throw error;
     }
   }
 
@@ -182,10 +176,17 @@ export class PerformanceCollector {
           timestamp,
           screenshot: screenshot as string
         });
-      } catch (_error) {
-        console.error('Failed to capture frame:', _error);
+      } catch {
+        // Silently ignore screenshot errors (happens when page is closed)
       }
     }, 100); // Capture every 100ms
+  }
+
+  private stopFrameCapture() {
+    if (this.captureInterval) {
+      clearInterval(this.captureInterval);
+      this.captureInterval = null;
+    }
   }
 
   private async collectMetrics(page: Page): Promise<PerformanceMetrics> {
