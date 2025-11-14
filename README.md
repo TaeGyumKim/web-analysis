@@ -1,155 +1,643 @@
-﻿# WebPerf — README
+# Web Performance Analyzer
 
-간단 요약
-- WebPerf는 WebView2 + DevTools CDP를 이용해 웹 페이지 로드 과정을 캡처(프레임 스크린샷, 네트워크 이벤트, performance metrics)하고, 프레임·리소스 단위로 분석해 사람이 읽기 쉬운 텍스트 및 간단한 성능 점수를 제공하는 프로토타입입니다.
-- 목표: Lighthouse 스타일의 핵심 지표(예: FCP/LCP/TBT)와 네트워크·프레임 관점의 원인 분석을 빠르게 확인하고, AI에 전달할 텍스트를 만들기 위한 전처리/시각화.
+웹 페이지 로딩 성능을 분석하고 시각화하는 도구입니다. Nuxt 3와 Puppeteer로 구축되어 디자이너와 비개발자도 쉽게 페이지 성능 메트릭을 이해할 수 있습니다.
 
-목차
-1. 요구사항
-2. 실행 방법
-3. 아키텍처 및 데이터 흐름
-4. 수집되는 데이터(포맷)
-5. 점수 산출 방식(상세)
-6. UI/출력 요약
-7. 제약·주의사항
-8. 향후 확장 제안
+## Features
 
-1. 요구사항
-- .NET Framework 4.8, C# 7.3
-- Visual Studio 2022 권장
-- NuGet 패키지: `Microsoft.Web.WebView2`
-- 실행 환경에 WebView2 런타임 설치 필요 (Edge Chromium 기반 런타임)
+- 🎯 **6개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, 성능 예산, Lighthouse, 커스텀 메트릭
+- 📊 **종합 성능 분석**: FCP, LCP, TBT, CLS, TTFB 등 핵심 메트릭 측정
+- 🎬 **프레임별 렌더링 과정**: 페이지 로드 과정을 프레임 단위로 캡처 및 재생
+- 🌊 **네트워크 워터폴 차트**: 모든 네트워크 요청을 타임라인으로 시각화
+- 📈 **고급 인터랙티브 시각화**:
+  - **Radar Chart**: Core Web Vitals 성능 메트릭 분포
+  - **Doughnut Chart**: 종합 성능 점수 시각화
+  - **Heatmap**: 네트워크 요청 타입별/시간대별 분포
+  - **Animated Progress Bars**: 실시간 메트릭 진행 상태
+  - **Timeline Bar Chart**: 로딩 이벤트 순서 시각화
+- 🎨 **깔끔한 UI**: 16px 보더 라디우스와 부드러운 섀도우를 활용한 모던한 디자인
+- ⚙️ **설정 가능한 테스트 환경**: 네트워크 속도(3G/4G/Wi-Fi), 장비 사양(Desktop/Mobile) 선택
+- 📉 **Long Task 히스토그램**: 메인 스레드 차단 작업 시각화 및 분석
+- 💾 **결과 내보내기**: JSON, 텍스트 리포트, CSV, **PDF 리포트** 형식으로 분석 결과 저장
+- 💰 **성능 예산**: 목표 메트릭 설정 및 실제 성능 비교
+- 🔍 **Lighthouse 통합**: Google Lighthouse 기반 성능, 접근성, SEO, PWA 분석
+- 🎛️ **커스텀 메트릭**: 사용자 정의 성능 지표 생성 및 추적
+  - **User Timing API**: performance.mark()/measure() 기반 메트릭
+  - **Element Timing**: 특정 요소의 렌더링 시간 측정
+  - **계산된 메트릭**: 기존 메트릭 조합으로 새로운 지표 생성
+  - **임계값 설정**: 양호/개선 필요/나쁨 기준 커스터마이징
+- ❓ **Help Tooltip 시스템**: 비개발자를 위한 용어 설명
+  - **인터랙티브 툴팁**: 모든 전문 용어에 물음표 아이콘 추가
+  - **한글 용어 사전**: FCP, LCP, TBT, CLS 등 핵심 메트릭 설명
+  - **호버 액션**: 마우스 오버 시 자동으로 설명 표시
+  - **디자이너 친화적**: 기술 용어를 쉬운 한국어로 설명
 
-2. 실행 방법
-- 솔루션 열기 → 빌드
-- __NuGet 패키지 관리자__에서 `Microsoft.Web.WebView2` 확인/설치
-- 프로그램 실행 → 메인 창에 URL 입력 → 네트워크/CPU 프로파일 선택 → Start
-- 페이지 로딩 완료 후 Stop → 결과 창에서 DevTools/Frames 확인
+## Tech Stack
 
-3. 아키텍처 및 데이터 흐름 (요약)
-- `WebPerfForm` (사용자 입력) → `WebViewerForm` (수집) → `WebPerfResultForm` (시각화/분석)
-- 수집:
-  - Network: CDP 이벤트 `Network.requestWillBeSent`, `Network.loadingFinished` → `NetworkPerfModel`에 `RequestRecord`로 저장
-  - 스크린샷(프레임): CDP `Page.captureScreenshot`을 100ms 간격으로 호출하여 `FrameModel` 저장
-  - DevTools/performance: `Performance.getMetrics`, `performance.getEntries()`를 수집
-  - 페이지 주입 스크립트로 LCP/FCP/longtask/TBT 수집(see `WebViewerForm`의 스크립트 주입)
-- 표시: `WebPerfResultForm`가 `PerfResultModel`(RunningTime, NetworkPerfResult, DevTools JSON, Frames)을 받아 표시
+- **Frontend**: Nuxt 3, Vue 3, TypeScript
+- **Styling**: Custom CSS (HTML 디자인 기반) + Tailwind CSS
+- **Charts**: Chart.js (바 차트, 라인 차트)
+- **Backend**: Nuxt Server API
+- **Performance Collection**: Puppeteer (CDP protocol), Lighthouse
+- **Scoring Algorithm**: C# WebPerf 구현 기반
 
-4. 수집되는 데이터(포맷)
-- `PerfResultModel.DevToolsPerformanceJson` — JSON:  
-  - `metrics` : `Performance.getMetrics` 원본  
-  - `navigationTiming` : navigation timing object  
-  - `performanceEntries` : `performance.getEntries()` 결과  
-  - `webperfMetrics` : 주입 스크립트로 수집된 `{ lcp: { time, tag, snippet }, fcp: ms, longTasks: [{start,duration}], tbt: ms }`
-- `NetworkPerfModel._requestLists` : 각 요청에 대해 `RequestRecord { Id, Url, Type, StartSec, EndSec, Size }`
-- `Frames` : `FrameModel { TimestampSec, Base64Png, Metadata }`
+## Installation
 
-5. 점수 산출 방식 — 상세(중요)
-- 최종 점수는 세 축(메트릭, 네트워크, 프레임) 가중합으로 계산됩니다.
-  - 기본 가중치:
-    - Metrics: `PERF_WEIGHT_METRICS = 0.5`
-    - Network: `PERF_WEIGHT_NETWORK = 0.35`
-    - Frames: `PERF_WEIGHT_FRAMES = 0.15`
-  - (메트릭이 없거나 `PERF_WEIGHT_METRICS`를 0으로 설정하면 네트워크/프레임 가중치 정규화)
+### Prerequisites
 
-5.1. 메트릭 서브스코어 (metricsScore)
-- 수집 가능한 메트릭:
-  - DevTools `Performance.getMetrics` 항목들 (예: FirstContentfulPaint, FirstMeaningfulPaint, FirstPaint, DomContentLoaded, NavigationStart)
-  - 주입된 `webperfMetrics` 항목: `LCP`, `FCP`, `TBT` (TBT = Total Blocking Time, longtask 기준 합계 초과분 합)
-- 메트릭별 점수 산정은 공통 함수 `ScoreTimingMs(ms)` 로 매핑:
-  - 입력: ms(밀리초). 출력: 서브스코어(0..100), 클수록 좋음.
-  - 구현(휴리스틱):
-    - ms <= 1000 → score = 100
-    - 1000 < ms <= 3000 → 선형감소: 100 → 75
-      - score = 100 - (ms - 1000) * (25 / 2000)
-    - 3000 < ms <= 7000 → 선형감소: 75 → 30
-      - score = 75 - (ms - 3000) * (45 / 4000)
-    - ms > 7000 → 천천히 감소(매 1s마다 -1): score = max(0, 30 - (ms - 7000)/1000)
-    - 특이사항: 음수/NaN/Inf/0 등 비정상 값은 100으로 간주(수집 실패 시 중립)
-- 메트릭 집계:
-  - 우선순위 가중치(`preferredWeights`)를 사용해 가중 평균을 계산:
-    - 예: FirstContentfulPaint(0.28), FirstMeaningfulPaint(0.28), FirstPaint(0.12), DomContentLoaded(0.12), NavigationStart(0.20)
-    - 추가로 LCP(0.2), FCP(0.12), TBT(0.18)가 가중치 목록에 포함되어 사용 가능
-  - 이용 가능한 우선 메트릭만을 정규화하여 합산(가용 메트릭에 대해 상대적 비중 적용)
-  - 결과 `metricsScore`는 0..100 범위(가중 평균)
+- Node.js 20+
+- npm or yarn
 
-5.2. 네트워크 점수 (ComputeNetworkScore)
-- 기본 아이디어: 바이트 크기, 요청 수, 최장 요청 시간에 따른 감점(100에서 출발)
-- 수식(코드에 구현된 로직):
-  1. totalBytes (전체 바이트), mb = totalBytes / (1024*1024)
-     - mb > 5 → 바이트 패널티 p1 = min(30, (mb - 5) * 3)
-  2. reqCount (요청 수)
-     - reqCount > 40 → 패널티 p2 = min(25, (reqCount - 40) * 0.8)
-  3. longestMs (요청 중 최대 지속시간, ms)
-     - longestMs > 2000 → 패널티 p3 = min(30, (longestMs - 2000)/500 * 3)
-  4. score = 100 - (p1 + p2 + p3) → 정수 반올림 후 0..100 clamp
-- 별도 항목:
-  - `LongestRequestMs`에 대해서는 `ScoreTimingMs(longestMs)`로 별도 세부점수를 생성하여 분석에 노출
-- 결과: `NetworkAggregate` (정수 0..100)
+### Setup
 
-5.3. 프레임 점수 (ComputeFramesScore)
-- 목적: 캡처된 프레임 간격(프레임 빈도 및 안정성)으로 간단 평가
-- 계산:
-  - 각 연속 프레임의 타임스탬프 차이를 ms로 계산 → 평균 avg (ms) 및 median
-  - 점수 규칙:
-    - avg <= 100 → 100
-    - avg <= 200 → 90
-    - avg <= 400 → 75
-    - else → 60
-- 결과: `FramesAggregate` (정수 0..100)
+```bash
+npm install
+```
 
-5.4. 최종 합산 (ComputePerformanceScore)
-- metricsScore (0..100) × PERF_WEIGHT_METRICS
-- NetworkAggregate (0..100) × PERF_WEIGHT_NETWORK
-- FramesAggregate (0..100) × PERF_WEIGHT_FRAMES
-- 최종 정수화: 반올림, 0..100 범위 clamp → `FinalScore`
-- 내부적으로 각 개별 항목들은 `PerfScoreDetail` 리스트로 수집되어 상세보기에서 표시
+For Puppeteer to work, you need Chrome/Chromium installed. If you're on a server environment:
 
-5.5. 예시 계산
-- 가정: Metrics (FCP=800ms, LCP=1800ms), Network: total 6MB, 45 req, longest 2500ms, Frames avg 150ms
-  - Metric sub-scores:
-    - FCP 800ms → ScoreTimingMs=100
-    - LCP 1800ms → in 1000-3000 ⇒ score ≈ 100 - (1800-1000)*(25/2000) = 100 - 800*0.0125 = 100 - 10 = 90
-    - metricsScore (가중 예): suppose combined = 95
-  - Network:
-    - mb = 6 → p1 = min(30,(6-5)*3)=3
-    - reqCount=45 → p2 = min(25,(45-40)*0.8)=4
-    - longest=2500 → p3 = min(30,(2500-2000)/500*3) = (500/500*3)=3
-    - score = 100 - (3+4+3) = 90 → NetworkAggregate=90
-  - Frames avg 150ms → FramesAggregate = 90
-  - Final = 95*0.5 + 90*0.35 + 90*0.15 = 47.5 + 31.5 + 13.5 = 92.5 → FinalScore = 93
+```bash
+# Install Chrome dependencies on Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install -y chromium-browser
 
-6. UI / 출력 (어디서 확인)
-- DevTools 탭:
-  - 요약 메트릭 배지(자동으로 ExtractMetricsDict에서 추출된 값, LCP/FCP/TBT 포함)
-  - Performance Score 배지(클릭 시 상세 창) — `PerfScoreDetail` 리스트 확인 가능
-  - 원본 DevTools/performance JSON 트리
-- Frames 탭:
-  - 프레임 썸네일, 타임라인(네트워크 워터폴 + 프레임 마커), 프레임 선택 시 메타/DOM 렌더
-  - "프레임 분석 (AI용 텍스트 생성)" 버튼으로 각 프레임과 관련된 네트워크 요청 요약 텍스트 생성
+# Or use the bundled Chromium (download during install)
+npm install puppeteer
+```
 
-7. 제약·주의사항
-- 점수 로직은 휴리스틱(간단 규칙 기반)입니다. Lighthouse와 동일한 알고리즘이 아니므로 수치 해석 시 유의하세요.
-- 수집된 메트릭 품질은 페이지/환경에 따라 달라집니다(CSP, 브라우저 지원, iframe 등).
-- 많은 요청/프레임 데이터는 UI 성능/메모리에 영향이 있음. 대량 데이터는 가상화 필요.
-- WebView2 스크립트 주입은 외부 페이지와 상호작용하므로(다만 현재는 performance API만 사용) 보안·정책에 유의하세요.
+## Usage
 
-8. 향후 개선·확장 제안 (우선순위)
-- CLS 수집(PerformanceObserver('layout-shift')) 및 게이지 시각화
-- Long Tasks 히스토그램(시간축) 및 프레임 연동
-- 프레임 → 관련 요청 테이블(클릭 시 워터폴/타임라인 하이라이트)
-- LCP 요소 하이라이트(WebView2 렌더러에서 강조)
-- 결과 내보내기(JSON/CSV 및 AI 전송 페이로드 스키마
+### Development
 
-참고: 주요 구현 위치(파일/함수)
-- 수집(스크립트 주입, screenshots): `WebViewerForm.cs`  
-  - `EnsureWebView2Async()` — 스크립트 주입(`AddScriptToExecuteOnDocumentCreatedAsync`)  
-  - `StartCaptureTimer()` — `Page.captureScreenshot` 반복 캡처  
-  - `CollectDevToolsPerfAsync()` — `Performance.getMetrics`, `Runtime.evaluate` (performance.entries 및 주입된 `window.__webperf_metrics__`) 수집
-- 네트워크 추적: `WebPerf\Model\NetworkPerfModel.cs` (`OnNetworkRequestStart` / `OnNetworkRequestEnd`)
-- 분석/시각화/점수: `WebPerfResultForm.cs`  
-  - `ExtractMetricsDict`, `ScoreTimingMs`, `ComputeNetworkScore`, `ComputeFramesScore`, `ComputePerformanceScore`
+Start the development server:
 
-문의 및 다음 단계
-- README를 프로젝트 루트에 `README.md`로 추가하길 원하시면 생성해 드립니다.
-- 점수 산출 규칙(임계값·가중치)을 조정하거나, CLS/LongTask 시각화를 먼저 구현하길 원하면 선택해 주세요.  
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:3000`
+
+### Production
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Start the production server:
+
+```bash
+npm run preview
+```
+
+### Docker Deployment
+
+Build and run with Docker:
+
+```bash
+# 단일 컨테이너 실행
+docker build -t web-perf-analyzer .
+docker run -p 3000:3000 web-perf-analyzer
+
+# Docker Compose 사용
+docker-compose up -d
+
+# Nginx 프록시와 함께 실행
+docker-compose --profile with-nginx up -d
+```
+
+Pull from GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/TaeGyumKim/web-analysis:latest
+docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
+```
+
+### Using the Analyzer
+
+#### 1. 분석 시작
+
+상단 제어바에서:
+
+- **네트워크 속도** 선택: 3G, 4G, Wi-Fi, Slow 3G
+- **장비 사양** 선택: Desktop, Mobile (High-end/Mid-range/Low-end)
+- **URL 입력**: 분석할 웹 페이지 주소 입력
+- **Lighthouse 사용** 체크박스: Google Lighthouse 분석 활성화 (선택)
+- **시작 버튼** 클릭: 분석 시작 (자동으로 스크린샷 캡처)
+
+#### 2. 결과 확인 - 8개 탭 시스템
+
+**📸 프레임 분석 탭**
+
+- **PerformanceMetricsChart 시각화** (NEW ✨):
+  - **Radar Chart**: FCP, LCP, TBT, CLS, TTFB 성능 점수 분포
+  - **Doughnut Chart**: 종합 성능 점수 (0-100) 중앙 오버레이
+  - **Animated Metric Bars**: 각 메트릭의 실시간 진행 상태 (색상 코딩)
+  - **Timeline Bar Chart**: TTFB → FCP → LCP → DCL → Load 순서 표시
+- 좌측: 프레임별 렌더링 과정 뷰어
+  - 슬라이더로 프레임 이동
+  - 이전/다음/재생 버튼으로 제어
+- 우측: 메트릭 정보 (340px 고정폭)
+  - 현재 프레임 정보 (시간, 상태)
+  - 로드된 리소스 통계
+  - 핵심 메트릭 (FCP, LCP, TBT, CLS) 색상 바 표시
+  - Long Tasks 요약 (개수, 평균, 최대)
+
+**🌐 네트워크 타임라인 탭**
+
+- **NetworkHeatmap 히트맵** (NEW ✨):
+  - **인터랙티브 히트맵**: 리소스 타입별(document, stylesheet, script, image, font, xhr, fetch) / 시간대별(10 구간) 요청 분포
+  - **클릭 상세 정보**: 히트맵 셀 클릭 시 해당 시간대의 요청 목록 모달 표시
+  - **Size Distribution Chart**: 타입별 전체 크기 바 차트
+  - **Color-coded Heat Levels**: 요청 수에 따른 5단계 색상 구분
+- **NetworkWaterfall 워터폴 차트** (Enhanced):
+  - 필터링: 타입별 요청 필터 (All/Document/Stylesheet/Script/Image/Font/XHR/Fetch)
+  - 요약 통계: 총 크기, 요청 수, 평균/최장 지속시간
+  - 상세 정보 모달: 클릭 시 URL, 타입, 상태, 크기, 지속시간, 시간대 표시
+  - **세로 스크롤**: max-height 600px, sticky 헤더로 빠른 탐색
+- **네트워크 요청 타임라인 테이블** (Enhanced):
+  - **테이블 해설 박스**: 각 열(리소스 이름, 요청 구간, 크기)에 대한 상세 설명
+  - **리소스 이름 말줄임**: max-width 250px, 마우스 오버 시 전체 URL 표시
+  - **세로 스크롤**: max-height 500px, sticky 헤더로 많은 요청도 쉽게 탐색
+  - 리소스 타입별 색상 구분 (Document, CSS, JS, Image)
+  - 각 요청의 시작/종료 시간, 크기 표시
+- 요약 통계: 총 요청 수, 전송 크기, DCL, Load 시간
+
+**📊 로딩 분포 탭**
+
+- Chart.js 차트 3종:
+  - 네트워크 속도별 로딩 시간 분포 (바 차트)
+  - 장비별 로딩 시간 분포 (바 차트)
+  - 24시간 로딩 시간 추이 (라인 차트)
+  - ⚠️ Note: 현재 mock 데이터 사용 (향후 히스토리 데이터 연동 예정)
+- 4개 요약 카드: 평균 로딩 시간, 성능 점수, 사용자 만족도, 최적화 가능성
+- 성능 개선 제안 (이미지 최적화, CSS 경량화, 리소스 사전 로딩)
+- Long Task 히스토그램 (지속시간 분포, 상위 작업)
+
+**💰 성능 예산 탭**
+
+- 메트릭별 목표 값 설정 (FCP, LCP, TBT, CLS, 요청 수, 전송 크기)
+- 3가지 프리셋 (엄격한/보통/여유 기준)
+- 예산 vs 실제 성능 비교 테이블
+- 통과/초과 상태 및 통계
+- 실패한 메트릭에 대한 개선 권장사항
+
+**🔍 Lighthouse 탭**
+
+- 5개 카테고리 점수 (Performance, Accessibility, Best Practices, SEO, PWA)
+- 원형 게이지 차트로 각 점수 시각화
+- Lighthouse 메트릭 (FCP, LCP, TBT, CLS, Speed Index, TTI, FMP)
+- 성능 개선 기회 (Opportunities) 목록 및 예상 절감량
+- 진단 결과 (Diagnostics) 테이블
+- Mobile/Desktop 선택에 따른 자동 Form Factor 설정
+
+**🎛️ 커스텀 메트릭 탭** (NEW ✨)
+
+- **메트릭 관리**:
+  - 커스텀 메트릭 추가/편집/삭제
+  - 메트릭 활성화/비활성화 토글
+  - 3가지 메트릭 타입 지원:
+    - **User Timing API**: performance.mark()/measure() 기반
+    - **Element Timing**: 특정 요소의 렌더링 시간
+    - **계산된 메트릭**: 기존 메트릭 조합 (예: lcp - fcp)
+  - 임계값 설정 (양호/개선 필요/나쁨)
+  - 단위 선택 (ms, s, score, bytes, count)
+- **메트릭 결과 시각화**:
+  - 상태별 색상 코딩 (양호=녹색, 개선필요=노랑, 나쁨=빨강)
+  - 0-100 점수 표시
+  - 진행 바로 점수 시각화
+- **사용 팁 및 예제**:
+  - User Timing API 사용법
+  - Element Timing 설정 방법
+  - 계산된 메트릭 예제 (히어로 이미지 로딩 시간, API 응답 시간, 컨텐츠 렌더링 시간, 리소스 개수)
+
+## Development
+
+### Code Quality Tools
+
+이 프로젝트는 코드 품질과 일관성을 유지하기 위해 다음 도구들을 사용합니다:
+
+#### ESLint
+
+TypeScript와 Vue 코드의 정적 분석 도구입니다.
+
+```bash
+# 코드 린팅
+npm run lint
+
+# 자동 수정
+npm run lint:fix
+```
+
+#### Prettier
+
+코드 포맷팅 도구입니다.
+
+```bash
+# 코드 포맷팅
+npm run format
+
+# 포맷 검사만 수행
+npm run format:check
+```
+
+#### Husky + lint-staged
+
+Git pre-commit hook을 통해 커밋 전 자동으로 린트와 포맷팅을 실행합니다.
+
+```bash
+# 자동으로 실행됨 (git commit 시)
+# 스테이징된 파일만 린트/포맷팅
+```
+
+### VS Code Setup
+
+프로젝트에는 VS Code 설정이 포함되어 있습니다 (`.vscode/`):
+
+**권장 확장 프로그램:**
+
+- ESLint (`dbaeumer.vscode-eslint`)
+- Prettier (`esbenp.prettier-vscode`)
+- Volar (`vue.volar`)
+- Tailwind CSS IntelliSense (`bradlc.vscode-tailwindcss`)
+- Playwright Test (`ms-playwright.playwright`)
+
+**자동 설정:**
+
+- 저장 시 자동 포맷팅
+- 저장 시 ESLint 자동 수정
+- 일관된 줄 끝 문자 (LF)
+- 파일 끝에 빈 줄 추가
+
+### Development Workflow
+
+1. **코드 작성**
+
+   ```bash
+   npm run dev
+   ```
+
+2. **코드 린팅/포맷팅**
+
+   ```bash
+   npm run lint:fix
+   npm run format
+   ```
+
+3. **커밋 전 자동 체크**
+
+   ```bash
+   git add .
+   git commit -m "feat: add new feature"
+   # Husky가 자동으로 lint-staged 실행
+   ```
+
+4. **테스트 실행**
+
+   ```bash
+   npm run test        # Playwright E2E 테스트
+   npm run test:ui     # UI 모드로 테스트
+   ```
+
+5. **프로덕션 빌드**
+   ```bash
+   npm run build
+   npm run preview
+   ```
+
+### Code Style Guidelines
+
+- **TypeScript**: 모든 `.ts`, `.vue` 파일에서 타입 안전성 유지
+- **Vue 3 Composition API**: `<script setup>` 패턴 사용
+- **Single Quotes**: 문자열은 작은따옴표 사용
+- **Semicolons**: 세미콜론 사용
+- **Tab Width**: 2 spaces
+- **Line Length**: 최대 100자
+- **No console**: 프로덕션에서 console.log 제거
+
+### Git Commit Convention
+
+```
+feat: 새로운 기능 추가
+fix: 버그 수정
+docs: 문서 수정
+style: 코드 포맷팅, 세미콜론 누락 등
+refactor: 코드 리팩토링
+test: 테스트 코드 추가/수정
+chore: 빌드 설정, 패키지 등 기타 변경
+```
+
+## Project Structure
+
+```
+web-analysis/
+├── app.vue                        # App entry point
+├── assets/
+│   └── css/
+│       └── main.css              # Custom CSS (HTML 디자인 기반)
+├── components/
+│   ├── FrameAnalysisTab.vue         # 프레임 분석 탭 (좌우 레이아웃)
+│   ├── NetworkTimelineTab.vue       # 네트워크 타임라인 탭 (워터폴 차트)
+│   ├── LoadingDistributionTab.vue   # 로딩 분포 탭 (Chart.js)
+│   ├── PerformanceBudget.vue        # 성능 예산 탭 (목표 설정)
+│   ├── LighthouseTab.vue            # Lighthouse 탭 (5개 카테고리 점수) ⭐
+│   ├── LongTaskHistogram.vue        # Long Task 히스토그램 컴포넌트
+│   ├── PerformanceMetricsChart.vue  # Core Web Vitals 인터랙티브 차트 ⭐ NEW
+│   ├── NetworkHeatmap.vue           # 네트워크 요청 히트맵 시각화 ⭐ NEW
+│   ├── NetworkWaterfall.vue         # 네트워크 워터폴 차트 (Enhanced)
+│   ├── CustomMetricsManager.vue     # 커스텀 메트릭 관리 컴포넌트 ⭐ NEW
+│   ├── CustomMetricsTab.vue         # 커스텀 메트릭 결과 시각화 탭 ⭐ NEW
+│   └── HelpTooltip.vue              # 용어 설명 툴팁 컴포넌트 ⭐ NEW
+├── pages/
+│   └── index.vue                 # 메인 페이지 (상단 제어바 + 6탭)
+├── server/
+│   ├── api/
+│   │   ├── analyze.post.ts        # POST /api/analyze 엔드포인트
+│   │   ├── generate-pdf.post.ts   # POST /api/generate-pdf 엔드포인트 ⭐ NEW
+│   │   └── health.get.ts          # GET /api/health 엔드포인트
+│   └── utils/
+│       ├── performanceCollector.ts    # Puppeteer 기반 수집기
+│       ├── lighthouseCollector.ts     # Lighthouse 수집기 ⭐
+│       └── customMetricsCalculator.ts # 커스텀 메트릭 계산 유틸리티 ⭐ NEW
+├── types/
+│   └── performance.ts            # TypeScript 타입 정의
+├── utils/
+│   ├── scoreCalculator.ts        # 성능 점수 계산 로직
+│   ├── exportUtils.ts            # 결과 내보내기 유틸리티
+│   └── glossary.ts               # 전문 용어 한글 설명 사전 ⭐ NEW
+└── nuxt.config.ts                # Nuxt 설정
+```
+
+## Performance Scoring
+
+성능 점수는 세 가지 요소의 가중 평균으로 계산됩니다 (0-100점):
+
+### 메트릭 점수 (50% 가중치)
+
+FCP, LCP, TBT, TTFB, DOM 타이밍 평가:
+
+- **≤1000ms**: 100점 (녹색 바)
+- **1000-3000ms**: 선형 감소 → 75점 (노란색 바)
+- **3000-7000ms**: 선형 감소 → 30점 (주황색 바)
+- **>7000ms**: 느린 감소
+
+### 네트워크 점수 (35% 가중치)
+
+패널티 기준:
+
+- 총 전송 크기 > 5MB
+- 요청 수 > 40개
+- 최장 요청 시간 > 2000ms
+
+### 프레임 점수 (15% 가중치)
+
+프레임 캡처 일관성 기준:
+
+- 평균 간격 ≤100ms: 100점
+- 평균 간격 ≤200ms: 90점
+- 평균 간격 ≤400ms: 75점
+- 그 외: 60점
+
+## UI Design
+
+### 색상 테마
+
+- **배경**: `#f6f7f9` (밝은 회색)
+- **카드**: 흰색 배경, 16px 보더 라디우스, 부드러운 섀도우
+- **메트릭 색상**:
+  - 녹색: `#48d178` (좋음)
+  - 노란색: `#e6b421` (보통)
+  - 주황색: `#e67e22` (개선 필요)
+- **리소스 타입 색상**:
+  - Document: `#5b8efc`
+  - CSS: `#c08eff`
+  - JS: `#f4b940`
+  - Image: `#60c989`
+
+### 레이아웃
+
+- **상단 제어바**: 네트워크/장비 선택, URL 입력, 버튼
+- **탭 네비게이션**: 3개 탭 (프레임 분석 | 네트워크 타임라인 | 로딩 분포)
+- **프레임 분석**: 좌우 분할 (프레임 뷰어 + 메트릭 사이드바 340px)
+- **네트워크**: 워터폴 차트 테이블
+- **로딩 분포**: 2열 그리드 차트 + 추이 차트 + 요약 카드
+
+## Migration from C# WebPerf
+
+C# WebView2 데스크톱 애플리케이션의 웹 기반 재구현:
+
+- ✅ **크로스 플랫폼**: Windows 전용 → 모든 브라우저에서 접근
+- ✅ **모던 UI**: HTML 디자인 파일 기반의 깔끔한 인터페이스
+- ✅ **6탭 시스템**: 프레임/네트워크/로딩 분포/성능 예산/Lighthouse/커스텀 메트릭
+- ✅ **RESTful API**: 다른 도구와 통합 가능
+- ✅ **동일한 알고리즘**: 점수 계산 로직 유지
+- ✅ **Chart.js**: 고급 차트 시각화
+
+## CI/CD Pipeline
+
+### GitHub Actions 워크플로우
+
+이 프로젝트는 자동화된 CI/CD 파이프라인을 제공합니다:
+
+#### 🔄 CI (Continuous Integration)
+
+자동 실행 조건: PR 생성, `main`/`master`/`develop`/`claude/**` 브랜치에 푸시
+
+**Build and Test Job**
+
+- Node.js 20.x 테스트
+- 의존성 설치 (npm ci)
+- 프로덕션 빌드 검증
+- 빌드 아티팩트 업로드 (7일 보관)
+
+**Code Quality Job**
+
+- TypeScript 타입 체크 (`nuxi typecheck`)
+- 보안 취약점 스캔 (`npm audit`)
+
+**Lighthouse Integration Check**
+
+- Chromium 의존성 설치
+- Lighthouse 패키지 검증
+- Puppeteer 통합 테스트
+
+#### 🚀 CD (Continuous Deployment)
+
+자동 배포 조건: `main`/`master` 브랜치에 푸시, 태그 생성 (`v*`)
+
+**Docker Build & Push**
+
+- 멀티 스테이지 빌드로 최적화된 이미지 생성
+- GitHub Container Registry (ghcr.io)에 자동 푸시
+- 이미지 태그: `latest`, `브랜치명`, `SHA`, 버전 태그
+- GitHub Actions 캐시로 빌드 속도 향상
+
+**GitHub Pages 배포**
+
+- Static Site Generation (SSG)
+- `npm run generate`로 정적 사이트 생성
+- GitHub Pages에 자동 배포
+- 배포 URL: `https://[username].github.io/[repo]`
+
+**Release 자동 생성**
+
+- 버전 태그 푸시 시 자동 릴리즈 생성
+- 변경 로그 자동 생성
+- Docker 이미지 pull 명령어 포함
+
+### 워크플로우 파일
+
+- `.github/workflows/ci.yml` - CI 파이프라인
+- `.github/workflows/cd.yml` - CD 파이프라인
+
+### Health Check Endpoint
+
+Docker 컨테이너 헬스 체크를 위한 API:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+응답 예시:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "uptime": 123.456,
+  "environment": "production",
+  "checks": {
+    "api": "ok",
+    "memory": "ok",
+    "puppeteer": "ok"
+  },
+  "memory": {
+    "rss": 256,
+    "heapTotal": 128,
+    "heapUsed": 64,
+    "external": 8
+  },
+  "responseTime": "5ms"
+}
+```
+
+### E2E Testing with Playwright
+
+**Test Suite** (`tests/e2e/analyzer.spec.ts`):
+
+**UI Tests** (Always Run):
+
+- **Homepage Load**: Verifies all UI elements are visible
+- **8 Tabs Display**: Checks all tabs exist and are visible
+- **Tab Navigation**: Tests switching between empty tabs (8 screenshots)
+- **URL Input**: Validates URL input and button enabling
+- **Export Buttons**: Checks export UI area
+- **Lighthouse Checkbox**: Validates Lighthouse option
+
+**Analysis Tests** (Skipped in CI):
+
+- **Full Analysis Flow**: Tests actual performance analysis
+- Note: Skipped in CI due to Puppeteer reliability in headless environments
+- Can be run locally with `npm run test:headed`
+
+**Running Tests Locally**:
+
+```bash
+# Install Playwright browsers (first time only)
+npx playwright install chromium
+
+# Run tests headless
+npm test
+
+# Run with visible browser
+npm run test:headed
+
+# Open Playwright UI tool
+npm run test:ui
+```
+
+**CI/CD Integration**:
+
+- UI tests run automatically on every commit (fast, reliable)
+- Analysis tests skipped in CI (can run locally)
+- 3 artifacts uploaded (30-day retention):
+  - **e2e-screenshots**: Visual proof of UI (12+ screenshots)
+  - **playwright-report**: Detailed HTML test report
+  - **test-results**: Complete results including videos
+
+**Screenshots Captured in CI**:
+
+1. Homepage with all UI elements (01)
+2. All 8 tabs visible verification (02)
+   3-10. Individual tab navigation (03-10):
+   - Frame Analysis
+   - Network Timeline
+   - Loading Distribution
+   - Batch Analysis
+   - History
+   - Performance Budget
+   - Lighthouse
+   - Custom Metrics
+3. URL input test (11)
+4. Export area (12)
+5. Lighthouse checkbox area (13)
+
+**Local Analysis Tests** (npm run test:headed):
+
+- Captures full analysis flow with 20-30 second wait
+- Screenshots before, during, and after analysis
+- Tests actual Puppeteer-based performance collection
+
+## Implemented Enhancements ✅
+
+- [x] **CLS 메트릭 추가**: Cumulative Layout Shift 측정 및 시각화
+- [x] **Long Task 히스토그램**: 50ms 이상 차단 작업 분석 및 통계
+- [x] **결과 내보내기**: JSON, 텍스트 리포트, CSV, PDF 리포트 형식 지원
+- [x] **성능 예산 설정**: 목표 값 설정 및 실제 성능 대비 분석
+- [x] **Lighthouse API 통합**: Performance, Accessibility, SEO, PWA, Best Practices 분석
+- [x] **CI/CD 파이프라인**: GitHub Actions 기반 자동 빌드/테스트/배포
+- [x] **E2E 테스트**: Playwright 기반 자동화 테스트 및 스크린샷 캡처
+- [x] **고급 인터랙티브 시각화** ✨ NEW:
+  - **PerformanceMetricsChart**: Radar, Doughnut, Animated Bars, Timeline
+  - **NetworkHeatmap**: 타입별/시간대별 히트맵 + 클릭 상세 정보
+- [x] **PDF 리포트 생성** ✨ NEW:
+  - **Puppeteer 기반 고품질 PDF**: 서버 사이드에서 HTML을 PDF로 변환
+  - **자동 포맷팅**: Core Web Vitals, 네트워크 요약, Long Tasks 등 전체 리포트
+  - **다운로드 버튼**: 상단 제어바에서 원클릭 PDF 다운로드
+- [x] **커스텀 메트릭** ✨ NEW:
+  - **User Timing API 지원**: performance.mark()/measure() 기반 메트릭 추적
+  - **Element Timing 지원**: 특정 요소의 렌더링 시간 측정
+  - **계산된 메트릭**: 기존 메트릭 조합으로 새로운 지표 생성 (예: lcp - fcp)
+  - **임계값 커스터마이징**: 양호/개선 필요/나쁨 기준 사용자 정의
+  - **메트릭 관리 UI**: 메트릭 추가/편집/삭제/활성화/비활성화
+  - **시각화**: 상태별 색상 코딩, 점수 표시, 진행 바
+- [x] **Help Tooltip 시스템** ✨ NEW:
+  - **HelpTooltip 컴포넌트**: 물음표 아이콘 + 호버 툴팁
+  - **Glossary 시스템**: 15+ 전문 용어 한글 설명 (FCP, LCP, TBT, CLS, TTFB, FID, 네트워크 스로틀링, Lighthouse 등)
+  - **전역 적용**: 모든 탭과 메트릭 상세에 툴팁 추가
+  - **비개발자 친화적**: 디자이너도 쉽게 이해할 수 있는 설명
+
+## Future Enhancements
+
+### High Priority
+
+- [x] **PDF 리포트 생성**: ✅ Puppeteer 기반 고품질 PDF 리포트 구현 완료
+- [x] **커스텀 메트릭**: ✅ 사용자 정의 성능 지표 추적 시스템 구현 완료
+
+### Medium Priority (추천 기능 #8 완료)
+
+- [x] **고급 시각화**: ✅ Radar, Doughnut, Heatmap, Animated Charts 구현 완료
+- [ ] **로딩 분포 실제 데이터 연동**: 현재 mock 데이터 사용, 히스토리 데이터 활용 필요
+- [ ] **인터랙티브 차트 추가 개선**: D3.js 도입, 줌/팬 기능
+
+### Low Priority
+
+- [ ] 실시간 모니터링 대시보드
+- [ ] 다국어 지원 (현재 한국어만)
+- [ ] Kubernetes 배포 매니페스트
+
+## License
+
+MIT License
+
+Check out the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) and [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

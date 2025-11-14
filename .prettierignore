@@ -1,0 +1,22 @@
+# Build directories
+.nuxt
+.output
+dist
+node_modules
+
+# Generated files
+.DS_Store
+*.log
+coverage
+.env
+.env.*
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Temporary files
+*.tmp
+*.temp
+.cache

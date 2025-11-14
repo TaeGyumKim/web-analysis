@@ -1,0 +1,178 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - 'claude/**'
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  # 빌드 및 검증
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: 'nuxt-web-perf/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./nuxt-web-perf
+        run: npm ci
+
+      - name: Build application
+        working-directory: ./nuxt-web-perf
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Upload build artifacts
+        if: matrix.node-version == '20.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuxt-build
+          path: nuxt-web-perf/.output
+          retention-days: 7
+
+  # 코드 품질 검사
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: 'nuxt-web-perf/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./nuxt-web-perf
+        run: npm ci
+
+      - name: Check TypeScript
+        working-directory: ./nuxt-web-perf
+        run: npx nuxi typecheck
+        continue-on-error: true
+
+      - name: Check for security vulnerabilities
+        working-directory: ./nuxt-web-perf
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  # Lighthouse 통합 검증
+  lighthouse-check:
+    name: Lighthouse Integration Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: 'nuxt-web-perf/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./nuxt-web-perf
+        run: npm ci
+
+      - name: Install Chromium dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3 \
+            libatk-bridge2.0-0 \
+            libdrm2 \
+            libxkbcommon0 \
+            libgbm1 \
+            libasound2t64 \
+            libxrandr2 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxfixes3 \
+            libcups2
+
+      - name: Verify Lighthouse installation
+        working-directory: ./nuxt-web-perf
+        run: npx lighthouse --version
+
+  # E2E 테스트
+  e2e-test:
+    name: E2E Tests with Screenshots
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: 'nuxt-web-perf/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./nuxt-web-perf
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        working-directory: ./nuxt-web-perf
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        working-directory: ./nuxt-web-perf
+        run: npm test
+        env:
+          CI: true
+
+      - name: Upload test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: nuxt-web-perf/test-results/screenshots/
+          retention-days: 30
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: nuxt-web-perf/playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: nuxt-web-perf/test-results/
+          retention-days: 30

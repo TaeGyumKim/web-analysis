@@ -1,0 +1,70 @@
+{
+  "name": "nuxt-web-perf",
+  "version": "1.0.0",
+  "description": "Web Performance Analyzer - 웹 페이지 로딩 성능 분석 및 시각화 도구 (Nuxt 3 + Puppeteer + Chart.js)",
+  "type": "module",
+  "private": true,
+  "keywords": [
+    "web-performance",
+    "performance-analysis",
+    "nuxt3",
+    "puppeteer",
+    "chartjs",
+    "web-vitals",
+    "fcp",
+    "lcp",
+    "tbt",
+    "performance-metrics"
+  ],
+  "author": "Web Performance Team",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run prepare:tsconfig && nuxt build",
+    "dev": "nuxt dev",
+    "generate": "npm run prepare:tsconfig && nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "prepare": "husky",
+    "prepare:tsconfig": "test -f .nuxt/tsconfig.json && cp .nuxt/tsconfig.json .nuxt/tsconfig.app.json || true",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "lint": "eslint --ext .js,.ts,.vue .",
+    "lint:fix": "eslint --ext .js,.ts,.vue . --fix",
+    "format": "prettier --write \"**/*.{js,ts,vue,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,vue,json,md,yml,yaml}\""
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "chart.js": "^4.5.1",
+    "chrome-launcher": "^1.1.2",
+    "lighthouse": "^13.0.1",
+    "nuxt": "3.19.3",
+    "puppeteer": "^24.29.1",
+    "vue": "^3.5.24",
+    "vue-chartjs": "^5.3.3",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.10.0",
+    "@playwright/test": "^1.49.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-vue": "^10.5.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

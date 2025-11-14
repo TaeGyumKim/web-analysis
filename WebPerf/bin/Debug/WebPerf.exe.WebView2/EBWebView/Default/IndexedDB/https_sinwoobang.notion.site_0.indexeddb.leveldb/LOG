@@ -1,6 +1,0 @@
-2025/10/24-13:40:51.494 6934 Creating DB D:\SSU\2025\UI디자인\WebPerf\WebPerf\bin\Debug\WebPerf.exe.WebView2\EBWebView\Default\IndexedDB\https_sinwoobang.notion.site_0.indexeddb.leveldb since it was missing.
-2025/10/24-13:40:51.505 6934 Reusing MANIFEST D:\SSU\2025\UI디자인\WebPerf\WebPerf\bin\Debug\WebPerf.exe.WebView2\EBWebView\Default\IndexedDB\https_sinwoobang.notion.site_0.indexeddb.leveldb/MANIFEST-000001
-2025/10/24-13:40:59.880 9764 Level-0 table #5: started
-2025/10/24-13:40:59.884 9764 Level-0 table #5: 2659 bytes OK
-2025/10/24-13:40:59.887 9764 Delete type=0 #3
-2025/10/24-13:40:59.888 9764 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
