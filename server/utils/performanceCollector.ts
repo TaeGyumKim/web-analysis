@@ -352,7 +352,7 @@ export class PerformanceCollector {
       });
 
       // Wait a bit for scroll to complete
-      await page.waitForTimeout(100);
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Collect DOM elements with their timing and position information
       const domElements = await page.evaluate(() => {
