@@ -32,14 +32,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: 'nuxt-web-perf/package-lock.json'
 
       - name: Install dependencies
-        working-directory: ./nuxt-web-perf
         run: npm ci
 
       - name: Build application
-        working-directory: ./nuxt-web-perf
         run: npm run build
         env:
           NODE_ENV: production
@@ -49,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nuxt-build
-          path: nuxt-web-perf/.output
+          path: .output
           retention-days: 7
 
   # 코드 품질 검사
@@ -66,19 +63,15 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-          cache-dependency-path: 'nuxt-web-perf/package-lock.json'
 
       - name: Install dependencies
-        working-directory: ./nuxt-web-perf
         run: npm ci
 
       - name: Check TypeScript
-        working-directory: ./nuxt-web-perf
         run: npx nuxi typecheck
         continue-on-error: true
 
       - name: Check for security vulnerabilities
-        working-directory: ./nuxt-web-perf
         run: npm audit --audit-level=high
         continue-on-error: true
 
@@ -96,10 +89,8 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-          cache-dependency-path: 'nuxt-web-perf/package-lock.json'
 
       - name: Install dependencies
-        working-directory: ./nuxt-web-perf
         run: npm ci
 
       - name: Install Chromium dependencies
@@ -111,7 +102,7 @@ jobs:
             libdrm2 \
             libxkbcommon0 \
             libgbm1 \
-            libasound2t64 \
+            libasound2 \
             libxrandr2 \
             libxcomposite1 \
             libxdamage1 \
@@ -119,7 +110,6 @@ jobs:
             libcups2
 
       - name: Verify Lighthouse installation
-        working-directory: ./nuxt-web-perf
         run: npx lighthouse --version
 
   # E2E 테스트
@@ -137,18 +127,14 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-          cache-dependency-path: 'nuxt-web-perf/package-lock.json'
 
       - name: Install dependencies
-        working-directory: ./nuxt-web-perf
         run: npm ci
 
       - name: Install Playwright Browsers
-        working-directory: ./nuxt-web-perf
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests
-        working-directory: ./nuxt-web-perf
         run: npm test
         env:
           CI: true
@@ -158,7 +144,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-screenshots
-          path: nuxt-web-perf/test-results/screenshots/
+          path: test-results/screenshots/
           retention-days: 30
 
       - name: Upload Playwright report
@@ -166,7 +152,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: nuxt-web-perf/playwright-report/
+          path: playwright-report/
           retention-days: 30
 
       - name: Upload test results
@@ -174,5 +160,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: nuxt-web-perf/test-results/
+          path: test-results/
           retention-days: 30
