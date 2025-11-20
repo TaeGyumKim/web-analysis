@@ -52,7 +52,7 @@
             alt="Page Screenshot"
             class="screenshot"
             style="display: block; width: 100%; height: auto"
-            @load="updateScale"
+            @load="handleImageLoad"
           />
 
           <!-- 하이라이트 오버레이 -->
@@ -180,34 +180,57 @@ const lastFrameImage = computed(() => {
 });
 
 function updateScale() {
-  if (!screenshotRef.value || !props.result) return;
+  nextTick(() => {
+    if (!screenshotRef.value || !props.result) return;
 
-  const img = screenshotRef.value;
+    const img = screenshotRef.value;
 
-  // Use viewport size from analysis options (default: 1920x1080)
-  const viewportWidth = props.result.options?.viewportWidth || 1920;
-  const viewportHeight = props.result.options?.viewportHeight || 1080;
+    // Use viewport size from analysis options (default: 1920x1080)
+    const viewportWidth = props.result.options?.viewportWidth || 1920;
+    const viewportHeight = props.result.options?.viewportHeight || 1080;
 
-  if (img.clientWidth && img.clientHeight) {
-    scale.value = {
-      x: viewportWidth / img.clientWidth,
-      y: viewportHeight / img.clientHeight
-    };
+    if (img.clientWidth && img.clientHeight) {
+      scale.value = {
+        x: viewportWidth / img.clientWidth,
+        y: viewportHeight / img.clientHeight
+      };
 
-    console.log('[DOM Inspector] Scale calculation:', {
-      viewportWidth,
-      viewportHeight,
-      clientWidth: img.clientWidth,
-      clientHeight: img.clientHeight,
-      scaleX: scale.value.x,
-      scaleY: scale.value.y
-    });
-  }
+      console.log('[DOM Inspector] Scale calculation:', {
+        viewportWidth,
+        viewportHeight,
+        clientWidth: img.clientWidth,
+        clientHeight: img.clientHeight,
+        scaleX: scale.value.x,
+        scaleY: scale.value.y
+      });
+    }
+  });
 }
+
+function handleImageLoad() {
+  // Call updateScale immediately
+  updateScale();
+  // Also call after a short delay to ensure DOM is fully rendered
+  setTimeout(() => {
+    updateScale();
+  }, 100);
+}
+
+// Watch for result changes to recalculate scale
+watch(
+  () => props.result,
+  () => {
+    if (props.result) {
+      updateScale();
+    }
+  }
+);
 
 // Update scale on window resize
 onMounted(() => {
   window.addEventListener('resize', updateScale);
+  // Also update scale on mount
+  updateScale();
 });
 
 onUnmounted(() => {
