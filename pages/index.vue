@@ -186,7 +186,9 @@
 
     <!-- 로딩 분포 탭 -->
     <div v-show="activeTab === 'loading'" style="margin-top: 20px">
-      <LoadingDistributionTab :result="analysisResult" />
+      <ClientOnly>
+        <LoadingDistributionTab :result="analysisResult" />
+      </ClientOnly>
     </div>
 
     <!-- 성능 예산 탭 -->
@@ -206,7 +208,9 @@
 
     <!-- DOM 검사 탭 -->
     <div v-show="activeTab === 'inspector'" style="margin-top: 20px">
-      <InteractiveDOMInspector :result="analysisResult" />
+      <ClientOnly>
+        <InteractiveDOMInspector :result="analysisResult" />
+      </ClientOnly>
     </div>
   </div>
 </template>
