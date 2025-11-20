@@ -9,43 +9,6 @@
           페이지 성능을 분석하고 있습니다. 잠시만 기다려주세요.
         </p>
         <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 14px">{{ url }}</p>
-        <div v-if="testAllCombinations && totalTests > 0" style="margin-top: 20px">
-          <div
-            style="
-              background: #f3f4f6;
-              border-radius: 8px;
-              padding: 12px 20px;
-              display: inline-block;
-              min-width: 200px;
-            "
-          >
-            <div style="font-size: 24px; font-weight: bold; color: #667eea; margin-bottom: 8px">
-              {{ completedTests }} / {{ totalTests }}
-            </div>
-            <div style="font-size: 14px; color: #6b7280">
-              {{ currentTestDescription }}
-            </div>
-          </div>
-          <div
-            style="
-              width: 300px;
-              height: 6px;
-              background: #e5e7eb;
-              border-radius: 3px;
-              margin: 16px auto 0;
-              overflow: hidden;
-            "
-          >
-            <div
-              style="
-                height: 100%;
-                background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-                transition: width 0.3s ease;
-              "
-              :style="{ width: `${(completedTests / totalTests) * 100}%` }"
-            ></div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -131,27 +94,6 @@
           <HelpTooltip
             :text="glossary.lighthouse.description"
             :title="glossary.lighthouse.title"
-            position="bottom"
-          />
-        </label>
-
-        <label
-          style="
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 500;
-          "
-        >
-          <input v-model="testAllCombinations" type="checkbox" />
-          모든 조합 테스트 (16개)
-          <HelpTooltip
-            text="체크하면 모든 네트워크 속도(4가지) × 장비 사양(4가지) 조합을 자동으로 테스트합니다. 로딩 분포 차트에 전체 데이터가 표시됩니다."
-            title="모든 조합 테스트"
             position="bottom"
           />
         </label>
@@ -282,16 +224,10 @@ const url = ref('https://www.naver.com/');
 const networkSpeed = ref('4G');
 const deviceSpec = ref('Desktop');
 const useLighthouse = ref(false);
-const testAllCombinations = ref(false);
 const activeTab = ref('frame');
 const isAnalyzing = ref(false);
 const isGeneratingPDF = ref(false);
 const analysisResult = ref<AnalysisResult | null>(null);
-
-// Progress tracking for all combinations test
-const completedTests = ref(0);
-const totalTests = ref(0);
-const currentTestDescription = ref('');
 
 // Viewport settings
 const viewportPreset = ref('desktop-1920');
@@ -337,97 +273,41 @@ async function startAnalysis() {
   isAnalyzing.value = true;
 
   try {
-    if (testAllCombinations.value) {
-      await runAllCombinationsTest();
-    } else {
-      await runSingleTest(networkSpeed.value, deviceSpec.value);
+    // Load custom metrics from localStorage
+    const customMetrics = loadCustomMetrics();
+
+    // Get viewport size
+    const viewport = getViewportSize();
+
+    const response = await $fetch('/api/analyze', {
+      method: 'POST',
+      body: {
+        url: url.value,
+        options: {
+          captureScreenshots: true,
+          networkThrottling: getNetworkThrottling(networkSpeed.value),
+          cpuThrottling: getCPUThrottling(deviceSpec.value),
+          waitUntil: 'networkidle0',
+          useLighthouse: useLighthouse.value,
+          lighthouseFormFactor: deviceSpec.value.includes('Mobile') ? 'mobile' : 'desktop',
+          customMetrics: customMetrics,
+          viewportWidth: viewport.width,
+          viewportHeight: viewport.height
+        }
+      }
+    });
+
+    if (response.success) {
+      analysisResult.value = response.data;
+      // Save to history
+      saveResultToHistory(response.data);
     }
   } catch (err: any) {
     console.error('Analysis error:', err);
     alert('분석 중 오류가 발생했습니다: ' + (err.data?.message || err.message));
   } finally {
     isAnalyzing.value = false;
-    completedTests.value = 0;
-    totalTests.value = 0;
-    currentTestDescription.value = '';
   }
-}
-
-async function runAllCombinationsTest() {
-  const networkSpeeds = ['Slow 3G', '3G', '4G', 'Wi-Fi'];
-  const deviceSpecs = ['Desktop', 'Mobile (High-end)', 'Mobile (Mid-range)', 'Mobile (Low-end)'];
-
-  totalTests.value = networkSpeeds.length * deviceSpecs.length;
-  completedTests.value = 0;
-
-  let lastResult: AnalysisResult | null = null;
-
-  for (const network of networkSpeeds) {
-    for (const device of deviceSpecs) {
-      currentTestDescription.value = `${network} + ${device}`;
-
-      try {
-        const result = await runSingleTest(network, device, false);
-        if (result) {
-          lastResult = result;
-        }
-      } catch (err) {
-        console.error(`Failed test: ${network} + ${device}`, err);
-        // Continue with other tests even if one fails
-      }
-
-      completedTests.value++;
-    }
-  }
-
-  // Show the last result
-  if (lastResult) {
-    analysisResult.value = lastResult;
-  }
-}
-
-async function runSingleTest(
-  network: string,
-  device: string,
-  updateUI: boolean = true
-): Promise<AnalysisResult | null> {
-  // Load custom metrics from localStorage
-  const customMetrics = loadCustomMetrics();
-
-  // Get viewport size
-  const viewport = getViewportSize();
-
-  const response = await $fetch('/api/analyze', {
-    method: 'POST',
-    body: {
-      url: url.value,
-      options: {
-        captureScreenshots: true,
-        networkThrottling: getNetworkThrottling(network),
-        cpuThrottling: getCPUThrottling(device),
-        waitUntil: 'networkidle0',
-        useLighthouse: useLighthouse.value,
-        lighthouseFormFactor: device.includes('Mobile') ? 'mobile' : 'desktop',
-        customMetrics: customMetrics,
-        viewportWidth: viewport.width,
-        viewportHeight: viewport.height
-      }
-    }
-  });
-
-  if (response.success) {
-    const result = response.data;
-    // Save to history
-    saveResultToHistory(result);
-
-    if (updateUI) {
-      analysisResult.value = result;
-    }
-
-    return result;
-  }
-
-  return null;
 }
 
 function reAnalyze() {
