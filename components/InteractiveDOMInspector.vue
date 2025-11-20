@@ -279,8 +279,9 @@ function handleMouseMove(event: MouseEvent) {
   if (!container) return;
 
   const rect = container.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+  // Include scroll offset for accurate positioning
+  const x = event.clientX - rect.left + container.scrollLeft;
+  const y = event.clientY - rect.top + container.scrollTop;
 
   // 마우스 좌표를 원본 이미지 좌표로 변환
   const originalX = x * scale.value.x;
@@ -293,6 +294,7 @@ function handleMouseMove(event: MouseEvent) {
   if (elements.length > 0 && elements[0] !== hoveredElements.value[0]) {
     console.log('[DOM Inspector] Element hover:', {
       displayCoords: { x, y },
+      scrollOffset: { left: container.scrollLeft, top: container.scrollTop },
       originalCoords: { x: originalX, y: originalY },
       elementCount: elements.length,
       elements: elements.map(el => ({ tagName: el.tagName, box: el.boundingBox })),
@@ -303,9 +305,9 @@ function handleMouseMove(event: MouseEvent) {
   if (elements.length > 0) {
     hoveredElements.value = elements;
 
-    // Position tooltip near cursor but avoid edges (using display coordinates)
-    const tooltipX = Math.min(x + 15, rect.width - 350);
-    const tooltipY = Math.min(y + 15, rect.height - 300);
+    // Position tooltip near cursor (add scroll offset for absolute positioning within scrollable container)
+    const tooltipX = Math.min(event.clientX - rect.left + container.scrollLeft + 15, rect.width - 350 + container.scrollLeft);
+    const tooltipY = Math.min(event.clientY - rect.top + container.scrollTop + 15, rect.height - 300 + container.scrollTop);
 
     tooltipPosition.value = { x: tooltipX, y: tooltipY };
   } else {
