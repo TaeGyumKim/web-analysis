@@ -287,7 +287,7 @@ async function startAnalysis() {
           captureScreenshots: true,
           networkThrottling: getNetworkThrottling(networkSpeed.value),
           cpuThrottling: getCPUThrottling(deviceSpec.value),
-          waitUntil: 'networkidle0',
+          waitUntil: 'networkidle2', // Changed from networkidle0 for better timeout handling
           useLighthouse: useLighthouse.value,
           lighthouseFormFactor: deviceSpec.value.includes('Mobile') ? 'mobile' : 'desktop',
           customMetrics: customMetrics,

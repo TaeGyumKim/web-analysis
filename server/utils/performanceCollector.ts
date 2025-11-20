@@ -85,10 +85,17 @@ export class PerformanceCollector {
         this.startFrameCapture(page);
       }
 
-      // Navigate to URL
+      // Navigate to URL with increased timeout and flexible wait condition
+      // Use networkidle2 (500ms with max 2 connections) instead of networkidle0 (0 connections)
+      // for better compatibility with slow networks
+      const navigationTimeout = options.networkThrottling === 'slow-3g' ? 180000 : 120000;
+      const waitCondition = options.waitUntil || 'networkidle2';
+
+      console.log(`[PerformanceCollector] Navigating with timeout: ${navigationTimeout}ms, waitUntil: ${waitCondition}`);
+
       await page.goto(url, {
-        waitUntil: options.waitUntil || 'networkidle0',
-        timeout: 60000
+        waitUntil: waitCondition as any,
+        timeout: navigationTimeout
       });
 
       // Wait a bit more for animations and late resources
