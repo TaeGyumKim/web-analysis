@@ -164,6 +164,14 @@
       <div class="tab" :class="{ active: activeTab === 'custom' }" @click="activeTab = 'custom'">
         커스텀 메트릭
       </div>
+      <span class="divider">|</span>
+      <div
+        class="tab"
+        :class="{ active: activeTab === 'inspector' }"
+        @click="activeTab = 'inspector'"
+      >
+        DOM 검사
+      </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
@@ -178,7 +186,9 @@
 
     <!-- 로딩 분포 탭 -->
     <div v-show="activeTab === 'loading'" style="margin-top: 20px">
-      <LoadingDistributionTab :result="analysisResult" />
+      <ClientOnly>
+        <LoadingDistributionTab :result="analysisResult" />
+      </ClientOnly>
     </div>
 
     <!-- 성능 예산 탭 -->
@@ -194,6 +204,13 @@
     <!-- 커스텀 메트릭 탭 -->
     <div v-show="activeTab === 'custom'" style="margin-top: 20px">
       <CustomMetricsTab :result="analysisResult" />
+    </div>
+
+    <!-- DOM 검사 탭 -->
+    <div v-show="activeTab === 'inspector'" style="margin-top: 20px">
+      <ClientOnly>
+        <InteractiveDOMInspector :result="analysisResult" :is-active="activeTab === 'inspector'" />
+      </ClientOnly>
     </div>
   </div>
 </template>
@@ -270,7 +287,7 @@ async function startAnalysis() {
           captureScreenshots: true,
           networkThrottling: getNetworkThrottling(networkSpeed.value),
           cpuThrottling: getCPUThrottling(deviceSpec.value),
-          waitUntil: 'networkidle0',
+          waitUntil: 'networkidle2', // Changed from networkidle0 for better timeout handling
           useLighthouse: useLighthouse.value,
           lighthouseFormFactor: deviceSpec.value.includes('Mobile') ? 'mobile' : 'desktop',
           customMetrics: customMetrics,
@@ -379,28 +396,18 @@ async function exportPDF() {
   }
 }
 
-function saveResultToHistory(result: AnalysisResult) {
-  if (typeof window === 'undefined') return;
-
-  const STORAGE_KEY = 'performance-analysis-history';
-  const MAX_HISTORY_ITEMS = 50;
-
+async function saveResultToHistory(result: AnalysisResult) {
   try {
-    const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    const entry = {
-      id: `${result.url}-${result.timestamp}`,
-      url: result.url,
-      timestamp: result.timestamp,
-      result
-    };
+    const response = await $fetch('/api/history', {
+      method: 'POST',
+      body: {
+        result
+      }
+    });
 
-    history.unshift(entry);
-
-    if (history.length > MAX_HISTORY_ITEMS) {
-      history.splice(MAX_HISTORY_ITEMS);
+    if (!response.success) {
+      console.error('Failed to save to history:', response.error);
     }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
   } catch (error) {
     console.error('Failed to save to history:', error);
   }

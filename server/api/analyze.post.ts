@@ -2,16 +2,21 @@ import { PerformanceCollector } from '~/server/utils/performanceCollector';
 import { LighthouseCollector } from '~/server/utils/lighthouseCollector';
 import { CustomMetricsCalculator } from '~/server/utils/customMetricsCalculator';
 import type { AnalysisOptions } from '~/types/performance';
+import { logger } from '~/server/utils/logger';
 
 let collector: PerformanceCollector | null = null;
 let lighthouseCollector: LighthouseCollector | null = null;
 
 export default defineEventHandler(async event => {
+  const startTime = Date.now();
+  let currentStep = 'initialization';
+
   try {
     const body = await readBody(event);
     const { url, options } = body as { url: string; options: AnalysisOptions };
 
     // Validate URL
+    currentStep = 'url-validation';
     if (!url || typeof url !== 'string') {
       throw createError({
         statusCode: 400,
@@ -19,7 +24,6 @@ export default defineEventHandler(async event => {
       });
     }
 
-    // Validate URL format
     try {
       new URL(url);
     } catch {
@@ -30,7 +34,9 @@ export default defineEventHandler(async event => {
     }
 
     // Initialize collector if needed
+    currentStep = 'collector-initialization';
     if (!collector) {
+      logger.debug('Initializing PerformanceCollector');
       collector = new PerformanceCollector();
       await collector.initialize();
     }
@@ -49,10 +55,12 @@ export default defineEventHandler(async event => {
     };
 
     // Perform analysis
+    currentStep = 'performance-analysis';
     const result = await collector.analyze(url, analysisOptions);
 
     // Perform Lighthouse analysis if requested
     if (analysisOptions.useLighthouse) {
+      currentStep = 'lighthouse-analysis';
       if (!lighthouseCollector) {
         lighthouseCollector = new LighthouseCollector();
       }
@@ -71,15 +79,14 @@ export default defineEventHandler(async event => {
 
         result.lighthouse = lighthouseResult;
       } catch (lighthouseError) {
-        console.error('Lighthouse analysis failed:', lighthouseError);
-        // Continue without Lighthouse data
+        logger.error('Lighthouse analysis failed:', lighthouseError);
       }
     }
 
     // Calculate custom metrics if any are defined
     if (analysisOptions.customMetrics && analysisOptions.customMetrics.length > 0) {
+      currentStep = 'custom-metrics';
       try {
-        // Get user timing and element timing data from the collector
         const userTimingData = collector.getUserTimingData?.() || [];
         const elementTimingData = collector.getElementTimingData?.() || [];
 
@@ -90,21 +97,26 @@ export default defineEventHandler(async event => {
           elementTimingData
         );
       } catch (customMetricsError) {
-        console.error('Custom metrics calculation failed:', customMetricsError);
-        // Continue without custom metrics
+        logger.error('Custom metrics calculation failed:', customMetricsError);
       }
     }
+
+    result.options = analysisOptions;
 
     return {
       success: true,
       data: result
     };
   } catch (error: any) {
-    console.error('Analysis error:', error);
+    logger.error(`Analysis failed at ${currentStep}:`, {
+      url: error.url,
+      message: error.message,
+      stack: error.stack
+    });
 
     throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: error.message || 'Failed to analyze page performance'
+      statusMessage: `Failed at ${currentStep}: ${error.message || 'Unknown error'}`
     });
   }
 });

@@ -149,10 +149,9 @@ const metricsManager = ref();
 const trendChart = ref<HTMLCanvasElement | null>(null);
 let chartInstance: Chart | null = null;
 
-const hasHistory = ref(false); // TODO: Implement history tracking
+const hasHistory = ref(false);
 
 onMounted(() => {
-  // TODO: Load history from localStorage
   initTrendChart();
 });
 
@@ -178,10 +177,9 @@ watch(
 );
 
 function initTrendChart() {
+  // History tracking not yet implemented
   if (!trendChart.value || !hasHistory.value) return;
 
-  // TODO: Use real historical data
-  // For now, this is placeholder code
   chartInstance = new Chart(trendChart.value, {
     type: 'line',
     data: {

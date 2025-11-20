@@ -5,8 +5,10 @@ import type {
   FrameCapture,
   LongTask,
   AnalysisResult,
-  AnalysisOptions
+  AnalysisOptions,
+  DOMElementTiming
 } from '~/types/performance';
+import { logger } from './logger';
 
 interface NetworkRequestData {
   requestId: string;
@@ -49,6 +51,8 @@ export class PerformanceCollector {
     this.requests.clear();
     this.frames = [];
 
+    logger.info(`Starting analysis: ${url}`);
+
     try {
       // Enable necessary CDP domains
       await client.send('Network.enable');
@@ -84,20 +88,23 @@ export class PerformanceCollector {
         this.startFrameCapture(page);
       }
 
-      // Navigate to URL
+      // Navigate to URL without timeout for analyzing even worst-performing pages
+      const waitCondition = options.waitUntil || 'networkidle2';
+      logger.debug(`Navigating with NO timeout, waitUntil: ${waitCondition}`);
+
       await page.goto(url, {
-        waitUntil: options.waitUntil || 'networkidle0',
-        timeout: 60000
+        waitUntil: waitCondition as any,
+        timeout: 0 // No timeout for worst-performing pages
       });
 
-      // Wait a bit more for animations and late resources
+      // Wait for animations and late resources
       await new Promise<void>(resolve => setTimeout(resolve, 2000));
 
-      // Collect performance metrics
+      // Collect all metrics
       const metrics = await this.collectMetrics(page);
-
-      // Collect long tasks
       const longTasks = await this.collectLongTasks(page);
+      const domElements = await this.collectDOMElements(page);
+      const capturedHTML = await this.captureHTML(page);
 
       // Calculate running time
       const runningTime = Date.now() - this.startTime;
@@ -110,6 +117,8 @@ export class PerformanceCollector {
         m.computePerformanceScore(metrics, networkRequests, this.frames)
       );
 
+      logger.info(`Analysis completed: ${url} (${runningTime}ms)`);
+
       return {
         url,
         timestamp: this.startTime,
@@ -118,12 +127,33 @@ export class PerformanceCollector {
         networkRequests,
         frames: this.frames,
         longTasks,
-        performanceScore
+        performanceScore,
+        domElements,
+        capturedHTML
       };
+    } catch (error) {
+      logger.error('Analysis failed:', {
+        url,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
     } finally {
-      // Always stop frame capture before closing page
+      // Cleanup resources
       this.stopFrameCapture();
-      await page.close();
+
+      try {
+        await client.detach();
+      } catch (detachError) {
+        logger.warn('Failed to detach CDP session:', detachError);
+      }
+
+      try {
+        await page.close();
+      } catch (closeError) {
+        logger.error('Failed to close page:', closeError);
+      }
+
+      logger.debug('Resource cleanup completed');
     }
   }
 
@@ -168,7 +198,8 @@ export class PerformanceCollector {
       try {
         const screenshot = await page.screenshot({
           encoding: 'base64',
-          type: 'png'
+          type: 'png',
+          fullPage: true
         });
         const timestamp = (Date.now() - this.startTime) / 1000;
 
@@ -332,6 +363,143 @@ export class PerformanceCollector {
     }
 
     return result.sort((a, b) => a.startTime - b.startTime);
+  }
+
+  private async collectDOMElements(page: Page): Promise<DOMElementTiming[]> {
+    try {
+      // Scroll to top before collecting elements to ensure accurate positions
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+
+      // Wait a bit for scroll to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Collect DOM elements with their timing and position information
+      const domElements = await page.evaluate(() => {
+        const elements: DOMElementTiming[] = [];
+        const allElements = document.querySelectorAll('*');
+
+        // Helper function to generate a unique CSS selector
+        const getSelector = (el: Element): string => {
+          if (el.id) return `#${el.id}`;
+          if (el.className && typeof el.className === 'string') {
+            const classes = el.className.trim().split(/\s+/).join('.');
+            if (classes) return `${el.tagName.toLowerCase()}.${classes}`;
+          }
+          return el.tagName.toLowerCase();
+        };
+
+        // Helper function to get associated resources (images, backgrounds, etc.)
+        const getAssociatedResources = (el: Element): string[] => {
+          const resources: string[] = [];
+
+          // Check for img src
+          if (el.tagName === 'IMG') {
+            const img = el as HTMLImageElement;
+            if (img.src) resources.push(img.src);
+          }
+
+          // Check for background images
+          const computedStyle = window.getComputedStyle(el);
+          const bgImage = computedStyle.backgroundImage;
+          if (bgImage && bgImage !== 'none') {
+            const matches = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+            if (matches && matches[1]) resources.push(matches[1]);
+          }
+
+          // Check for video/audio sources
+          if (el.tagName === 'VIDEO' || el.tagName === 'AUDIO') {
+            const media = el as HTMLMediaElement;
+            if (media.src) resources.push(media.src);
+          }
+
+          return resources;
+        };
+
+        // Limit to important elements (visible and reasonable size)
+        for (let i = 0; i < allElements.length; i++) {
+          const el = allElements[i];
+          const rect = el.getBoundingClientRect();
+
+          // Skip if too small
+          if (rect.width < 10 || rect.height < 10) continue;
+
+          const selector = getSelector(el);
+          const associatedResources = getAssociatedResources(el);
+
+          // Calculate absolute position in the full page (including scroll offset)
+          const absoluteX = Math.round(rect.left + window.scrollX);
+          const absoluteY = Math.round(rect.top + window.scrollY);
+
+          elements.push({
+            selector,
+            tagName: el.tagName,
+            className: el.className && typeof el.className === 'string' ? el.className : undefined,
+            id: el.id || undefined,
+            innerText:
+              el.textContent && el.textContent.length > 0
+                ? el.textContent.trim().substring(0, 50)
+                : undefined,
+            boundingBox: {
+              x: absoluteX,
+              y: absoluteY,
+              width: Math.round(rect.width),
+              height: Math.round(rect.height)
+            },
+            associatedResources: associatedResources.length > 0 ? associatedResources : undefined
+          });
+
+          // Limit to 1000 elements to prevent huge payloads (increased from 500 for full page)
+          if (elements.length >= 1000) break;
+        }
+
+        return elements;
+      });
+
+      // Match DOM elements with network resource timings
+      const networkRequests = this.convertRequestsToArray();
+
+      for (const element of domElements) {
+        if (element.associatedResources && element.associatedResources.length > 0) {
+          element.resourceTimings = [];
+
+          for (const resourceUrl of element.associatedResources) {
+            const matchedRequest = networkRequests.find(req => req.url === resourceUrl);
+
+            if (matchedRequest) {
+              element.resourceTimings.push({
+                url: matchedRequest.url,
+                duration: matchedRequest.duration,
+                size: matchedRequest.size,
+                type: matchedRequest.type
+              });
+
+              // Set element load time based on the slowest resource
+              if (!element.loadTime || matchedRequest.endTime > element.loadTime) {
+                element.loadTime = matchedRequest.endTime * 1000; // Convert to ms
+              }
+            }
+          }
+        }
+      }
+
+      return domElements;
+    } catch (error) {
+      console.error('Error collecting DOM elements:', error);
+      return [];
+    }
+  }
+
+  private async captureHTML(page: Page): Promise<string> {
+    try {
+      // Get the full HTML of the page after all resources have loaded
+      const html = await page.content();
+      return html;
+    } catch (error) {
+      console.error('Error capturing HTML:', error);
+      return '';
+    }
   }
 
   async close() {

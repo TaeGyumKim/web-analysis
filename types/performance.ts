@@ -36,6 +36,30 @@ export interface LongTask {
   attribution?: string;
 }
 
+export interface DOMElementTiming {
+  selector: string; // CSS selector
+  tagName: string;
+  className?: string;
+  id?: string;
+  innerText?: string; // First 50 chars
+  renderTime?: number; // When element appeared in DOM
+  paintTime?: number; // When element was painted
+  loadTime?: number; // When associated resources loaded
+  boundingBox: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  associatedResources?: string[]; // URLs of images, backgrounds, etc.
+  resourceTimings?: {
+    url: string;
+    duration: number;
+    size: number;
+    type: string;
+  }[];
+}
+
 export interface LighthouseScore {
   performance: number;
   accessibility: number;
@@ -137,6 +161,9 @@ export interface AnalysisResult {
   performanceScore: PerformanceScore;
   lighthouse?: LighthouseResult;
   customMetrics?: CustomMetricResult[];
+  options?: AnalysisOptions; // Analysis options used for this result
+  domElements?: DOMElementTiming[]; // DOM elements with loading timing
+  capturedHTML?: string; // Full HTML snapshot for interactive inspection
 }
 
 export interface AnalysisOptions {
