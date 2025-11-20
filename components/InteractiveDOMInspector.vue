@@ -43,6 +43,7 @@
           class="inspector-container"
           @mousemove="handleMouseMove"
           @mouseleave="handleMouseLeave"
+          @contextmenu="handleRightClick"
         >
           <!-- 페이지 스크린샷 -->
           <img
@@ -153,6 +154,97 @@
               </div>
             </div>
           </div>
+
+          <!-- 고정된 툴팁 (우클릭으로 고정) -->
+          <div
+            v-if="pinnedElements.length > 0 && pinnedPosition"
+            class="tooltip pinned-tooltip"
+            :style="{
+              left: pinnedPosition.x + 'px',
+              top: pinnedPosition.y + 'px',
+              maxHeight: '600px',
+              overflowY: 'auto'
+            }"
+          >
+            <!-- 닫기 버튼 -->
+            <button class="close-button" @click="closePinnedTooltip" title="닫기 (ESC)">
+              ✕
+            </button>
+
+            <div class="pinned-badge">고정됨 (우클릭)</div>
+            <div v-if="pinnedElements.length > 1" class="tooltip-info" style="margin-bottom: 8px; font-size: 12px; color: #666;">
+              겹친 요소 {{ pinnedElements.length }}개
+            </div>
+
+            <div
+              v-for="(element, index) in pinnedElements"
+              :key="index"
+              :style="{
+                marginBottom: index < pinnedElements.length - 1 ? '12px' : '0',
+                paddingBottom: index < pinnedElements.length - 1 ? '12px' : '0',
+                borderBottom: index < pinnedElements.length - 1 ? '1px solid #e5e7eb' : 'none'
+              }"
+            >
+              <div class="tooltip-header">
+                <strong>{{ element.tagName }}</strong>
+                <span v-if="element.id" style="color: #3b82f6"> #{{ element.id }}</span>
+                <span v-if="element.className" style="color: #8b5cf6">
+                  .{{ element.className.split(' ')[0] }}
+                </span>
+              </div>
+
+              <div class="tooltip-content">
+                <div v-if="element.innerText" class="tooltip-row">
+                  <span class="label">텍스트:</span>
+                  <span class="value">{{ element.innerText }}</span>
+                </div>
+
+                <div v-if="element.loadTime" class="tooltip-row">
+                  <span class="label">로드 시간:</span>
+                  <span class="value highlight">{{ element.loadTime.toFixed(0) }} ms</span>
+                </div>
+
+                <div class="tooltip-row">
+                  <span class="label">크기:</span>
+                  <span class="value"
+                    >{{ element.boundingBox.width }} ×
+                    {{ element.boundingBox.height }} px</span
+                  >
+                </div>
+
+                <div class="tooltip-row">
+                  <span class="label">위치:</span>
+                  <span class="value"
+                    >({{ element.boundingBox.x }}, {{ element.boundingBox.y }})</span
+                  >
+                </div>
+
+                <div
+                  v-if="element.resourceTimings && element.resourceTimings.length > 0"
+                >
+                  <div class="tooltip-section-title">연관 리소스:</div>
+                  <div
+                    v-for="(resource, rIndex) in element.resourceTimings"
+                    :key="rIndex"
+                    class="resource-item"
+                  >
+                    <div class="resource-type">{{ resource.type }}</div>
+                    <div class="resource-details">
+                      <span>{{ formatBytes(resource.size) }}</span>
+                      <span style="margin-left: 8px">{{ resource.duration.toFixed(0) }}ms</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  v-if="!element.loadTime && !element.resourceTimings"
+                  class="no-data"
+                >
+                  로딩 정보 없음 (정적 요소)
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- 통계 정보 -->
@@ -185,6 +277,10 @@ const screenshotRef = ref<HTMLImageElement | null>(null);
 const hoveredElements = ref<DOMElementTiming[]>([]);
 const tooltipPosition = ref<{ x: number; y: number } | null>(null);
 const scale = ref({ x: 1, y: 1 });
+
+// Pinned tooltip state
+const pinnedElements = ref<DOMElementTiming[]>([]);
+const pinnedPosition = ref<{ x: number; y: number } | null>(null);
 
 const lastFrameImage = computed(() => {
   if (!props.result || !props.result.frames || props.result.frames.length === 0) {
@@ -264,12 +360,14 @@ watch(
 // Update scale on window resize
 onMounted(() => {
   window.addEventListener('resize', updateScale);
+  window.addEventListener('keydown', handleKeyDown);
   // Also update scale on mount
   updateScale();
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateScale);
+  window.removeEventListener('keydown', handleKeyDown);
 });
 
 function handleMouseMove(event: MouseEvent) {
@@ -319,6 +417,34 @@ function handleMouseMove(event: MouseEvent) {
 function handleMouseLeave() {
   hoveredElements.value = [];
   tooltipPosition.value = null;
+}
+
+function handleRightClick(event: MouseEvent) {
+  // Prevent default context menu
+  event.preventDefault();
+
+  // Pin current hovered elements if any
+  if (hoveredElements.value.length > 0 && tooltipPosition.value) {
+    pinnedElements.value = [...hoveredElements.value];
+    pinnedPosition.value = { ...tooltipPosition.value };
+
+    console.log('[DOM Inspector] Tooltip pinned:', {
+      elementCount: pinnedElements.value.length,
+      position: pinnedPosition.value
+    });
+  }
+}
+
+function closePinnedTooltip() {
+  pinnedElements.value = [];
+  pinnedPosition.value = null;
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+  // Close pinned tooltip on ESC key
+  if (event.key === 'Escape' && pinnedElements.value.length > 0) {
+    closePinnedTooltip();
+  }
 }
 
 function findElementsAtPosition(x: number, y: number): DOMElementTiming[] {
@@ -422,6 +548,49 @@ function calculateAverageLoadTime(): string {
   z-index: 20;
   pointer-events: none;
   font-size: 13px;
+}
+
+.pinned-tooltip {
+  pointer-events: auto;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  z-index: 30;
+}
+
+.close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  transition: background 0.2s;
+}
+
+.close-button:hover {
+  background: #dc2626;
+}
+
+.pinned-badge {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .tooltip-header {
