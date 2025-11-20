@@ -396,67 +396,30 @@ async function exportPDF() {
   }
 }
 
-function saveResultToHistory(result: AnalysisResult) {
-  if (typeof window === 'undefined') {
-    console.warn('[saveResultToHistory] Window is undefined, skipping save');
-    return;
-  }
-
-  const STORAGE_KEY = 'performance-analysis-history';
-  const MAX_HISTORY_ITEMS = 50;
-
+async function saveResultToHistory(result: AnalysisResult) {
   try {
-    const existingHistory = localStorage.getItem(STORAGE_KEY) || '[]';
-    console.log('[saveResultToHistory] Existing history length:', JSON.parse(existingHistory).length);
-
-    const history = JSON.parse(existingHistory);
-
-    // Only save minimal data needed for charts (not full result with screenshots/DOM)
-    const entry = {
-      id: `${result.url}-${result.timestamp}`,
+    console.log('[saveResultToHistory] Saving to server:', {
       url: result.url,
       timestamp: result.timestamp,
-      result: {
-        url: result.url,
-        timestamp: result.timestamp,
-        runningTime: result.runningTime,
-        options: {
-          networkThrottling: result.options?.networkThrottling,
-          cpuThrottling: result.options?.cpuThrottling
-        }
-      }
-    };
-
-    console.log('[saveResultToHistory] Saving entry:', {
-      id: entry.id,
-      url: entry.url,
-      networkThrottling: entry.result.options.networkThrottling,
-      cpuThrottling: entry.result.options.cpuThrottling,
-      runningTime: entry.result.runningTime
+      networkThrottling: result.options?.networkThrottling,
+      cpuThrottling: result.options?.cpuThrottling,
+      runningTime: result.runningTime
     });
 
-    history.unshift(entry);
+    const response = await $fetch('/api/history', {
+      method: 'POST',
+      body: {
+        result
+      }
+    });
 
-    if (history.length > MAX_HISTORY_ITEMS) {
-      history.splice(MAX_HISTORY_ITEMS);
+    if (response.success) {
+      console.log('[saveResultToHistory] Saved successfully to server');
+    } else {
+      console.error('[saveResultToHistory] Server save failed:', response.error);
     }
-
-    const dataToSave = JSON.stringify(history);
-    const dataSizeKB = (dataToSave.length / 1024).toFixed(2);
-    console.log('[saveResultToHistory] Data size to save:', dataSizeKB, 'KB');
-
-    localStorage.setItem(STORAGE_KEY, dataToSave);
-    console.log('[saveResultToHistory] Saved! New history length:', history.length);
-
-    // Verify save
-    const verifyHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    console.log('[saveResultToHistory] Verified history length:', verifyHistory.length);
   } catch (error) {
-    console.error('[saveResultToHistory] Failed to save to history:', error);
-    if (error instanceof Error) {
-      console.error('[saveResultToHistory] Error message:', error.message);
-      console.error('[saveResultToHistory] Error stack:', error.stack);
-    }
+    console.error('[saveResultToHistory] Failed to save to server:', error);
   }
 }
 </script>

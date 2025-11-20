@@ -234,7 +234,7 @@ watch(
   }
 );
 
-function initCharts() {
+async function initCharts() {
   if (!chartNetwork.value || !chartDevice.value || !chartTrend.value) {
     console.warn('[LoadingDistributionTab] Canvas refs not ready');
     return;
@@ -245,8 +245,8 @@ function initCharts() {
     return;
   }
 
-  // Load historical data from localStorage
-  const historyData = loadHistoryData();
+  // Load historical data from server
+  const historyData = await loadHistoryData();
   console.log('[LoadingDistributionTab] History data loaded:', historyData.length, 'entries');
 
   // Add current result to history data for chart calculations
@@ -415,16 +415,15 @@ interface HistoryEntry {
   result: AnalysisResult;
 }
 
-function loadHistoryData(): HistoryEntry[] {
-  if (typeof window === 'undefined') return [];
-
+async function loadHistoryData(): Promise<HistoryEntry[]> {
   try {
-    const stored = localStorage.getItem('performance-analysis-history');
-    if (stored) {
-      return JSON.parse(stored) as HistoryEntry[];
+    const response = await $fetch('/api/history');
+    if (response.success && response.data) {
+      console.log('[loadHistoryData] Loaded from server:', response.data.length, 'entries');
+      return response.data as HistoryEntry[];
     }
   } catch (error) {
-    console.error('Failed to load history data:', error);
+    console.error('[loadHistoryData] Failed to load history from server:', error);
   }
   return [];
 }
