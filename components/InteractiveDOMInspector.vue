@@ -47,10 +47,12 @@
           <!-- 페이지 스크린샷 -->
           <img
             v-if="lastFrameImage"
+            ref="screenshotRef"
             :src="lastFrameImage"
             alt="Page Screenshot"
             class="screenshot"
             style="display: block; width: 100%; height: auto"
+            @load="updateScale"
           />
 
           <!-- 하이라이트 오버레이 -->
@@ -58,10 +60,10 @@
             v-if="hoveredElement"
             class="highlight-overlay"
             :style="{
-              left: hoveredElement.boundingBox.x + 'px',
-              top: hoveredElement.boundingBox.y + 'px',
-              width: hoveredElement.boundingBox.width + 'px',
-              height: hoveredElement.boundingBox.height + 'px'
+              left: hoveredElement.boundingBox.x / scale.x + 'px',
+              top: hoveredElement.boundingBox.y / scale.y + 'px',
+              width: hoveredElement.boundingBox.width / scale.x + 'px',
+              height: hoveredElement.boundingBox.height / scale.y + 'px'
             }"
           ></div>
 
@@ -160,8 +162,10 @@ const props = defineProps<{
 }>();
 
 const inspectorContainer = ref<HTMLElement | null>(null);
+const screenshotRef = ref<HTMLImageElement | null>(null);
 const hoveredElement = ref<DOMElementTiming | null>(null);
 const tooltipPosition = ref<{ x: number; y: number } | null>(null);
+const scale = ref({ x: 1, y: 1 });
 
 const lastFrameImage = computed(() => {
   if (!props.result || !props.result.frames || props.result.frames.length === 0) {
@@ -175,6 +179,18 @@ const lastFrameImage = computed(() => {
   return `data:image/png;base64,${lastFrame.screenshot}`;
 });
 
+function updateScale() {
+  if (!screenshotRef.value) return;
+
+  const img = screenshotRef.value;
+  if (img.naturalWidth && img.clientWidth) {
+    scale.value = {
+      x: img.naturalWidth / img.clientWidth,
+      y: img.naturalHeight / img.clientHeight
+    };
+  }
+}
+
 function handleMouseMove(event: MouseEvent) {
   if (!props.result || !props.result.domElements) return;
 
@@ -185,13 +201,17 @@ function handleMouseMove(event: MouseEvent) {
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
 
-  // Find DOM element at this position
-  const element = findElementAtPosition(x, y);
+  // 마우스 좌표를 원본 이미지 좌표로 변환
+  const originalX = x * scale.value.x;
+  const originalY = y * scale.value.y;
+
+  // Find DOM element at this position (using original coordinates)
+  const element = findElementAtPosition(originalX, originalY);
 
   if (element) {
     hoveredElement.value = element;
 
-    // Position tooltip near cursor but avoid edges
+    // Position tooltip near cursor but avoid edges (using display coordinates)
     const tooltipX = Math.min(x + 15, rect.width - 300);
     const tooltipY = Math.min(y + 15, rect.height - 200);
 
