@@ -137,6 +137,7 @@ export interface AnalysisResult {
   performanceScore: PerformanceScore;
   lighthouse?: LighthouseResult;
   customMetrics?: CustomMetricResult[];
+  options?: AnalysisOptions; // Analysis options used for this result
 }
 
 export interface AnalysisOptions {

@@ -13,6 +13,26 @@
 
     <!-- 분석 결과 화면 -->
     <div v-else>
+      <!-- 인터랙티브 차트 안내 -->
+      <div
+        style="
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 12px 20px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        "
+      >
+        <div style="font-size: 24px">🔍</div>
+        <div>
+          <strong>인터랙티브 차트</strong> – 마우스 휠로 줌 인/아웃, 드래그로 차트 이동이
+          가능합니다.
+        </div>
+      </div>
+
       <!-- 차트 그리드 -->
       <div class="chart-grid">
         <div class="chart-container">
@@ -109,10 +129,11 @@
 
 <script setup lang="ts">
 import { Chart, registerables } from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
 import type { AnalysisResult } from '~/types/performance';
 import { glossary } from '~/utils/glossary';
 
-Chart.register(...registerables);
+Chart.register(...registerables, zoomPlugin);
 
 const props = defineProps<{
   result: AnalysisResult | null;
@@ -214,25 +235,54 @@ watch(
 function initCharts() {
   if (!chartNetwork.value || !chartDevice.value || !chartTrend.value) return;
 
-  // TODO: Use real historical data from localStorage or database
-  // Currently using mock data for demonstration purposes
-  // This tab should aggregate data from multiple analysis runs
+  // Load historical data from localStorage
+  const historyData = loadHistoryData();
+
+  // Calculate statistics from historical data
+  const networkStats = calculateNetworkStats(historyData);
+  const deviceStats = calculateDeviceStats(historyData);
+  const trendStats = calculateTrendStats(historyData);
 
   // 네트워크 속도별 차트
   networkChart = new Chart(chartNetwork.value, {
     type: 'bar',
     data: {
-      labels: ['3G', '4G', 'Wi-Fi'],
+      labels: ['Slow 3G', '3G', '4G', 'Wi-Fi'],
       datasets: [
-        { label: 'P50', data: [5200, 3400, 1800], backgroundColor: '#7b91f0' },
-        { label: 'P95', data: [6200, 4200, 2200], backgroundColor: '#f3b94a' },
-        { label: '평균', data: [5800, 3600, 1900], backgroundColor: '#68ca84' }
+        { label: 'P50', data: networkStats.p50, backgroundColor: '#7b91f0' },
+        { label: 'P95', data: networkStats.p95, backgroundColor: '#f3b94a' },
+        { label: '평균', data: networkStats.avg, backgroundColor: '#68ca84' }
       ]
     },
     options: {
       responsive: true,
       scales: {
-        y: { beginAtZero: true }
+        y: { beginAtZero: true, title: { display: true, text: '로딩 시간 (ms)' } }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            afterLabel: context => {
+              const dataCount = networkStats.counts[context.dataIndex];
+              return `샘플 수: ${dataCount}`;
+            }
+          }
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'y'
+          },
+          zoom: {
+            wheel: {
+              enabled: true
+            },
+            pinch: {
+              enabled: true
+            },
+            mode: 'y'
+          }
+        }
       }
     }
   });
@@ -243,15 +293,40 @@ function initCharts() {
     data: {
       labels: ['Desktop', 'Mobile High', 'Mobile Mid', 'Mobile Low'],
       datasets: [
-        { label: 'P50', data: [1500, 2200, 3900, 6500], backgroundColor: '#7b91f0' },
-        { label: 'P95', data: [2000, 2900, 4300, 8000], backgroundColor: '#f3b94a' },
-        { label: '평균', data: [1600, 2300, 3800, 6540], backgroundColor: '#68ca84' }
+        { label: 'P50', data: deviceStats.p50, backgroundColor: '#7b91f0' },
+        { label: 'P95', data: deviceStats.p95, backgroundColor: '#f3b94a' },
+        { label: '평균', data: deviceStats.avg, backgroundColor: '#68ca84' }
       ]
     },
     options: {
       responsive: true,
       scales: {
-        y: { beginAtZero: true }
+        y: { beginAtZero: true, title: { display: true, text: '로딩 시간 (ms)' } }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            afterLabel: context => {
+              const dataCount = deviceStats.counts[context.dataIndex];
+              return `샘플 수: ${dataCount}`;
+            }
+          }
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'y'
+          },
+          zoom: {
+            wheel: {
+              enabled: true
+            },
+            pinch: {
+              enabled: true
+            },
+            mode: 'y'
+          }
+        }
       }
     }
   });
@@ -260,37 +335,201 @@ function initCharts() {
   trendChart = new Chart(chartTrend.value, {
     type: 'line',
     data: {
-      labels: [
-        '0:00',
-        '2:00',
-        '4:00',
-        '6:00',
-        '8:00',
-        '10:00',
-        '12:00',
-        '14:00',
-        '16:00',
-        '18:00',
-        '20:00',
-        '22:00'
-      ],
+      labels: trendStats.labels,
       datasets: [
         {
           label: '평균 로딩 시간',
-          data: [3200, 3800, 3100, 3400, 3650, 3450, 3600, 3750, 3650, 3700, 3300, 3100],
+          data: trendStats.data,
           borderColor: '#3b82f6',
           tension: 0.3,
-          fill: false
+          fill: false,
+          pointRadius: 4,
+          pointHoverRadius: 6
         }
       ]
     },
     options: {
       responsive: true,
       scales: {
-        y: { beginAtZero: true }
+        y: { beginAtZero: true, title: { display: true, text: '로딩 시간 (ms)' } },
+        x: { title: { display: true, text: '시간' } }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            afterLabel: context => {
+              const dataCount = trendStats.counts[context.dataIndex];
+              return `샘플 수: ${dataCount}`;
+            }
+          }
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'xy'
+          },
+          zoom: {
+            wheel: {
+              enabled: true
+            },
+            pinch: {
+              enabled: true
+            },
+            mode: 'xy'
+          }
+        }
       }
     }
   });
+}
+
+interface HistoryEntry {
+  id: string;
+  url: string;
+  timestamp: string;
+  result: AnalysisResult;
+}
+
+function loadHistoryData(): HistoryEntry[] {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const stored = localStorage.getItem('performance-analysis-history');
+    if (stored) {
+      return JSON.parse(stored) as HistoryEntry[];
+    }
+  } catch (error) {
+    console.error('Failed to load history data:', error);
+  }
+  return [];
+}
+
+function calculateNetworkStats(history: HistoryEntry[]) {
+  const categories = ['slow-3g', 'fast-3g', '4g', 'none'];
+  const data = {
+    p50: [] as number[],
+    p95: [] as number[],
+    avg: [] as number[],
+    counts: [] as number[]
+  };
+
+  for (const category of categories) {
+    const samples = history
+      .filter(h => h.result?.options?.networkThrottling === category)
+      .map(h => h.result.runningTime)
+      .filter(t => typeof t === 'number' && t > 0);
+
+    if (samples.length === 0) {
+      data.p50.push(0);
+      data.p95.push(0);
+      data.avg.push(0);
+      data.counts.push(0);
+    } else {
+      samples.sort((a, b) => a - b);
+      const p50 = percentile(samples, 50);
+      const p95 = percentile(samples, 95);
+      const avg = samples.reduce((sum, val) => sum + val, 0) / samples.length;
+
+      data.p50.push(Math.round(p50));
+      data.p95.push(Math.round(p95));
+      data.avg.push(Math.round(avg));
+      data.counts.push(samples.length);
+    }
+  }
+
+  return data;
+}
+
+function calculateDeviceStats(history: HistoryEntry[]) {
+  // Map CPU throttling to device categories
+  const categories = [1, 2, 4, 6];
+  const data = {
+    p50: [] as number[],
+    p95: [] as number[],
+    avg: [] as number[],
+    counts: [] as number[]
+  };
+
+  for (const category of categories) {
+    const samples = history
+      .filter(h => h.result?.options?.cpuThrottling === category)
+      .map(h => h.result.runningTime)
+      .filter(t => typeof t === 'number' && t > 0);
+
+    if (samples.length === 0) {
+      data.p50.push(0);
+      data.p95.push(0);
+      data.avg.push(0);
+      data.counts.push(0);
+    } else {
+      samples.sort((a, b) => a - b);
+      const p50 = percentile(samples, 50);
+      const p95 = percentile(samples, 95);
+      const avg = samples.reduce((sum, val) => sum + val, 0) / samples.length;
+
+      data.p50.push(Math.round(p50));
+      data.p95.push(Math.round(p95));
+      data.avg.push(Math.round(avg));
+      data.counts.push(samples.length);
+    }
+  }
+
+  return data;
+}
+
+function calculateTrendStats(history: HistoryEntry[]) {
+  // Group by hour of day (0-23)
+  const hourBuckets: Record<number, number[]> = {};
+
+  for (let i = 0; i < 24; i++) {
+    hourBuckets[i] = [];
+  }
+
+  for (const entry of history) {
+    if (!entry.timestamp || !entry.result?.runningTime) continue;
+
+    const date = new Date(entry.timestamp);
+    const hour = date.getHours();
+
+    if (typeof entry.result.runningTime === 'number' && entry.result.runningTime > 0) {
+      hourBuckets[hour].push(entry.result.runningTime);
+    }
+  }
+
+  const labels = [];
+  const data = [];
+  const counts = [];
+
+  for (let hour = 0; hour < 24; hour++) {
+    labels.push(`${hour}:00`);
+
+    const samples = hourBuckets[hour];
+    if (samples.length === 0) {
+      data.push(null); // Show gap in chart
+      counts.push(0);
+    } else {
+      const avg = samples.reduce((sum, val) => sum + val, 0) / samples.length;
+      data.push(Math.round(avg));
+      counts.push(samples.length);
+    }
+  }
+
+  return { labels, data, counts };
+}
+
+function percentile(sortedArray: number[], p: number): number {
+  if (sortedArray.length === 0) return 0;
+
+  const index = (p / 100) * (sortedArray.length - 1);
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  const weight = index - lower;
+
+  if (lower === upper) {
+    return sortedArray[lower];
+  }
+
+  return sortedArray[lower] * (1 - weight) + sortedArray[upper] * weight;
 }
 
 function destroyCharts() {

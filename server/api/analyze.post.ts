@@ -95,6 +95,9 @@ export default defineEventHandler(async event => {
       }
     }
 
+    // Include analysis options in the result for historical tracking
+    result.options = analysisOptions;
+
     return {
       success: true,
       data: result
