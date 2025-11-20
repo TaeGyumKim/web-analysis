@@ -36,6 +36,21 @@
         </div>
       </div>
 
+      <!-- 컨트롤 버튼 -->
+      <div style="margin-bottom: 16px; display: flex; gap: 12px;">
+        <button
+          class="toggle-button"
+          :class="{ active: showAllBorders }"
+          @click="showAllBorders = !showAllBorders"
+        >
+          <span v-if="showAllBorders">🔳 전체 경계 숨기기</span>
+          <span v-else>🔲 전체 경계 보기</span>
+        </button>
+        <div v-if="pinnedElements.length > 0" style="color: #3b82f6; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+          📌 {{ pinnedElements.length }}개 요소 고정됨
+        </div>
+      </div>
+
       <!-- DOM 검사 뷰어 -->
       <div class="card">
         <div
@@ -56,10 +71,38 @@
             @load="handleImageLoad"
           />
 
-          <!-- 하이라이트 오버레이 (겹친 요소 모두 표시) -->
+          <!-- 전체 DOM 경계 표시 (토글 버튼 활성화 시) -->
+          <div
+            v-if="showAllBorders && result.domElements"
+            v-for="(element, index) in result.domElements"
+            :key="'border-' + index"
+            class="border-overlay"
+            :style="{
+              left: element.boundingBox.x / scale.x + 'px',
+              top: element.boundingBox.y / scale.y + 'px',
+              width: element.boundingBox.width / scale.x + 'px',
+              height: element.boundingBox.height / scale.y + 'px'
+            }"
+          ></div>
+
+          <!-- 고정된 요소 하이라이트 (초록색) -->
+          <div
+            v-for="(element, index) in pinnedElements"
+            :key="'pinned-' + index"
+            class="highlight-overlay pinned-highlight"
+            :style="{
+              left: element.boundingBox.x / scale.x + 'px',
+              top: element.boundingBox.y / scale.y + 'px',
+              width: element.boundingBox.width / scale.x + 'px',
+              height: element.boundingBox.height / scale.y + 'px',
+              opacity: 0.4 - index * 0.05
+            }"
+          ></div>
+
+          <!-- 하이라이트 오버레이 (호버된 요소 - 파란색) -->
           <div
             v-for="(element, index) in hoveredElements"
-            :key="index"
+            :key="'hover-' + index"
             class="highlight-overlay"
             :style="{
               left: element.boundingBox.x / scale.x + 'px',
@@ -281,6 +324,7 @@ const scale = ref({ x: 1, y: 1 });
 // Pinned tooltip state
 const pinnedElements = ref<DOMElementTiming[]>([]);
 const pinnedPosition = ref<{ x: number; y: number } | null>(null);
+const showAllBorders = ref(false);
 
 const lastFrameImage = computed(() => {
   if (!props.result || !props.result.frames || props.result.frames.length === 0) {
@@ -534,6 +578,46 @@ function calculateAverageLoadTime(): string {
   pointer-events: none;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
   z-index: 10;
+}
+
+.pinned-highlight {
+  border: 2px solid #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
+  z-index: 15;
+}
+
+.border-overlay {
+  position: absolute;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: transparent;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.toggle-button {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggle-button:hover {
+  border-color: #8b5cf6;
+  background: #f5f3ff;
+}
+
+.toggle-button.active {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+  border-color: #8b5cf6;
 }
 
 .tooltip {
