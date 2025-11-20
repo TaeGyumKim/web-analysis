@@ -346,6 +346,14 @@ export class PerformanceCollector {
 
   private async collectDOMElements(page: Page): Promise<DOMElementTiming[]> {
     try {
+      // Scroll to top before collecting elements to ensure accurate positions
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+
+      // Wait a bit for scroll to complete
+      await page.waitForTimeout(100);
+
       // Collect DOM elements with their timing and position information
       const domElements = await page.evaluate(() => {
         const elements: DOMElementTiming[] = [];

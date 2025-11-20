@@ -337,8 +337,28 @@ function findElementsAtPosition(x: number, y: number): DOMElementTiming[] {
     return areaA - areaB;
   });
 
-  // Return all matching elements (overlapping elements)
-  return matchingElements;
+  // Get the selected element (smallest = most specific)
+  const selectedElement = matchingElements[0];
+
+  // Helper function to check if element A contains element B
+  const isContainedIn = (parent: DOMElementTiming, child: DOMElementTiming): boolean => {
+    const p = parent.boundingBox;
+    const c = child.boundingBox;
+    return (
+      c.x >= p.x &&
+      c.y >= p.y &&
+      c.x + c.width <= p.x + p.width &&
+      c.y + c.height <= p.y + p.height
+    );
+  };
+
+  // Return only the selected element and its children (elements contained within it)
+  return matchingElements.filter(el => {
+    // Include the selected element itself
+    if (el === selectedElement) return true;
+    // Include only elements that are contained within the selected element
+    return isContainedIn(selectedElement, el);
+  });
 }
 
 function formatBytes(bytes: number): string {
