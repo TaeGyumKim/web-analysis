@@ -159,6 +159,7 @@ import type { AnalysisResult, DOMElementTiming } from '~/types/performance';
 
 const props = defineProps<{
   result: AnalysisResult | null;
+  isActive: boolean;
 }>();
 
 const inspectorContainer = ref<HTMLElement | null>(null);
@@ -222,6 +223,24 @@ watch(
   () => {
     if (props.result) {
       updateScale();
+    }
+  }
+);
+
+// Watch for tab activation to recalculate scale
+watch(
+  () => props.isActive,
+  (newValue) => {
+    if (newValue) {
+      // Tab just became active, recalculate scale
+      // Use setTimeout to ensure DOM is fully rendered after v-show changes
+      setTimeout(() => {
+        updateScale();
+      }, 50);
+      // Also try again after a bit more delay for safety
+      setTimeout(() => {
+        updateScale();
+      }, 200);
     }
   }
 );

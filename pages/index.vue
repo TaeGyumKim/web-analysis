@@ -209,7 +209,7 @@
     <!-- DOM 검사 탭 -->
     <div v-show="activeTab === 'inspector'" style="margin-top: 20px">
       <ClientOnly>
-        <InteractiveDOMInspector :result="analysisResult" />
+        <InteractiveDOMInspector :result="analysisResult" :is-active="activeTab === 'inspector'" />
       </ClientOnly>
     </div>
   </div>
