@@ -168,7 +168,11 @@ const lastFrameImage = computed(() => {
     return null;
   }
   const lastFrame = props.result.frames[props.result.frames.length - 1];
-  return lastFrame.screenshot;
+  // Add data URI prefix if not already present
+  if (lastFrame.screenshot.startsWith('data:')) {
+    return lastFrame.screenshot;
+  }
+  return `data:image/png;base64,${lastFrame.screenshot}`;
 });
 
 function handleMouseMove(event: MouseEvent) {
