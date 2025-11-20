@@ -7,11 +7,16 @@ let collector: PerformanceCollector | null = null;
 let lighthouseCollector: LighthouseCollector | null = null;
 
 export default defineEventHandler(async event => {
+  const startTime = Date.now();
+  let currentStep = 'initialization';
+
   try {
+    console.log('[API /analyze] Request received');
     const body = await readBody(event);
     const { url, options } = body as { url: string; options: AnalysisOptions };
 
     // Validate URL
+    currentStep = 'url-validation';
     if (!url || typeof url !== 'string') {
       throw createError({
         statusCode: 400,
@@ -29,10 +34,15 @@ export default defineEventHandler(async event => {
       });
     }
 
+    console.log('[API /analyze] URL validated:', url);
+
     // Initialize collector if needed
+    currentStep = 'collector-initialization';
     if (!collector) {
+      console.log('[API /analyze] Initializing new PerformanceCollector...');
       collector = new PerformanceCollector();
       await collector.initialize();
+      console.log('[API /analyze] PerformanceCollector initialized');
     }
 
     // Set default options
@@ -49,15 +59,21 @@ export default defineEventHandler(async event => {
     };
 
     // Perform analysis
+    currentStep = 'performance-analysis';
+    console.log('[API /analyze] Starting performance analysis...');
     const result = await collector.analyze(url, analysisOptions);
+    console.log('[API /analyze] Performance analysis completed');
 
     // Perform Lighthouse analysis if requested
     if (analysisOptions.useLighthouse) {
+      currentStep = 'lighthouse-analysis';
       if (!lighthouseCollector) {
+        console.log('[API /analyze] Initializing LighthouseCollector...');
         lighthouseCollector = new LighthouseCollector();
       }
 
       try {
+        console.log('[API /analyze] Starting Lighthouse analysis...');
         const lighthouseResult = await lighthouseCollector.analyze({
           url,
           formFactor: analysisOptions.lighthouseFormFactor,
@@ -70,15 +86,18 @@ export default defineEventHandler(async event => {
         });
 
         result.lighthouse = lighthouseResult;
+        console.log('[API /analyze] Lighthouse analysis completed');
       } catch (lighthouseError) {
-        console.error('Lighthouse analysis failed:', lighthouseError);
+        console.error('[API /analyze] Lighthouse analysis failed:', lighthouseError);
         // Continue without Lighthouse data
       }
     }
 
     // Calculate custom metrics if any are defined
     if (analysisOptions.customMetrics && analysisOptions.customMetrics.length > 0) {
+      currentStep = 'custom-metrics';
       try {
+        console.log('[API /analyze] Calculating custom metrics...');
         // Get user timing and element timing data from the collector
         const userTimingData = collector.getUserTimingData?.() || [];
         const elementTimingData = collector.getElementTimingData?.() || [];
@@ -89,8 +108,9 @@ export default defineEventHandler(async event => {
           userTimingData,
           elementTimingData
         );
+        console.log('[API /analyze] Custom metrics calculated');
       } catch (customMetricsError) {
-        console.error('Custom metrics calculation failed:', customMetricsError);
+        console.error('[API /analyze] Custom metrics calculation failed:', customMetricsError);
         // Continue without custom metrics
       }
     }
@@ -98,16 +118,26 @@ export default defineEventHandler(async event => {
     // Include analysis options in the result for historical tracking
     result.options = analysisOptions;
 
+    const totalTime = Date.now() - startTime;
+    console.log(`[API /analyze] Request completed successfully in ${totalTime}ms`);
+
     return {
       success: true,
       data: result
     };
   } catch (error: any) {
-    console.error('Analysis error:', error);
+    const totalTime = Date.now() - startTime;
+    console.error(`[API /analyze] Request failed at step '${currentStep}' after ${totalTime}ms`);
+    console.error('[API /analyze] Error details:', {
+      step: currentStep,
+      message: error.message,
+      statusCode: error.statusCode,
+      stack: error.stack
+    });
 
     throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: error.message || 'Failed to analyze page performance'
+      statusMessage: `Failed at ${currentStep}: ${error.message || 'Unknown error'}`
     });
   }
 });

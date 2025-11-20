@@ -50,11 +50,15 @@ export class PerformanceCollector {
     this.requests.clear();
     this.frames = [];
 
+    console.log('[PerformanceCollector] Starting analysis for:', url);
+
     try {
+      console.log('[PerformanceCollector] Enabling CDP domains...');
       // Enable necessary CDP domains
       await client.send('Network.enable');
       await client.send('Performance.enable');
       await client.send('Page.enable');
+      console.log('[PerformanceCollector] CDP domains enabled');
 
       // Apply network throttling if specified
       if (options.networkThrottling && options.networkThrottling !== 'none') {
@@ -96,19 +100,24 @@ export class PerformanceCollector {
         waitUntil: waitCondition as any,
         timeout: 0 // 0 = no timeout, wait indefinitely for worst-performing pages
       });
+      console.log('[PerformanceCollector] Navigation completed');
 
       // Wait a bit more for animations and late resources
       await new Promise<void>(resolve => setTimeout(resolve, 2000));
 
+      console.log('[PerformanceCollector] Collecting performance metrics...');
       // Collect performance metrics
       const metrics = await this.collectMetrics(page);
 
+      console.log('[PerformanceCollector] Collecting long tasks...');
       // Collect long tasks
       const longTasks = await this.collectLongTasks(page);
 
+      console.log('[PerformanceCollector] Collecting DOM elements...');
       // Collect DOM elements with timing information
       const domElements = await this.collectDOMElements(page);
 
+      console.log('[PerformanceCollector] Capturing HTML snapshot...');
       // Capture HTML snapshot
       const capturedHTML = await this.captureHTML(page);
 
@@ -123,6 +132,8 @@ export class PerformanceCollector {
         m.computePerformanceScore(metrics, networkRequests, this.frames)
       );
 
+      console.log('[PerformanceCollector] Analysis completed successfully');
+
       return {
         url,
         timestamp: this.startTime,
@@ -135,10 +146,38 @@ export class PerformanceCollector {
         domElements,
         capturedHTML
       };
+    } catch (error) {
+      console.error('[PerformanceCollector] Analysis failed:', error);
+      console.error('[PerformanceCollector] Error details:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        url,
+        options
+      });
+      throw error;
     } finally {
+      console.log('[PerformanceCollector] Cleaning up resources...');
       // Always stop frame capture before closing page
       this.stopFrameCapture();
-      await page.close();
+      console.log('[PerformanceCollector] Frame capture stopped');
+
+      // Detach CDP session
+      try {
+        await client.detach();
+        console.log('[PerformanceCollector] CDP session detached');
+      } catch (detachError) {
+        console.warn('[PerformanceCollector] Failed to detach CDP session:', detachError);
+      }
+
+      // Close page
+      try {
+        await page.close();
+        console.log('[PerformanceCollector] Page closed');
+      } catch (closeError) {
+        console.error('[PerformanceCollector] Failed to close page:', closeError);
+      }
+
+      console.log('[PerformanceCollector] Cleanup completed');
     }
   }
 
@@ -202,6 +241,9 @@ export class PerformanceCollector {
     if (this.captureInterval) {
       clearInterval(this.captureInterval);
       this.captureInterval = null;
+      console.log('[PerformanceCollector] Frame capture interval cleared');
+    } else {
+      console.log('[PerformanceCollector] No frame capture interval to clear');
     }
   }
 
