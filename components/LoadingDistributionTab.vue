@@ -212,7 +212,9 @@ const suggestions = computed(() => {
 
 onMounted(() => {
   if (props.result) {
-    initCharts();
+    nextTick(() => {
+      initCharts();
+    });
   }
 });
 
@@ -233,15 +235,38 @@ watch(
 );
 
 function initCharts() {
-  if (!chartNetwork.value || !chartDevice.value || !chartTrend.value) return;
+  if (!chartNetwork.value || !chartDevice.value || !chartTrend.value) {
+    console.warn('[LoadingDistributionTab] Canvas refs not ready');
+    return;
+  }
+
+  if (!props.result) {
+    console.warn('[LoadingDistributionTab] No result available');
+    return;
+  }
 
   // Load historical data from localStorage
   const historyData = loadHistoryData();
+  console.log('[LoadingDistributionTab] History data loaded:', historyData.length, 'entries');
 
-  // Calculate statistics from historical data
-  const networkStats = calculateNetworkStats(historyData);
-  const deviceStats = calculateDeviceStats(historyData);
-  const trendStats = calculateTrendStats(historyData);
+  // Add current result to history data for chart calculations
+  const currentEntry: HistoryEntry = {
+    id: `${props.result.url}-${props.result.timestamp}`,
+    url: props.result.url,
+    timestamp: props.result.timestamp,
+    result: props.result
+  };
+  const allData = [currentEntry, ...historyData];
+  console.log('[LoadingDistributionTab] Total data for charts:', allData.length, 'entries');
+
+  // Calculate statistics from all data (current + historical)
+  const networkStats = calculateNetworkStats(allData);
+  const deviceStats = calculateDeviceStats(allData);
+  const trendStats = calculateTrendStats(allData);
+
+  console.log('[LoadingDistributionTab] Network stats:', networkStats);
+  console.log('[LoadingDistributionTab] Device stats:', deviceStats);
+  console.log('[LoadingDistributionTab] Trend stats:', trendStats);
 
   // 네트워크 속도별 차트
   networkChart = new Chart(chartNetwork.value, {
