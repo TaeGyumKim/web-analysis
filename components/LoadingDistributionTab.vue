@@ -249,6 +249,15 @@ async function initCharts() {
   const historyData = await loadHistoryData();
   console.log('[LoadingDistributionTab] History data loaded:', historyData.length, 'entries');
 
+  // Filter history data to only include entries with the same URL
+  const currentUrl = props.result.url;
+  const filteredHistory = historyData.filter(entry => entry.url === currentUrl);
+  console.log(
+    `[LoadingDistributionTab] Filtered history for URL "${currentUrl}":`,
+    filteredHistory.length,
+    'entries'
+  );
+
   // Add current result to history data for chart calculations
   const currentEntry: HistoryEntry = {
     id: `${props.result.url}-${props.result.timestamp}`,
@@ -256,7 +265,7 @@ async function initCharts() {
     timestamp: props.result.timestamp,
     result: props.result
   };
-  const allData = [currentEntry, ...historyData];
+  const allData = [currentEntry, ...filteredHistory];
   console.log('[LoadingDistributionTab] Total data for charts:', allData.length, 'entries');
 
   // Calculate statistics from all data (current + historical)
