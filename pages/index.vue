@@ -397,19 +397,33 @@ async function exportPDF() {
 }
 
 function saveResultToHistory(result: AnalysisResult) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') {
+    console.warn('[saveResultToHistory] Window is undefined, skipping save');
+    return;
+  }
 
   const STORAGE_KEY = 'performance-analysis-history';
   const MAX_HISTORY_ITEMS = 50;
 
   try {
-    const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const existingHistory = localStorage.getItem(STORAGE_KEY) || '[]';
+    console.log('[saveResultToHistory] Existing history length:', JSON.parse(existingHistory).length);
+
+    const history = JSON.parse(existingHistory);
     const entry = {
       id: `${result.url}-${result.timestamp}`,
       url: result.url,
       timestamp: result.timestamp,
       result
     };
+
+    console.log('[saveResultToHistory] Saving entry:', {
+      id: entry.id,
+      url: entry.url,
+      networkThrottling: result.options?.networkThrottling,
+      cpuThrottling: result.options?.cpuThrottling,
+      runningTime: result.runningTime
+    });
 
     history.unshift(entry);
 
@@ -418,8 +432,13 @@ function saveResultToHistory(result: AnalysisResult) {
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    console.log('[saveResultToHistory] Saved! New history length:', history.length);
+
+    // Verify save
+    const verifyHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    console.log('[saveResultToHistory] Verified history length:', verifyHistory.length);
   } catch (error) {
-    console.error('Failed to save to history:', error);
+    console.error('[saveResultToHistory] Failed to save to history:', error);
   }
 }
 </script>
