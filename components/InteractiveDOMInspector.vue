@@ -55,83 +55,101 @@
             @load="handleImageLoad"
           />
 
-          <!-- 하이라이트 오버레이 -->
+          <!-- 하이라이트 오버레이 (겹친 요소 모두 표시) -->
           <div
-            v-if="hoveredElement"
+            v-for="(element, index) in hoveredElements"
+            :key="index"
             class="highlight-overlay"
             :style="{
-              left: hoveredElement.boundingBox.x / scale.x + 'px',
-              top: hoveredElement.boundingBox.y / scale.y + 'px',
-              width: hoveredElement.boundingBox.width / scale.x + 'px',
-              height: hoveredElement.boundingBox.height / scale.y + 'px'
+              left: element.boundingBox.x / scale.x + 'px',
+              top: element.boundingBox.y / scale.y + 'px',
+              width: element.boundingBox.width / scale.x + 'px',
+              height: element.boundingBox.height / scale.y + 'px',
+              opacity: 0.3 - index * 0.05
             }"
           ></div>
 
-          <!-- 툴팁 -->
+          <!-- 툴팁 (겹친 요소 모두 표시) -->
           <div
-            v-if="hoveredElement && tooltipPosition"
+            v-if="hoveredElements.length > 0 && tooltipPosition"
             class="tooltip"
             :style="{
               left: tooltipPosition.x + 'px',
-              top: tooltipPosition.y + 'px'
+              top: tooltipPosition.y + 'px',
+              maxHeight: '600px',
+              overflowY: 'auto'
             }"
           >
-            <div class="tooltip-header">
-              <strong>{{ hoveredElement.tagName }}</strong>
-              <span v-if="hoveredElement.id" style="color: #3b82f6"> #{{ hoveredElement.id }}</span>
-              <span v-if="hoveredElement.className" style="color: #8b5cf6">
-                .{{ hoveredElement.className.split(' ')[0] }}
-              </span>
+            <div v-if="hoveredElements.length > 1" class="tooltip-info" style="margin-bottom: 8px; font-size: 12px; color: #666;">
+              겹친 요소 {{ hoveredElements.length }}개
             </div>
 
-            <div class="tooltip-content">
-              <div v-if="hoveredElement.innerText" class="tooltip-row">
-                <span class="label">텍스트:</span>
-                <span class="value">{{ hoveredElement.innerText }}</span>
+            <div
+              v-for="(element, index) in hoveredElements"
+              :key="index"
+              :style="{
+                marginBottom: index < hoveredElements.length - 1 ? '12px' : '0',
+                paddingBottom: index < hoveredElements.length - 1 ? '12px' : '0',
+                borderBottom: index < hoveredElements.length - 1 ? '1px solid #e5e7eb' : 'none'
+              }"
+            >
+              <div class="tooltip-header">
+                <strong>{{ element.tagName }}</strong>
+                <span v-if="element.id" style="color: #3b82f6"> #{{ element.id }}</span>
+                <span v-if="element.className" style="color: #8b5cf6">
+                  .{{ element.className.split(' ')[0] }}
+                </span>
               </div>
 
-              <div v-if="hoveredElement.loadTime" class="tooltip-row">
-                <span class="label">로드 시간:</span>
-                <span class="value highlight">{{ hoveredElement.loadTime.toFixed(0) }} ms</span>
-              </div>
+              <div class="tooltip-content">
+                <div v-if="element.innerText" class="tooltip-row">
+                  <span class="label">텍스트:</span>
+                  <span class="value">{{ element.innerText }}</span>
+                </div>
 
-              <div class="tooltip-row">
-                <span class="label">크기:</span>
-                <span class="value"
-                  >{{ hoveredElement.boundingBox.width }} ×
-                  {{ hoveredElement.boundingBox.height }} px</span
-                >
-              </div>
+                <div v-if="element.loadTime" class="tooltip-row">
+                  <span class="label">로드 시간:</span>
+                  <span class="value highlight">{{ element.loadTime.toFixed(0) }} ms</span>
+                </div>
 
-              <div class="tooltip-row">
-                <span class="label">위치:</span>
-                <span class="value"
-                  >({{ hoveredElement.boundingBox.x }}, {{ hoveredElement.boundingBox.y }})</span
-                >
-              </div>
+                <div class="tooltip-row">
+                  <span class="label">크기:</span>
+                  <span class="value"
+                    >{{ element.boundingBox.width }} ×
+                    {{ element.boundingBox.height }} px</span
+                  >
+                </div>
 
-              <div
-                v-if="hoveredElement.resourceTimings && hoveredElement.resourceTimings.length > 0"
-              >
-                <div class="tooltip-section-title">연관 리소스:</div>
+                <div class="tooltip-row">
+                  <span class="label">위치:</span>
+                  <span class="value"
+                    >({{ element.boundingBox.x }}, {{ element.boundingBox.y }})</span
+                  >
+                </div>
+
                 <div
-                  v-for="(resource, index) in hoveredElement.resourceTimings"
-                  :key="index"
-                  class="resource-item"
+                  v-if="element.resourceTimings && element.resourceTimings.length > 0"
                 >
-                  <div class="resource-type">{{ resource.type }}</div>
-                  <div class="resource-details">
-                    <span>{{ formatBytes(resource.size) }}</span>
-                    <span style="margin-left: 8px">{{ resource.duration.toFixed(0) }}ms</span>
+                  <div class="tooltip-section-title">연관 리소스:</div>
+                  <div
+                    v-for="(resource, rIndex) in element.resourceTimings"
+                    :key="rIndex"
+                    class="resource-item"
+                  >
+                    <div class="resource-type">{{ resource.type }}</div>
+                    <div class="resource-details">
+                      <span>{{ formatBytes(resource.size) }}</span>
+                      <span style="margin-left: 8px">{{ resource.duration.toFixed(0) }}ms</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div
-                v-if="!hoveredElement.loadTime && !hoveredElement.resourceTimings"
-                class="no-data"
-              >
-                로딩 정보 없음 (정적 요소)
+                <div
+                  v-if="!element.loadTime && !element.resourceTimings"
+                  class="no-data"
+                >
+                  로딩 정보 없음 (정적 요소)
+                </div>
               </div>
             </div>
           </div>
@@ -164,7 +182,7 @@ const props = defineProps<{
 
 const inspectorContainer = ref<HTMLElement | null>(null);
 const screenshotRef = ref<HTMLImageElement | null>(null);
-const hoveredElement = ref<DOMElementTiming | null>(null);
+const hoveredElements = ref<DOMElementTiming[]>([]);
 const tooltipPosition = ref<{ x: number; y: number } | null>(null);
 const scale = ref({ x: 1, y: 1 });
 
@@ -186,19 +204,17 @@ function updateScale() {
 
     const img = screenshotRef.value;
 
-    // Use viewport size from analysis options (default: 1920x1080)
-    const viewportWidth = props.result.options?.viewportWidth || 1920;
-    const viewportHeight = props.result.options?.viewportHeight || 1080;
-
-    if (img.clientWidth && img.clientHeight) {
+    // For fullPage screenshots, use naturalWidth/Height (actual page dimensions)
+    // instead of viewport size
+    if (img.naturalWidth && img.naturalHeight && img.clientWidth && img.clientHeight) {
       scale.value = {
-        x: viewportWidth / img.clientWidth,
-        y: viewportHeight / img.clientHeight
+        x: img.naturalWidth / img.clientWidth,
+        y: img.naturalHeight / img.clientHeight
       };
 
       console.log('[DOM Inspector] Scale calculation:', {
-        viewportWidth,
-        viewportHeight,
+        naturalWidth: img.naturalWidth,
+        naturalHeight: img.naturalHeight,
         clientWidth: img.clientWidth,
         clientHeight: img.clientHeight,
         scaleX: scale.value.x,
@@ -270,57 +286,59 @@ function handleMouseMove(event: MouseEvent) {
   const originalX = x * scale.value.x;
   const originalY = y * scale.value.y;
 
-  // Find DOM element at this position (using original coordinates)
-  const element = findElementAtPosition(originalX, originalY);
+  // Find all DOM elements at this position (using original coordinates)
+  const elements = findElementsAtPosition(originalX, originalY);
 
-  // Debug logging (only when element changes)
-  if (element && element !== hoveredElement.value) {
+  // Debug logging (only when elements change)
+  if (elements.length > 0 && elements[0] !== hoveredElements.value[0]) {
     console.log('[DOM Inspector] Element hover:', {
       displayCoords: { x, y },
       originalCoords: { x: originalX, y: originalY },
-      elementBox: element.boundingBox,
+      elementCount: elements.length,
+      elements: elements.map(el => ({ tagName: el.tagName, box: el.boundingBox })),
       scale: scale.value
     });
   }
 
-  if (element) {
-    hoveredElement.value = element;
+  if (elements.length > 0) {
+    hoveredElements.value = elements;
 
     // Position tooltip near cursor but avoid edges (using display coordinates)
-    const tooltipX = Math.min(x + 15, rect.width - 300);
-    const tooltipY = Math.min(y + 15, rect.height - 200);
+    const tooltipX = Math.min(x + 15, rect.width - 350);
+    const tooltipY = Math.min(y + 15, rect.height - 300);
 
     tooltipPosition.value = { x: tooltipX, y: tooltipY };
   } else {
-    hoveredElement.value = null;
+    hoveredElements.value = [];
     tooltipPosition.value = null;
   }
 }
 
 function handleMouseLeave() {
-  hoveredElement.value = null;
+  hoveredElements.value = [];
   tooltipPosition.value = null;
 }
 
-function findElementAtPosition(x: number, y: number): DOMElementTiming | null {
-  if (!props.result || !props.result.domElements) return null;
+function findElementsAtPosition(x: number, y: number): DOMElementTiming[] {
+  if (!props.result || !props.result.domElements) return [];
 
-  // Find all elements that contain this point, then return the smallest one (most specific)
+  // Find all elements that contain this point
   const matchingElements = props.result.domElements.filter(el => {
     const box = el.boundingBox;
     return x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height;
   });
 
-  if (matchingElements.length === 0) return null;
+  if (matchingElements.length === 0) return [];
 
-  // Sort by area (smallest first = most specific element)
+  // Sort by area (smallest first = most specific element on top)
   matchingElements.sort((a, b) => {
     const areaA = a.boundingBox.width * a.boundingBox.height;
     const areaB = b.boundingBox.width * b.boundingBox.height;
     return areaA - areaB;
   });
 
-  return matchingElements[0];
+  // Return all matching elements (overlapping elements)
+  return matchingElements;
 }
 
 function formatBytes(bytes: number): string {

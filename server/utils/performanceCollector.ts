@@ -177,7 +177,8 @@ export class PerformanceCollector {
       try {
         const screenshot = await page.screenshot({
           encoding: 'base64',
-          type: 'png'
+          type: 'png',
+          fullPage: true
         });
         const timestamp = (Date.now() - this.startTime) / 1000;
 
@@ -392,12 +393,15 @@ export class PerformanceCollector {
           const el = allElements[i];
           const rect = el.getBoundingClientRect();
 
-          // Skip if too small or not visible
+          // Skip if too small
           if (rect.width < 10 || rect.height < 10) continue;
-          if (rect.top > window.innerHeight * 2) continue; // Skip elements far below fold
 
           const selector = getSelector(el);
           const associatedResources = getAssociatedResources(el);
+
+          // Calculate absolute position in the full page (including scroll offset)
+          const absoluteX = Math.round(rect.left + window.scrollX);
+          const absoluteY = Math.round(rect.top + window.scrollY);
 
           elements.push({
             selector,
@@ -409,16 +413,16 @@ export class PerformanceCollector {
                 ? el.textContent.trim().substring(0, 50)
                 : undefined,
             boundingBox: {
-              x: Math.round(rect.left),
-              y: Math.round(rect.top),
+              x: absoluteX,
+              y: absoluteY,
               width: Math.round(rect.width),
               height: Math.round(rect.height)
             },
             associatedResources: associatedResources.length > 0 ? associatedResources : undefined
           });
 
-          // Limit to 500 elements to prevent huge payloads
-          if (elements.length >= 500) break;
+          // Limit to 1000 elements to prevent huge payloads (increased from 500 for full page)
+          if (elements.length >= 1000) break;
         }
 
         return elements;
