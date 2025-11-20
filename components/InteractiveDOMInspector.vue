@@ -180,16 +180,39 @@ const lastFrameImage = computed(() => {
 });
 
 function updateScale() {
-  if (!screenshotRef.value) return;
+  if (!screenshotRef.value || !props.result) return;
 
   const img = screenshotRef.value;
-  if (img.naturalWidth && img.clientWidth) {
+
+  // Use viewport size from analysis options (default: 1920x1080)
+  const viewportWidth = props.result.options?.viewportWidth || 1920;
+  const viewportHeight = props.result.options?.viewportHeight || 1080;
+
+  if (img.clientWidth && img.clientHeight) {
     scale.value = {
-      x: img.naturalWidth / img.clientWidth,
-      y: img.naturalHeight / img.clientHeight
+      x: viewportWidth / img.clientWidth,
+      y: viewportHeight / img.clientHeight
     };
+
+    console.log('[DOM Inspector] Scale calculation:', {
+      viewportWidth,
+      viewportHeight,
+      clientWidth: img.clientWidth,
+      clientHeight: img.clientHeight,
+      scaleX: scale.value.x,
+      scaleY: scale.value.y
+    });
   }
 }
+
+// Update scale on window resize
+onMounted(() => {
+  window.addEventListener('resize', updateScale);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateScale);
+});
 
 function handleMouseMove(event: MouseEvent) {
   if (!props.result || !props.result.domElements) return;
@@ -207,6 +230,16 @@ function handleMouseMove(event: MouseEvent) {
 
   // Find DOM element at this position (using original coordinates)
   const element = findElementAtPosition(originalX, originalY);
+
+  // Debug logging (only when element changes)
+  if (element && element !== hoveredElement.value) {
+    console.log('[DOM Inspector] Element hover:', {
+      displayCoords: { x, y },
+      originalCoords: { x: originalX, y: originalY },
+      elementBox: element.boundingBox,
+      scale: scale.value
+    });
+  }
 
   if (element) {
     hoveredElement.value = element;
