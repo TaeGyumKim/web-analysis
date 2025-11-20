@@ -1,4 +1,5 @@
 import { addHistoryEntry } from '../utils/historyStorage';
+import { logger } from '../utils/logger';
 import type { AnalysisResult } from '~/types/performance';
 
 export default defineEventHandler(async event => {
@@ -7,6 +8,7 @@ export default defineEventHandler(async event => {
     const result = body.result as AnalysisResult;
 
     if (!result) {
+      logger.warn('History save request missing result');
       return {
         success: false,
         error: 'Missing result in request body'
@@ -27,7 +29,7 @@ export default defineEventHandler(async event => {
       message: 'History entry saved successfully'
     };
   } catch (error) {
-    console.error('[POST /api/history] Error:', error);
+    logger.error('Failed to save history entry:', error);
 
     return {
       success: false,

@@ -8,6 +8,7 @@ import type {
   AnalysisOptions,
   DOMElementTiming
 } from '~/types/performance';
+import { logger } from './logger';
 
 interface NetworkRequestData {
   requestId: string;
@@ -50,15 +51,13 @@ export class PerformanceCollector {
     this.requests.clear();
     this.frames = [];
 
-    console.log('[PerformanceCollector] Starting analysis for:', url);
+    logger.info(`Starting analysis: ${url}`);
 
     try {
-      console.log('[PerformanceCollector] Enabling CDP domains...');
       // Enable necessary CDP domains
       await client.send('Network.enable');
       await client.send('Performance.enable');
       await client.send('Page.enable');
-      console.log('[PerformanceCollector] CDP domains enabled');
 
       // Apply network throttling if specified
       if (options.networkThrottling && options.networkThrottling !== 'none') {
@@ -90,35 +89,21 @@ export class PerformanceCollector {
       }
 
       // Navigate to URL without timeout for analyzing even worst-performing pages
-      // Use networkidle2 (500ms with max 2 connections) instead of networkidle0 (0 connections)
-      // for better compatibility with slow networks
       const waitCondition = options.waitUntil || 'networkidle2';
-
-      console.log(`[PerformanceCollector] Navigating with NO timeout, waitUntil: ${waitCondition}`);
+      logger.debug(`Navigating with NO timeout, waitUntil: ${waitCondition}`);
 
       await page.goto(url, {
         waitUntil: waitCondition as any,
-        timeout: 0 // 0 = no timeout, wait indefinitely for worst-performing pages
+        timeout: 0 // No timeout for worst-performing pages
       });
-      console.log('[PerformanceCollector] Navigation completed');
 
-      // Wait a bit more for animations and late resources
+      // Wait for animations and late resources
       await new Promise<void>(resolve => setTimeout(resolve, 2000));
 
-      console.log('[PerformanceCollector] Collecting performance metrics...');
-      // Collect performance metrics
+      // Collect all metrics
       const metrics = await this.collectMetrics(page);
-
-      console.log('[PerformanceCollector] Collecting long tasks...');
-      // Collect long tasks
       const longTasks = await this.collectLongTasks(page);
-
-      console.log('[PerformanceCollector] Collecting DOM elements...');
-      // Collect DOM elements with timing information
       const domElements = await this.collectDOMElements(page);
-
-      console.log('[PerformanceCollector] Capturing HTML snapshot...');
-      // Capture HTML snapshot
       const capturedHTML = await this.captureHTML(page);
 
       // Calculate running time
@@ -132,7 +117,7 @@ export class PerformanceCollector {
         m.computePerformanceScore(metrics, networkRequests, this.frames)
       );
 
-      console.log('[PerformanceCollector] Analysis completed successfully');
+      logger.info(`Analysis completed: ${url} (${runningTime}ms)`);
 
       return {
         url,
@@ -147,37 +132,28 @@ export class PerformanceCollector {
         capturedHTML
       };
     } catch (error) {
-      console.error('[PerformanceCollector] Analysis failed:', error);
-      console.error('[PerformanceCollector] Error details:', {
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+      logger.error('Analysis failed:', {
         url,
-        options
+        error: error instanceof Error ? error.message : String(error)
       });
       throw error;
     } finally {
-      console.log('[PerformanceCollector] Cleaning up resources...');
-      // Always stop frame capture before closing page
+      // Cleanup resources
       this.stopFrameCapture();
-      console.log('[PerformanceCollector] Frame capture stopped');
 
-      // Detach CDP session
       try {
         await client.detach();
-        console.log('[PerformanceCollector] CDP session detached');
       } catch (detachError) {
-        console.warn('[PerformanceCollector] Failed to detach CDP session:', detachError);
+        logger.warn('Failed to detach CDP session:', detachError);
       }
 
-      // Close page
       try {
         await page.close();
-        console.log('[PerformanceCollector] Page closed');
       } catch (closeError) {
-        console.error('[PerformanceCollector] Failed to close page:', closeError);
+        logger.error('Failed to close page:', closeError);
       }
 
-      console.log('[PerformanceCollector] Cleanup completed');
+      logger.debug('Resource cleanup completed');
     }
   }
 
@@ -241,9 +217,6 @@ export class PerformanceCollector {
     if (this.captureInterval) {
       clearInterval(this.captureInterval);
       this.captureInterval = null;
-      console.log('[PerformanceCollector] Frame capture interval cleared');
-    } else {
-      console.log('[PerformanceCollector] No frame capture interval to clear');
     }
   }
 

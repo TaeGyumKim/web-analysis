@@ -1,16 +1,17 @@
 import { loadHistory } from '../utils/historyStorage';
+import { logger } from '../utils/logger';
 
 export default defineEventHandler(() => {
   try {
     const history = loadHistory();
-    console.log('[GET /api/history] Returning', history.length, 'entries');
+    logger.debug(`Returning ${history.length} history entries`);
 
     return {
       success: true,
       data: history
     };
   } catch (error) {
-    console.error('[GET /api/history] Error:', error);
+    logger.error('Failed to load history:', error);
 
     return {
       success: false,

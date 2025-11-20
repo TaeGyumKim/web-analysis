@@ -398,14 +398,6 @@ async function exportPDF() {
 
 async function saveResultToHistory(result: AnalysisResult) {
   try {
-    console.log('[saveResultToHistory] Saving to server:', {
-      url: result.url,
-      timestamp: result.timestamp,
-      networkThrottling: result.options?.networkThrottling,
-      cpuThrottling: result.options?.cpuThrottling,
-      runningTime: result.runningTime
-    });
-
     const response = await $fetch('/api/history', {
       method: 'POST',
       body: {
@@ -413,13 +405,11 @@ async function saveResultToHistory(result: AnalysisResult) {
       }
     });
 
-    if (response.success) {
-      console.log('[saveResultToHistory] Saved successfully to server');
-    } else {
-      console.error('[saveResultToHistory] Server save failed:', response.error);
+    if (!response.success) {
+      console.error('Failed to save to history:', response.error);
     }
   } catch (error) {
-    console.error('[saveResultToHistory] Failed to save to server:', error);
+    console.error('Failed to save to history:', error);
   }
 }
 </script>

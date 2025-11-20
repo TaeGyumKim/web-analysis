@@ -2,6 +2,7 @@ import { PerformanceCollector } from '~/server/utils/performanceCollector';
 import { LighthouseCollector } from '~/server/utils/lighthouseCollector';
 import { CustomMetricsCalculator } from '~/server/utils/customMetricsCalculator';
 import type { AnalysisOptions } from '~/types/performance';
+import { logger } from '~/server/utils/logger';
 
 let collector: PerformanceCollector | null = null;
 let lighthouseCollector: LighthouseCollector | null = null;
@@ -11,7 +12,6 @@ export default defineEventHandler(async event => {
   let currentStep = 'initialization';
 
   try {
-    console.log('[API /analyze] Request received');
     const body = await readBody(event);
     const { url, options } = body as { url: string; options: AnalysisOptions };
 
@@ -24,7 +24,6 @@ export default defineEventHandler(async event => {
       });
     }
 
-    // Validate URL format
     try {
       new URL(url);
     } catch {
@@ -34,15 +33,12 @@ export default defineEventHandler(async event => {
       });
     }
 
-    console.log('[API /analyze] URL validated:', url);
-
     // Initialize collector if needed
     currentStep = 'collector-initialization';
     if (!collector) {
-      console.log('[API /analyze] Initializing new PerformanceCollector...');
+      logger.debug('Initializing PerformanceCollector');
       collector = new PerformanceCollector();
       await collector.initialize();
-      console.log('[API /analyze] PerformanceCollector initialized');
     }
 
     // Set default options
@@ -60,20 +56,16 @@ export default defineEventHandler(async event => {
 
     // Perform analysis
     currentStep = 'performance-analysis';
-    console.log('[API /analyze] Starting performance analysis...');
     const result = await collector.analyze(url, analysisOptions);
-    console.log('[API /analyze] Performance analysis completed');
 
     // Perform Lighthouse analysis if requested
     if (analysisOptions.useLighthouse) {
       currentStep = 'lighthouse-analysis';
       if (!lighthouseCollector) {
-        console.log('[API /analyze] Initializing LighthouseCollector...');
         lighthouseCollector = new LighthouseCollector();
       }
 
       try {
-        console.log('[API /analyze] Starting Lighthouse analysis...');
         const lighthouseResult = await lighthouseCollector.analyze({
           url,
           formFactor: analysisOptions.lighthouseFormFactor,
@@ -86,10 +78,8 @@ export default defineEventHandler(async event => {
         });
 
         result.lighthouse = lighthouseResult;
-        console.log('[API /analyze] Lighthouse analysis completed');
       } catch (lighthouseError) {
-        console.error('[API /analyze] Lighthouse analysis failed:', lighthouseError);
-        // Continue without Lighthouse data
+        logger.error('Lighthouse analysis failed:', lighthouseError);
       }
     }
 
@@ -97,8 +87,6 @@ export default defineEventHandler(async event => {
     if (analysisOptions.customMetrics && analysisOptions.customMetrics.length > 0) {
       currentStep = 'custom-metrics';
       try {
-        console.log('[API /analyze] Calculating custom metrics...');
-        // Get user timing and element timing data from the collector
         const userTimingData = collector.getUserTimingData?.() || [];
         const elementTimingData = collector.getElementTimingData?.() || [];
 
@@ -108,30 +96,21 @@ export default defineEventHandler(async event => {
           userTimingData,
           elementTimingData
         );
-        console.log('[API /analyze] Custom metrics calculated');
       } catch (customMetricsError) {
-        console.error('[API /analyze] Custom metrics calculation failed:', customMetricsError);
-        // Continue without custom metrics
+        logger.error('Custom metrics calculation failed:', customMetricsError);
       }
     }
 
-    // Include analysis options in the result for historical tracking
     result.options = analysisOptions;
-
-    const totalTime = Date.now() - startTime;
-    console.log(`[API /analyze] Request completed successfully in ${totalTime}ms`);
 
     return {
       success: true,
       data: result
     };
   } catch (error: any) {
-    const totalTime = Date.now() - startTime;
-    console.error(`[API /analyze] Request failed at step '${currentStep}' after ${totalTime}ms`);
-    console.error('[API /analyze] Error details:', {
-      step: currentStep,
+    logger.error(`Analysis failed at ${currentStep}:`, {
+      url: error.url,
       message: error.message,
-      statusCode: error.statusCode,
       stack: error.stack
     });
 

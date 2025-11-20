@@ -236,27 +236,19 @@ watch(
 
 async function initCharts() {
   if (!chartNetwork.value || !chartDevice.value || !chartTrend.value) {
-    console.warn('[LoadingDistributionTab] Canvas refs not ready');
     return;
   }
 
   if (!props.result) {
-    console.warn('[LoadingDistributionTab] No result available');
     return;
   }
 
   // Load historical data from server
   const historyData = await loadHistoryData();
-  console.log('[LoadingDistributionTab] History data loaded:', historyData.length, 'entries');
 
   // Filter history data to only include entries with the same URL
   const currentUrl = props.result.url;
   const filteredHistory = historyData.filter(entry => entry.url === currentUrl);
-  console.log(
-    `[LoadingDistributionTab] Filtered history for URL "${currentUrl}":`,
-    filteredHistory.length,
-    'entries'
-  );
 
   // Add current result to history data for chart calculations
   const currentEntry: HistoryEntry = {
@@ -266,16 +258,11 @@ async function initCharts() {
     result: props.result
   };
   const allData = [currentEntry, ...filteredHistory];
-  console.log('[LoadingDistributionTab] Total data for charts:', allData.length, 'entries');
 
   // Calculate statistics from all data (current + historical)
   const networkStats = calculateNetworkStats(allData);
   const deviceStats = calculateDeviceStats(allData);
   const trendStats = calculateTrendStats(allData);
-
-  console.log('[LoadingDistributionTab] Network stats:', networkStats);
-  console.log('[LoadingDistributionTab] Device stats:', deviceStats);
-  console.log('[LoadingDistributionTab] Trend stats:', trendStats);
 
   // 네트워크 속도별 차트
   networkChart = new Chart(chartNetwork.value, {
@@ -428,11 +415,10 @@ async function loadHistoryData(): Promise<HistoryEntry[]> {
   try {
     const response = await $fetch('/api/history');
     if (response.success && response.data) {
-      console.log('[loadHistoryData] Loaded from server:', response.data.length, 'entries');
       return response.data as HistoryEntry[];
     }
   } catch (error) {
-    console.error('[loadHistoryData] Failed to load history from server:', error);
+    console.error('Failed to load history from server:', error);
   }
   return [];
 }

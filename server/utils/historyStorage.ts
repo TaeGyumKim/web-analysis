@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { logger } from './logger';
 import type { AnalysisResult } from '~/types/performance';
 
 const HISTORY_DIR = path.join(process.cwd(), '.data', 'history');
@@ -40,7 +41,7 @@ export function loadHistory(): HistoryEntry[] {
     const data = fs.readFileSync(HISTORY_FILE, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
-    console.error('[historyStorage] Error loading history:', error);
+    logger.error('Error loading history:', error);
     return [];
   }
 }
@@ -54,10 +55,10 @@ export function saveHistory(history: HistoryEntry[]): boolean {
     const limitedHistory = history.slice(0, MAX_HISTORY_ITEMS);
 
     fs.writeFileSync(HISTORY_FILE, JSON.stringify(limitedHistory, null, 2), 'utf-8');
-    console.log('[historyStorage] Saved history with', limitedHistory.length, 'entries');
+    logger.debug(`Saved history with ${limitedHistory.length} entries`);
     return true;
   } catch (error) {
-    console.error('[historyStorage] Error saving history:', error);
+    logger.error('Error saving history:', error);
     return false;
   }
 }
@@ -83,8 +84,7 @@ export function addHistoryEntry(result: AnalysisResult): boolean {
       }
     };
 
-    console.log('[historyStorage] Adding entry:', {
-      id: entry.id,
+    logger.info('Adding history entry:', {
       url: entry.url,
       networkThrottling: entry.result.options.networkThrottling,
       cpuThrottling: entry.result.options.cpuThrottling,
@@ -97,7 +97,7 @@ export function addHistoryEntry(result: AnalysisResult): boolean {
     // Save updated history
     return saveHistory(history);
   } catch (error) {
-    console.error('[historyStorage] Error adding entry:', error);
+    logger.error('Error adding entry:', error);
     return false;
   }
 }

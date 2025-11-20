@@ -90,6 +90,27 @@ Start the production server:
 npm run preview
 ```
 
+#### Production Environment Variables
+
+Configure logging and performance settings:
+
+```bash
+# .env
+NODE_ENV=production
+VERBOSE_LOGGING=false  # Set to 'true' for detailed debug logs
+```
+
+**Logging Levels:**
+
+- `logger.info()`: Always shown (important events)
+- `logger.error()`: Always shown (errors)
+- `logger.warn()`: Always shown (warnings)
+- `logger.debug()`: Only shown when `NODE_ENV !== 'production'` or `VERBOSE_LOGGING=true`
+
+**History Storage:**
+
+Analysis results are automatically saved to `.data/history/analysis-history.json` (max 100 entries). This directory is gitignored and persists across deployments when using Docker volumes.
+
 ### Docker Deployment
 
 Build and run with Docker:
@@ -169,7 +190,7 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
   - 네트워크 속도별 로딩 시간 분포 (바 차트)
   - 장비별 로딩 시간 분포 (바 차트)
   - 24시간 로딩 시간 추이 (라인 차트)
-  - ⚠️ Note: 현재 mock 데이터 사용 (향후 히스토리 데이터 연동 예정)
+  - ✅ **서버 사이드 히스토리**: 분석 결과를 서버에 저장하여 URL별로 누적 통계 제공
 - 4개 요약 카드: 평균 로딩 시간, 성능 점수, 사용자 만족도, 최적화 가능성
 - 성능 개선 제안 (이미지 최적화, CSS 경량화, 리소스 사전 로딩)
 - Long Task 히스토그램 (지속시간 분포, 상위 작업)
@@ -210,6 +231,21 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
   - User Timing API 사용법
   - Element Timing 설정 방법
   - 계산된 메트릭 예제 (히어로 이미지 로딩 시간, API 응답 시간, 컨텐츠 렌더링 시간, 리소스 개수)
+
+**🔎 DOM 검사 탭** (NEW ✨)
+
+- **인터랙티브 DOM 인스펙터** (Chrome DevTools 스타일):
+  - **전체 페이지 스크린샷**: 분석된 페이지의 완전한 화면 캡처
+  - **클릭 기반 요소 선택**: 스크린샷 위에 오버레이된 요소들을 클릭하여 선택
+  - **요소 상세 정보**:
+    - 태그명, ID, 클래스명
+    - 위치 및 크기 (bounding box)
+    - 내부 텍스트 (최대 50자)
+    - 연결된 리소스 (이미지, 배경, 비디오 등)
+    - 리소스 로딩 타이밍 (duration, size, type)
+  - **시각적 하이라이트**: 선택된 요소를 페이지 위에 강조 표시
+  - **1000개 요소 캡처**: 10px 이상 크기의 모든 DOM 요소 자동 수집
+  - **절대 위치 좌표**: 스크롤을 고려한 정확한 요소 위치 계산
 
 ## Development
 
@@ -354,11 +390,15 @@ web-analysis/
 │   ├── api/
 │   │   ├── analyze.post.ts        # POST /api/analyze 엔드포인트
 │   │   ├── generate-pdf.post.ts   # POST /api/generate-pdf 엔드포인트 ⭐ NEW
+│   │   ├── history.get.ts         # GET /api/history 엔드포인트 ⭐ NEW
+│   │   ├── history.post.ts        # POST /api/history 엔드포인트 ⭐ NEW
 │   │   └── health.get.ts          # GET /api/health 엔드포인트
 │   └── utils/
 │       ├── performanceCollector.ts    # Puppeteer 기반 수집기
 │       ├── lighthouseCollector.ts     # Lighthouse 수집기 ⭐
-│       └── customMetricsCalculator.ts # 커스텀 메트릭 계산 유틸리티 ⭐ NEW
+│       ├── customMetricsCalculator.ts # 커스텀 메트릭 계산 유틸리티 ⭐ NEW
+│       ├── historyStorage.ts          # 분석 히스토리 파일 저장 ⭐ NEW
+│       └── logger.ts                  # 환경별 로깅 유틸리티 ⭐ NEW
 ├── types/
 │   └── performance.ts            # TypeScript 타입 정의
 ├── utils/
@@ -616,6 +656,15 @@ npm run test:ui
   - **Glossary 시스템**: 15+ 전문 용어 한글 설명 (FCP, LCP, TBT, CLS, TTFB, FID, 네트워크 스로틀링, Lighthouse 등)
   - **전역 적용**: 모든 탭과 메트릭 상세에 툴팁 추가
   - **비개발자 친화적**: 디자이너도 쉽게 이해할 수 있는 설명
+- [x] **서버 사이드 히스토리** ✨ NEW:
+  - **파일 기반 저장**: `.data/history/` 디렉토리에 JSON 형식으로 저장
+  - **URL별 필터링**: 로딩 분포 차트에서 동일 URL만 비교
+  - **최대 100개 항목**: 자동으로 오래된 항목 제거
+  - **최소 데이터**: 전체 분석 결과가 아닌 필수 메트릭만 저장하여 용량 최적화
+- [x] **무제한 타임아웃** ✨ NEW:
+  - **최악 성능 페이지 분석**: 타임아웃 없이 페이지가 완전히 로드될 때까지 대기
+  - **networkidle2 전략**: 2개 이하의 네트워크 연결만 남을 때까지 대기
+  - **강화된 에러 처리**: CDP 세션 정리, 단계별 에러 추적
 
 ## Future Enhancements
 
@@ -627,7 +676,9 @@ npm run test:ui
 ### Medium Priority (추천 기능 #8 완료)
 
 - [x] **고급 시각화**: ✅ Radar, Doughnut, Heatmap, Animated Charts 구현 완료
-- [ ] **로딩 분포 실제 데이터 연동**: 현재 mock 데이터 사용, 히스토리 데이터 활용 필요
+- [x] **로딩 분포 실제 데이터 연동**: ✅ 서버 사이드 히스토리 저장 및 URL별 필터링 구현 완료
+- [x] **DOM 인스펙터**: ✅ Chrome DevTools 스타일 인터랙티브 DOM 검사 도구 구현 완료
+- [x] **환경별 로깅**: ✅ 프로덕션/개발 환경별 로그 레벨 관리 구현 완료
 - [ ] **인터랙티브 차트 추가 개선**: D3.js 도입, 줌/팬 기능
 
 ### Low Priority
