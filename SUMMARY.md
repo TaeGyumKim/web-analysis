@@ -308,11 +308,15 @@ web-analysis/
 │   ├── api/
 │   │   ├── analyze.post.ts             # POST /api/analyze 엔드포인트
 │   │   ├── generate-pdf.post.ts        # POST /api/generate-pdf 엔드포인트 ⭐
+│   │   ├── history.get.ts              # GET /api/history 엔드포인트 ⭐ NEW
+│   │   ├── history.post.ts             # POST /api/history 엔드포인트 ⭐ NEW
 │   │   └── health.get.ts               # GET /api/health 헬스 체크 ⭐
 │   └── utils/
 │       ├── performanceCollector.ts     # Puppeteer 기반 수집기
 │       ├── lighthouseCollector.ts      # Lighthouse 수집기 ⭐
-│       └── customMetricsCalculator.ts  # 커스텀 메트릭 계산 엔진 ⭐
+│       ├── customMetricsCalculator.ts  # 커스텀 메트릭 계산 엔진 ⭐
+│       ├── historyStorage.ts           # 파일 기반 히스토리 저장 ⭐ NEW
+│       └── logger.ts                   # 환경별 로깅 유틸리티 ⭐ NEW
 ├── types/performance.ts                # TypeScript 타입 정의
 ├── utils/
 │   ├── scoreCalculator.ts              # 성능 점수 계산
@@ -464,14 +468,17 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - [x] ~~PDF 보고서 생성~~ ✅ 완료
 - [x] ~~커스텀 메트릭 시스템~~ ✅ 완료
 - [x] ~~Viewport 설정 기능~~ ✅ 완료
+- [x] ~~환경별 로깅 시스템~~ ✅ 완료
+- [x] ~~서버 사이드 히스토리 저장~~ ✅ 완료
+- [x] ~~LoadingDistributionTab 실제 히스토리 데이터 연동~~ ✅ 완료
 - [ ] 실시간 모니터링 대시보드
 - [ ] 다국어 지원 (현재 한국어만)
 - [ ] WebSocket 기반 실시간 분석 진행률
 - [ ] 사용자 계정 및 팀 기능
 - [ ] 알림 및 성능 임계값 경고
 - [ ] Kubernetes 배포 매니페스트
-- [ ] LoadingDistributionTab 실제 히스토리 데이터 연동 (현재 mock 데이터 사용)
 - [ ] CustomMetricsTab 히스토리 추적 기능 구현
+- [ ] 히스토리 데이터 내보내기 (CSV, JSON)
 
 ---
 
@@ -508,12 +515,20 @@ docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 - ✅ Help Tooltip 시스템 구축 (HelpTooltip.vue, glossary.ts)
 - ✅ 전역 용어 설명 적용 (11개 컴포넌트, 15+ 용어)
 - ✅ 네트워크 타임라인 UX 개선 (테이블 해설, 스크롤, 말줄임)
+- ✅ **환경별 로깅 시스템 구축** (logger.ts, 프로덕션/개발 분리) ⭐ NEW
+- ✅ **서버 사이드 히스토리 저장** (historyStorage.ts, URL별 필터링) ⭐ NEW
+- ✅ **전체 코드 정리** (console.log → logger, TODO 제거, 디버그 로그 정리) ⭐ NEW
+- ✅ **CI/CD 경로 수정** (nuxt-web-perf 참조 제거, 루트 경로 사용) ⭐ NEW
+- ✅ **Puppeteer CI 최적화** (.npmrc 설정, PUPPETEER_SKIP_DOWNLOAD) ⭐ NEW
 
 **아키텍처**:
 
 - **Frontend**: Nuxt 3 + Vue 3 + TypeScript + Chart.js
 - **Backend**: Nuxt Server API + Puppeteer + Lighthouse
-- **Storage**: localStorage (히스토리, 예산, 커스텀 메트릭)
+- **Storage**:
+  - File-based: `.data/history/` (분석 히스토리, 서버 사이드)
+  - localStorage: 성능 예산, 커스텀 메트릭 정의
+- **Logging**: 환경별 로거 (logger.ts, dev/prod 분리)
 - **DevOps**: GitHub Actions + Docker + E2E Testing (Playwright)
 
 **현재 기능 수준**: 엔터프라이즈급 웹 성능 분석 도구

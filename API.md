@@ -442,6 +442,240 @@ URL.revokeObjectURL(url);
 
 ---
 
+## GET /api/history
+
+분석 히스토리를 조회합니다.
+
+### Request
+
+**Endpoint**: `GET /api/history`
+
+### Response
+
+**Success (200 OK)**:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "https://www.example.com-1699876543210",
+      "url": "https://www.example.com",
+      "timestamp": "2024-11-13T08:15:43.210Z",
+      "result": {
+        "url": "https://www.example.com",
+        "timestamp": "2024-11-13T08:15:43.210Z",
+        "runningTime": 5432,
+        "options": {
+          "networkThrottling": "4g",
+          "cpuThrottling": 1
+        }
+      }
+    }
+  ]
+}
+```
+
+**Error (500 Internal Server Error)**:
+
+```json
+{
+  "success": false,
+  "error": "Failed to load history"
+}
+```
+
+### Response Fields
+
+| Field     | Type           | Description                     |
+| --------- | -------------- | ------------------------------- |
+| `success` | boolean        | 성공 여부                       |
+| `data`    | HistoryEntry[] | 히스토리 항목 배열 (최대 100개) |
+
+### HistoryEntry
+
+| Field       | Type   | Description                                           |
+| ----------- | ------ | ----------------------------------------------------- |
+| `id`        | string | 고유 ID (url-timestamp)                               |
+| `url`       | string | 분석한 URL                                            |
+| `timestamp` | string | 분석 시간 (ISO 8601)                                  |
+| `result`    | object | 최소 분석 결과 (url, timestamp, runningTime, options) |
+
+### Usage Example
+
+```javascript
+const response = await fetch('/api/history');
+const result = await response.json();
+
+if (result.success) {
+  console.log(`Total history: ${result.data.length} entries`);
+  result.data.forEach(entry => {
+    console.log(`${entry.url} - ${entry.result.runningTime}ms`);
+  });
+}
+```
+
+---
+
+## POST /api/history
+
+분석 결과를 히스토리에 저장합니다.
+
+### Request
+
+**Endpoint**: `POST /api/history`
+
+**Headers**:
+
+```
+Content-Type: application/json
+```
+
+**Body**:
+
+```json
+{
+  "result": {
+    "url": "https://www.example.com",
+    "timestamp": "2024-11-13T08:15:43.210Z",
+    "runningTime": 5432,
+    "options": {
+      "networkThrottling": "4g",
+      "cpuThrottling": 1
+    },
+    "metrics": { ... },
+    "performanceScore": { ... }
+  }
+}
+```
+
+### Request Parameters
+
+| Field    | Type           | Required | Description    |
+| -------- | -------------- | -------- | -------------- |
+| `result` | AnalysisResult | ✅       | 분석 결과 객체 |
+
+### Response
+
+**Success (200 OK)**:
+
+```json
+{
+  "success": true,
+  "message": "History entry saved successfully"
+}
+```
+
+**Error (400 Bad Request)**:
+
+```json
+{
+  "success": false,
+  "error": "Missing result in request body"
+}
+```
+
+**Error (500 Internal Server Error)**:
+
+```json
+{
+  "success": false,
+  "error": "Failed to save history entry"
+}
+```
+
+### Usage Example
+
+```javascript
+// 분석 후 자동으로 히스토리 저장
+const analyzeResponse = await fetch('/api/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    url: 'https://www.example.com',
+    options: { captureScreenshots: true }
+  })
+});
+const analyzeResult = await analyzeResponse.json();
+
+if (analyzeResult.success) {
+  // 히스토리에 저장
+  await fetch('/api/history', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      result: analyzeResult.data
+    })
+  });
+}
+```
+
+### Notes
+
+- 히스토리는 서버 파일 시스템에 저장됩니다 (`.data/history/analysis-history.json`)
+- 최대 100개 항목만 유지되며, 오래된 항목은 자동으로 삭제됩니다
+- 전체 분석 결과가 아닌 필수 정보만 저장하여 용량을 최적화합니다
+- 로딩 분포 차트에서 URL별로 필터링하여 사용됩니다
+
+---
+
+## GET /api/health
+
+서버 헬스 체크를 수행합니다.
+
+### Request
+
+**Endpoint**: `GET /api/health`
+
+### Response
+
+**Success (200 OK)**:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-11-13T08:15:43.210Z",
+  "uptime": 123.456,
+  "environment": "production",
+  "checks": {
+    "api": "ok",
+    "memory": "ok",
+    "puppeteer": "ok"
+  },
+  "memory": {
+    "rss": 256,
+    "heapTotal": 128,
+    "heapUsed": 64,
+    "external": 8
+  },
+  "responseTime": "5ms"
+}
+```
+
+### Response Fields
+
+| Field          | Type   | Description                            |
+| -------------- | ------ | -------------------------------------- |
+| `status`       | string | 헬스 상태 ("healthy" 또는 "unhealthy") |
+| `timestamp`    | string | 현재 시간 (ISO 8601)                   |
+| `uptime`       | number | 서버 가동 시간 (초)                    |
+| `environment`  | string | 실행 환경 (production/development)     |
+| `checks`       | object | 각 컴포넌트 체크 상태                  |
+| `memory`       | object | 메모리 사용량 (MB)                     |
+| `responseTime` | string | 응답 시간                              |
+
+### Usage Example
+
+```bash
+# Docker healthcheck
+curl -f http://localhost:3000/api/health || exit 1
+
+# Monitoring script
+curl http://localhost:3000/api/health | jq '.status'
+```
+
+---
+
 ## Notes
 
 - 분석 시간은 페이지 복잡도와 네트워크 상태에 따라 5초~60초 소요될 수 있습니다
@@ -450,3 +684,35 @@ URL.revokeObjectURL(url);
 - 동시 요청 수가 많을 경우 서버 리소스를 고려해야 합니다
 - Lighthouse 분석은 추가로 10-30초 소요될 수 있습니다
 - PDF 생성은 분석 결과 크기에 따라 5-15초 소요됩니다
+- 히스토리 저장은 자동으로 이루어지며, 최대 100개 항목까지 유지됩니다
+- `waitUntil: "networkidle2"` 사용 시 타임아웃이 없어 최악 성능 페이지도 분석 가능합니다
+
+## API Endpoints Summary
+
+| Method | Endpoint          | Description               |
+| ------ | ----------------- | ------------------------- |
+| POST   | /api/analyze      | 웹 페이지 성능 분석 수행  |
+| POST   | /api/generate-pdf | 분석 결과 PDF 리포트 생성 |
+| GET    | /api/history      | 분석 히스토리 조회        |
+| POST   | /api/history      | 분석 결과 히스토리 저장   |
+| GET    | /api/health       | 서버 헬스 체크            |
+
+## Environment Variables
+
+프로덕션 환경에서 사용 가능한 환경 변수:
+
+| Variable                  | Default         | Description                           |
+| ------------------------- | --------------- | ------------------------------------- |
+| NODE_ENV                  | development     | 실행 환경 (production/development)    |
+| VERBOSE_LOGGING           | false           | 상세 디버그 로그 출력 여부            |
+| PUPPETEER_SKIP_DOWNLOAD   | false           | Puppeteer Chromium 다운로드 스킵 여부 |
+| PUPPETEER_EXECUTABLE_PATH | (시스템 Chrome) | Puppeteer 사용 Chrome 경로            |
+
+## Logging
+
+서버는 환경별 로깅을 지원합니다:
+
+- `logger.info()`: 항상 출력 (중요 이벤트)
+- `logger.error()`: 항상 출력 (에러)
+- `logger.warn()`: 항상 출력 (경고)
+- `logger.debug()`: 개발 환경 또는 `VERBOSE_LOGGING=true`일 때만 출력
