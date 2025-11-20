@@ -5,7 +5,8 @@ import type {
   FrameCapture,
   LongTask,
   AnalysisResult,
-  AnalysisOptions
+  AnalysisOptions,
+  DOMElementTiming
 } from '~/types/performance';
 
 interface NetworkRequestData {
@@ -99,6 +100,12 @@ export class PerformanceCollector {
       // Collect long tasks
       const longTasks = await this.collectLongTasks(page);
 
+      // Collect DOM elements with timing information
+      const domElements = await this.collectDOMElements(page);
+
+      // Capture HTML snapshot
+      const capturedHTML = await this.captureHTML(page);
+
       // Calculate running time
       const runningTime = Date.now() - this.startTime;
 
@@ -118,7 +125,9 @@ export class PerformanceCollector {
         networkRequests,
         frames: this.frames,
         longTasks,
-        performanceScore
+        performanceScore,
+        domElements,
+        capturedHTML
       };
     } finally {
       // Always stop frame capture before closing page
@@ -332,6 +341,132 @@ export class PerformanceCollector {
     }
 
     return result.sort((a, b) => a.startTime - b.startTime);
+  }
+
+  private async collectDOMElements(page: Page): Promise<DOMElementTiming[]> {
+    try {
+      // Collect DOM elements with their timing and position information
+      const domElements = await page.evaluate(() => {
+        const elements: DOMElementTiming[] = [];
+        const allElements = document.querySelectorAll('*');
+
+        // Helper function to generate a unique CSS selector
+        const getSelector = (el: Element): string => {
+          if (el.id) return `#${el.id}`;
+          if (el.className && typeof el.className === 'string') {
+            const classes = el.className.trim().split(/\s+/).join('.');
+            if (classes) return `${el.tagName.toLowerCase()}.${classes}`;
+          }
+          return el.tagName.toLowerCase();
+        };
+
+        // Helper function to get associated resources (images, backgrounds, etc.)
+        const getAssociatedResources = (el: Element): string[] => {
+          const resources: string[] = [];
+
+          // Check for img src
+          if (el.tagName === 'IMG') {
+            const img = el as HTMLImageElement;
+            if (img.src) resources.push(img.src);
+          }
+
+          // Check for background images
+          const computedStyle = window.getComputedStyle(el);
+          const bgImage = computedStyle.backgroundImage;
+          if (bgImage && bgImage !== 'none') {
+            const matches = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+            if (matches && matches[1]) resources.push(matches[1]);
+          }
+
+          // Check for video/audio sources
+          if (el.tagName === 'VIDEO' || el.tagName === 'AUDIO') {
+            const media = el as HTMLMediaElement;
+            if (media.src) resources.push(media.src);
+          }
+
+          return resources;
+        };
+
+        // Limit to important elements (visible and reasonable size)
+        for (let i = 0; i < allElements.length; i++) {
+          const el = allElements[i];
+          const rect = el.getBoundingClientRect();
+
+          // Skip if too small or not visible
+          if (rect.width < 10 || rect.height < 10) continue;
+          if (rect.top > window.innerHeight * 2) continue; // Skip elements far below fold
+
+          const selector = getSelector(el);
+          const associatedResources = getAssociatedResources(el);
+
+          elements.push({
+            selector,
+            tagName: el.tagName,
+            className: el.className && typeof el.className === 'string' ? el.className : undefined,
+            id: el.id || undefined,
+            innerText:
+              el.textContent && el.textContent.length > 0
+                ? el.textContent.trim().substring(0, 50)
+                : undefined,
+            boundingBox: {
+              x: Math.round(rect.left),
+              y: Math.round(rect.top),
+              width: Math.round(rect.width),
+              height: Math.round(rect.height)
+            },
+            associatedResources: associatedResources.length > 0 ? associatedResources : undefined
+          });
+
+          // Limit to 500 elements to prevent huge payloads
+          if (elements.length >= 500) break;
+        }
+
+        return elements;
+      });
+
+      // Match DOM elements with network resource timings
+      const networkRequests = this.convertRequestsToArray();
+
+      for (const element of domElements) {
+        if (element.associatedResources && element.associatedResources.length > 0) {
+          element.resourceTimings = [];
+
+          for (const resourceUrl of element.associatedResources) {
+            const matchedRequest = networkRequests.find(req => req.url === resourceUrl);
+
+            if (matchedRequest) {
+              element.resourceTimings.push({
+                url: matchedRequest.url,
+                duration: matchedRequest.duration,
+                size: matchedRequest.size,
+                type: matchedRequest.type
+              });
+
+              // Set element load time based on the slowest resource
+              if (!element.loadTime || matchedRequest.endTime > element.loadTime) {
+                element.loadTime = matchedRequest.endTime * 1000; // Convert to ms
+              }
+            }
+          }
+        }
+      }
+
+      return domElements;
+    } catch (error) {
+      console.error('Error collecting DOM elements:', error);
+      return [];
+    }
+  }
+
+  private async captureHTML(page: Page): Promise<string> {
+    try {
+      // Get the full HTML of the page after all resources have loaded
+      const html = await page.content();
+      return html;
+    } catch (error) {
+      console.error('Error capturing HTML:', error);
+      return '';
+    }
   }
 
   async close() {

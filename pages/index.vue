@@ -164,6 +164,14 @@
       <div class="tab" :class="{ active: activeTab === 'custom' }" @click="activeTab = 'custom'">
         커스텀 메트릭
       </div>
+      <span class="divider">|</span>
+      <div
+        class="tab"
+        :class="{ active: activeTab === 'inspector' }"
+        @click="activeTab = 'inspector'"
+      >
+        DOM 검사
+      </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
@@ -194,6 +202,11 @@
     <!-- 커스텀 메트릭 탭 -->
     <div v-show="activeTab === 'custom'" style="margin-top: 20px">
       <CustomMetricsTab :result="analysisResult" />
+    </div>
+
+    <!-- DOM 검사 탭 -->
+    <div v-show="activeTab === 'inspector'" style="margin-top: 20px">
+      <InteractiveDOMInspector :result="analysisResult" />
     </div>
   </div>
 </template>
