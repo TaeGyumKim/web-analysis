@@ -410,19 +410,29 @@ function saveResultToHistory(result: AnalysisResult) {
     console.log('[saveResultToHistory] Existing history length:', JSON.parse(existingHistory).length);
 
     const history = JSON.parse(existingHistory);
+
+    // Only save minimal data needed for charts (not full result with screenshots/DOM)
     const entry = {
       id: `${result.url}-${result.timestamp}`,
       url: result.url,
       timestamp: result.timestamp,
-      result
+      result: {
+        url: result.url,
+        timestamp: result.timestamp,
+        runningTime: result.runningTime,
+        options: {
+          networkThrottling: result.options?.networkThrottling,
+          cpuThrottling: result.options?.cpuThrottling
+        }
+      }
     };
 
     console.log('[saveResultToHistory] Saving entry:', {
       id: entry.id,
       url: entry.url,
-      networkThrottling: result.options?.networkThrottling,
-      cpuThrottling: result.options?.cpuThrottling,
-      runningTime: result.runningTime
+      networkThrottling: entry.result.options.networkThrottling,
+      cpuThrottling: entry.result.options.cpuThrottling,
+      runningTime: entry.result.runningTime
     });
 
     history.unshift(entry);
@@ -431,7 +441,11 @@ function saveResultToHistory(result: AnalysisResult) {
       history.splice(MAX_HISTORY_ITEMS);
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    const dataToSave = JSON.stringify(history);
+    const dataSizeKB = (dataToSave.length / 1024).toFixed(2);
+    console.log('[saveResultToHistory] Data size to save:', dataSizeKB, 'KB');
+
+    localStorage.setItem(STORAGE_KEY, dataToSave);
     console.log('[saveResultToHistory] Saved! New history length:', history.length);
 
     // Verify save
@@ -439,6 +453,10 @@ function saveResultToHistory(result: AnalysisResult) {
     console.log('[saveResultToHistory] Verified history length:', verifyHistory.length);
   } catch (error) {
     console.error('[saveResultToHistory] Failed to save to history:', error);
+    if (error instanceof Error) {
+      console.error('[saveResultToHistory] Error message:', error.message);
+      console.error('[saveResultToHistory] Error stack:', error.stack);
+    }
   }
 }
 </script>
