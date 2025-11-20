@@ -53,7 +53,7 @@ services:
 
     # 볼륨 마운트 (개발 모드용 - 프로덕션에서는 제거)
     # volumes:
-    #   - ./nuxt-web-perf:/app
+    #   - .:/app
     #   - /app/node_modules
     #   - /app/.nuxt
 
@@ -65,6 +65,9 @@ services:
       - 'com.web-perf.version=1.0.0'
 
   # Nginx 리버스 프록시 (선택사항)
+  # Note: nginx 디렉토리와 설정 파일을 먼저 생성해야 합니다
+  # mkdir -p nginx/ssl
+  # nginx.conf 파일 생성 필요
   nginx:
     image: nginx:alpine
     container_name: nginx-proxy
