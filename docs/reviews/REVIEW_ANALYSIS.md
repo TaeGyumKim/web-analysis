@@ -227,8 +227,8 @@ Possible reasons for the inaccurate review:
 ### For Users Reading This
 
 1. **Trust the actual code** over review claims
-2. **Refer to PROJECT_SUMMARY.md** for accurate feature list
-3. **Check REVIEW_RESPONSE.md** for verified improvements
+2. **Refer to docs/PROJECT_SUMMARY.md** for accurate feature list
+3. **Check docs/reviews/REVIEW_RESPONSE.md** for verified improvements
 4. **Run the code** to see what actually works
 
 ### For Code Review
@@ -257,8 +257,8 @@ Possible reasons for the inaccurate review:
 
 **Trust the actual codebase and documentation:**
 
-- `PROJECT_SUMMARY.md` - Comprehensive overview
-- `REVIEW_RESPONSE.md` - Verified improvements
+- `docs/PROJECT_SUMMARY.md` - Comprehensive overview
+- `docs/reviews/REVIEW_RESPONSE.md` - Verified improvements
 - `README.md` - Feature list and usage
 - Actual code in `components/` and `server/`
 

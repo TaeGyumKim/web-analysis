@@ -214,7 +214,7 @@ if (err.data?.error) {
 ### ❌ 4. "AI Summary Mentioned"
 
 **Review:** Multiple references to AI summary feature
-**Reality:** NO AI integration exists (see REVIEW_ANALYSIS.md)
+**Reality:** NO AI integration exists (see docs/reviews/REVIEW_ANALYSIS.md)
 
 ---
 
@@ -378,9 +378,9 @@ await page.screenshot({
 
 For accurate current state, refer to:
 
-- **PROJECT_SUMMARY.md** - Complete feature list
-- **REVIEW_RESPONSE.md** - First review (commit `8fc535a` baseline)
-- **REVIEW_ANALYSIS.md** - Second review (inaccurate features)
+- **docs/PROJECT_SUMMARY.md** - Complete feature list
+- **docs/reviews/REVIEW_RESPONSE.md** - First review (commit `8fc535a` baseline)
+- **docs/reviews/REVIEW_ANALYSIS.md** - Second review (inaccurate features)
 - **THIS DOCUMENT** - Third review (commit timeline)
 
 ---

@@ -90,11 +90,15 @@ web-analysis/
 │   ├── exportUtils.ts             # 내보내기 유틸리티
 │   ├── glossary.ts                # 용어 설명
 │   └── scoreCalculator.ts         # 점수 계산
+├── docs/
+│   ├── PROJECT_SUMMARY.md    # 프로젝트 요약 (이 문서)
+│   └── reviews/
+│       ├── REVIEW_RESPONSE.md       # 코드 리뷰 대응 문서
+│       ├── REVIEW_ANALYSIS.md       # 리뷰 불일치 분석
+│       └── THIRD_REVIEW_ANALYSIS.md # 커밋 타임라인 분석
 ├── API.md                # API 문서
 ├── CLI.md                # CLI 도구 문서
-├── README.md             # 프로젝트 README
-├── REVIEW_RESPONSE.md    # 코드 리뷰 대응 문서
-└── PROJECT_SUMMARY.md    # 이 문서
+└── README.md             # 프로젝트 README
 ```
 
 ---
@@ -157,7 +161,7 @@ web-analysis/
 
 ### Phase 5: 리뷰 대응 (f64e071)
 
-- ✅ **리뷰 응답 문서**: REVIEW_RESPONSE.md
+- ✅ **리뷰 응답 문서**: docs/reviews/REVIEW_RESPONSE.md
 - ✅ **에러 UX 개선**: 제안사항 포함 메시지
 
 ---
@@ -340,8 +344,10 @@ web-analysis https://example.com --output markdown --file report.md
 - **README.md** - 프로젝트 소개 및 사용법
 - **API.md** - API 상세 문서
 - **CLI.md** - CLI 도구 가이드
-- **REVIEW_RESPONSE.md** - 코드 리뷰 대응
-- **PROJECT_SUMMARY.md** - 프로젝트 요약 (이 문서)
+- **docs/PROJECT_SUMMARY.md** - 프로젝트 요약 (이 문서)
+- **docs/reviews/REVIEW_RESPONSE.md** - 코드 리뷰 대응
+- **docs/reviews/REVIEW_ANALYSIS.md** - 리뷰 불일치 분석
+- **docs/reviews/THIRD_REVIEW_ANALYSIS.md** - 커밋 타임라인 분석
 
 ### 코드 문서화
 
