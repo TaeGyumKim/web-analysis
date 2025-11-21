@@ -18,7 +18,11 @@
   ],
   "author": "Web Performance Team",
   "license": "MIT",
+  "bin": {
+    "web-analysis": "./bin/cli.js"
+  },
   "scripts": {
+    "cli": "node bin/cli.js",
     "build": "npm run prepare:tsconfig && nuxt build",
     "dev": "nuxt dev",
     "generate": "npm run prepare:tsconfig && nuxt generate",

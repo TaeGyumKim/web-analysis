@@ -149,6 +149,10 @@
         로딩 분포
       </div>
       <span class="divider">|</span>
+      <div class="tab" :class="{ active: activeTab === 'bundle' }" @click="activeTab = 'bundle'">
+        JS 번들 분석
+      </div>
+      <span class="divider">|</span>
       <div class="tab" :class="{ active: activeTab === 'budget' }" @click="activeTab = 'budget'">
         성능 예산
       </div>
@@ -200,6 +204,13 @@
     <div v-show="activeTab === 'loading'" style="margin-top: 20px">
       <ClientOnly>
         <LoadingDistributionTab :result="analysisResult" />
+      </ClientOnly>
+    </div>
+
+    <!-- JS 번들 분석 탭 -->
+    <div v-show="activeTab === 'bundle'" style="margin-top: 20px">
+      <ClientOnly>
+        <BundleAnalysisTab :result="analysisResult" />
       </ClientOnly>
     </div>
 
