@@ -112,8 +112,8 @@
         <button class="btn" @click="reAnalyze">재분석</button>
         <button
           class="btn"
-          @click="toggleDarkMode"
           :title="isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환'"
+          @click="toggleDarkMode"
         >
           {{ isDarkMode ? '☀️' : '🌙' }}
         </button>
@@ -352,7 +352,26 @@ async function startAnalysis() {
     }
   } catch (err: any) {
     console.error('Analysis error:', err);
-    alert('분석 중 오류가 발생했습니다: ' + (err.data?.message || err.message));
+
+    // Display enhanced error message if available
+    if (err.data?.error) {
+      const error = err.data.error;
+      let errorMessage = `❌ ${error.title}\n\n${error.message}`;
+
+      if (error.suggestions && error.suggestions.length > 0) {
+        errorMessage += '\n\n💡 제안사항:';
+        error.suggestions.forEach((suggestion: string) => {
+          errorMessage += `\n• ${suggestion}`;
+        });
+      }
+
+      alert(errorMessage);
+    } else {
+      // Fallback to generic error
+      alert(
+        '분석 중 오류가 발생했습니다:\n' + (err.data?.message || err.message || '알 수 없는 오류')
+      );
+    }
   } finally {
     isAnalyzing.value = false;
   }
