@@ -8,7 +8,6 @@ import { createEnhancedError, formatErrorForResponse } from '~/server/utils/erro
 let lighthouseCollector: LighthouseCollector | null = null;
 
 export default defineEventHandler(async event => {
-  const startTime = Date.now();
   let currentStep = 'initialization';
 
   try {

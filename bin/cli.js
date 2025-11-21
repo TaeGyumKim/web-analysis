@@ -131,7 +131,7 @@ function mapNetworkThrottling(network) {
 
 // Start Nuxt server if not running
 async function ensureServerRunning() {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const http = require('http');
     const options = {
       hostname: 'localhost',
@@ -141,7 +141,7 @@ async function ensureServerRunning() {
       timeout: 2000
     };
 
-    const req = http.request(options, (res) => {
+    const req = http.request(options, () => {
       resolve(true);
     });
 
@@ -200,10 +200,10 @@ async function analyze(url, options) {
         },
         timeout: options.timeout + 30000 // Add 30s buffer
       },
-      (res) => {
+      res => {
         let data = '';
 
-        res.on('data', (chunk) => {
+        res.on('data', chunk => {
           data += chunk;
         });
 
@@ -222,7 +222,7 @@ async function analyze(url, options) {
       }
     );
 
-    req.on('error', (error) => {
+    req.on('error', error => {
       reject(new Error(`Request failed: ${error.message}`));
     });
 
@@ -268,14 +268,18 @@ function formatOutput(result, format) {
 - **Total Size:** ${formatBytes(getTotalSize(result))}
 - **Load Time:** ${result.runningTime}ms
 
-${result.lighthouse ? `
+${
+  result.lighthouse
+    ? `
 ## Lighthouse Scores
 
 - **Performance:** ${result.lighthouse.scores.performance}/100
 - **Accessibility:** ${result.lighthouse.scores.accessibility}/100
 - **Best Practices:** ${result.lighthouse.scores.bestPractices}/100
 - **SEO:** ${result.lighthouse.scores.seo}/100
-` : ''}
+`
+    : ''
+}
 `;
   }
 

@@ -6,8 +6,10 @@ import { QUEUE_CONFIG } from '~/utils/constants';
 interface QueueItem {
   url: string;
   options: AnalysisOptions;
-  resolve: (result: AnalysisResult) => void;
-  reject: (error: Error) => void;
+  // eslint-disable-next-line no-unused-vars
+  resolve: (value: AnalysisResult) => void;
+  // eslint-disable-next-line no-unused-vars
+  reject: (reason: Error) => void;
 }
 
 /**

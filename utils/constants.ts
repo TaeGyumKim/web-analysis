@@ -159,27 +159,12 @@ export function getMetricStatus(
 /**
  * Helper function to get color for a metric value
  */
-export function getMetricColor(
-  metric: keyof typeof PERFORMANCE_THRESHOLDS,
-  value: number
-): string {
+export function getMetricColor(metric: keyof typeof PERFORMANCE_THRESHOLDS, value: number): string {
   const status = getMetricStatus(metric, value);
   return SCORE_COLORS[status].hex;
 }
 
 /**
- * Helper function to get score status
+ * Note: getScoreStatus() and getScoreColor() functions are available in utils/scoreCalculator.ts
+ * to avoid duplication and maintain single source of truth.
  */
-export function getScoreStatus(score: number): 'good' | 'needs-improvement' | 'poor' {
-  if (score >= SCORE_RANGES.good) return 'good';
-  if (score >= SCORE_RANGES.needsImprovement) return 'needs-improvement';
-  return 'poor';
-}
-
-/**
- * Helper function to get color for a score
- */
-export function getScoreColor(score: number): string {
-  const status = getScoreStatus(score);
-  return SCORE_COLORS[status].hex;
-}

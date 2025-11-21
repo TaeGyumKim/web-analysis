@@ -1,4 +1,4 @@
-import { ref, watch, onMounted } from 'vue';
+import { ref } from 'vue';
 
 const isDarkMode = ref(false);
 
@@ -47,7 +47,7 @@ export function useDarkMode() {
 
       // Listen for system preference changes
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener('change', (e) => {
+      mediaQuery.addEventListener('change', e => {
         // Only update if user hasn't manually set preference
         if (localStorage.getItem('darkMode') === null) {
           isDarkMode.value = e.matches;
