@@ -136,7 +136,7 @@
 
 <script setup lang="ts">
 import { Chart, registerables } from 'chart.js';
-import type { AnalysisResult, CustomMetricResult } from '~/types/performance';
+import type { AnalysisResult } from '~/types/performance';
 import { glossary } from '~/utils/glossary';
 
 Chart.register(...registerables);

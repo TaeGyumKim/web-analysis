@@ -32,9 +32,7 @@
           <div class="history-timestamp">{{ formatTimestamp(entry.timestamp) }}</div>
         </div>
         <div class="history-item-details">
-          <span class="detail-badge">
-            ⏱️ {{ formatDuration(entry.result.runningTime) }}
-          </span>
+          <span class="detail-badge"> ⏱️ {{ formatDuration(entry.result.runningTime) }} </span>
           <span v-if="entry.result.options?.networkThrottling" class="detail-badge">
             🌐 {{ entry.result.options.networkThrottling }}
           </span>
@@ -65,7 +63,7 @@ interface HistoryEntry {
   };
 }
 
-const emit = defineEmits<{
+defineEmits<{
   select: [entry: HistoryEntry];
 }>();
 

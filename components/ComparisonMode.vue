@@ -41,20 +41,20 @@
       <div class="metrics-comparison">
         <h3>Core Web Vitals 비교</h3>
         <div class="metrics-grid">
-          <div
-            v-for="metric in coreMetrics"
-            :key="metric.key"
-            class="metric-card"
-          >
+          <div v-for="metric in coreMetrics" :key="metric.key" class="metric-card">
             <div class="metric-name">{{ metric.label }}</div>
             <div class="metric-values">
               <div class="metric-value">
                 <span class="label">Before:</span>
-                <span class="value">{{ formatMetricValue(baseline.metrics[metric.key], metric.unit) }}</span>
+                <span class="value">{{
+                  formatMetricValue(baseline.metrics[metric.key], metric.unit)
+                }}</span>
               </div>
               <div class="metric-value">
                 <span class="label">After:</span>
-                <span class="value">{{ formatMetricValue(comparison.metrics[metric.key], metric.unit) }}</span>
+                <span class="value">{{
+                  formatMetricValue(comparison.metrics[metric.key], metric.unit)
+                }}</span>
               </div>
               <div class="metric-diff" :class="getDiffClass(metric.key)">
                 {{ getDiffText(metric.key) }}
@@ -96,8 +96,18 @@
               <span>{{ baseline.networkRequests.length }}</span>
               <span class="arrow">→</span>
               <span>{{ comparison.networkRequests.length }}</span>
-              <span class="diff" :class="getNumberDiffClass(baseline.networkRequests.length, comparison.networkRequests.length)">
-                ({{ getNumberDiff(baseline.networkRequests.length, comparison.networkRequests.length) }})
+              <span
+                class="diff"
+                :class="
+                  getNumberDiffClass(
+                    baseline.networkRequests.length,
+                    comparison.networkRequests.length
+                  )
+                "
+              >
+                ({{
+                  getNumberDiff(baseline.networkRequests.length, comparison.networkRequests.length)
+                }})
               </span>
             </div>
           </div>
@@ -107,7 +117,10 @@
               <span>{{ formatBytes(getTotalSize(baseline)) }}</span>
               <span class="arrow">→</span>
               <span>{{ formatBytes(getTotalSize(comparison)) }}</span>
-              <span class="diff" :class="getNumberDiffClass(getTotalSize(baseline), getTotalSize(comparison))">
+              <span
+                class="diff"
+                :class="getNumberDiffClass(getTotalSize(baseline), getTotalSize(comparison))"
+              >
                 ({{ getNumberDiff(getTotalSize(baseline), getTotalSize(comparison), true) }})
               </span>
             </div>
@@ -123,7 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import type { AnalysisResult } from '~/types/performance';
 
 const props = defineProps<{
