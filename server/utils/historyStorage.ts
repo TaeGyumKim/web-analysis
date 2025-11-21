@@ -2,10 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { logger } from './logger';
 import type { AnalysisResult } from '~/types/performance';
+import { RESOURCE_LIMITS } from '~/utils/constants';
 
 const HISTORY_DIR = path.join(process.cwd(), '.data', 'history');
 const HISTORY_FILE = path.join(HISTORY_DIR, 'analysis-history.json');
-const MAX_HISTORY_ITEMS = 100;
+const MAX_HISTORY_ITEMS = RESOURCE_LIMITS.maxHistoryEntries;
 
 export interface HistoryEntry {
   id: string;

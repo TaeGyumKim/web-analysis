@@ -85,16 +85,18 @@ export class PerformanceCollector {
 
       // Set up frame capture
       if (options.captureScreenshots) {
-        this.startFrameCapture(page);
+        const screenshotInterval = options.screenshotInterval || 100;
+        this.startFrameCapture(page, screenshotInterval);
       }
 
-      // Navigate to URL without timeout for analyzing even worst-performing pages
+      // Navigate to URL with configurable timeout (default 60s)
       const waitCondition = options.waitUntil || 'networkidle2';
-      logger.debug(`Navigating with NO timeout, waitUntil: ${waitCondition}`);
+      const timeout = options.timeout !== undefined ? options.timeout : 60000;
+      logger.debug(`Navigating with timeout: ${timeout}ms, waitUntil: ${waitCondition}`);
 
       await page.goto(url, {
         waitUntil: waitCondition as any,
-        timeout: 0 // No timeout for worst-performing pages
+        timeout
       });
 
       // Wait for animations and late resources
@@ -193,7 +195,7 @@ export class PerformanceCollector {
     });
   }
 
-  private startFrameCapture(page: Page) {
+  private startFrameCapture(page: Page, interval: number = 100) {
     this.captureInterval = setInterval(async () => {
       try {
         const screenshot = await page.screenshot({
@@ -210,7 +212,7 @@ export class PerformanceCollector {
       } catch {
         // Silently ignore screenshot errors (happens when page is closed)
       }
-    }, 100); // Capture every 100ms
+    }, interval); // Configurable capture interval
   }
 
   private stopFrameCapture() {
@@ -317,25 +319,9 @@ export class PerformanceCollector {
   }
 
   private async applyNetworkThrottling(client: CDPSession, profile: string) {
-    const profiles = {
-      'slow-3g': {
-        downloadThroughput: (500 * 1024) / 8,
-        uploadThroughput: (500 * 1024) / 8,
-        latency: 400
-      },
-      'fast-3g': {
-        downloadThroughput: (1.6 * 1024 * 1024) / 8,
-        uploadThroughput: (750 * 1024) / 8,
-        latency: 150
-      },
-      '4g': {
-        downloadThroughput: (4 * 1024 * 1024) / 8,
-        uploadThroughput: (3 * 1024 * 1024) / 8,
-        latency: 20
-      }
-    };
+    const { NETWORK_PROFILES } = await import('~/utils/constants');
 
-    const throttling = profiles[profile as keyof typeof profiles];
+    const throttling = NETWORK_PROFILES[profile as keyof typeof NETWORK_PROFILES];
     if (throttling) {
       await client.send('Network.emulateNetworkConditions', {
         offline: false,
@@ -367,6 +353,9 @@ export class PerformanceCollector {
 
   private async collectDOMElements(page: Page): Promise<DOMElementTiming[]> {
     try {
+      // Import constants
+      const { RESOURCE_LIMITS } = await import('~/utils/constants');
+
       // Scroll to top before collecting elements to ensure accurate positions
       await page.evaluate(() => {
         window.scrollTo(0, 0);
@@ -376,7 +365,7 @@ export class PerformanceCollector {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Collect DOM elements with their timing and position information
-      const domElements = await page.evaluate(() => {
+      const domElements = await page.evaluate((maxElements: number) => {
         const elements: DOMElementTiming[] = [];
         const allElements = document.querySelectorAll('*');
 
@@ -450,12 +439,12 @@ export class PerformanceCollector {
             associatedResources: associatedResources.length > 0 ? associatedResources : undefined
           });
 
-          // Limit to 1000 elements to prevent huge payloads (increased from 500 for full page)
-          if (elements.length >= 1000) break;
+          // Limit to maxElements to prevent huge payloads
+          if (elements.length >= maxElements) break;
         }
 
         return elements;
-      });
+      }, RESOURCE_LIMITS.maxDOMElements);
 
       // Match DOM elements with network resource timings
       const networkRequests = this.convertRequestsToArray();

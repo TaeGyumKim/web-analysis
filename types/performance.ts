@@ -176,4 +176,6 @@ export interface AnalysisOptions {
   customMetrics?: CustomMetricDefinition[];
   viewportWidth?: number;
   viewportHeight?: number;
+  timeout?: number; // Page load timeout in milliseconds (default: 60000)
+  screenshotInterval?: number; // Screenshot capture interval in milliseconds (default: 100)
 }

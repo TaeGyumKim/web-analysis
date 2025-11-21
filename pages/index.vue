@@ -172,6 +172,18 @@
       >
         DOM 검사
       </div>
+      <span class="divider">|</span>
+      <div class="tab" :class="{ active: activeTab === 'history' }" @click="activeTab = 'history'">
+        분석 기록
+      </div>
+      <span class="divider">|</span>
+      <div
+        class="tab"
+        :class="{ active: activeTab === 'comparison' }"
+        @click="activeTab = 'comparison'"
+      >
+        성능 비교
+      </div>
     </div>
 
     <!-- 프레임 분석 탭 -->
@@ -211,6 +223,16 @@
       <ClientOnly>
         <InteractiveDOMInspector :result="analysisResult" :is-active="activeTab === 'inspector'" />
       </ClientOnly>
+    </div>
+
+    <!-- 분석 기록 탭 -->
+    <div v-show="activeTab === 'history'" style="margin-top: 20px">
+      <AnalysisHistory @select="loadHistoryEntry" />
+    </div>
+
+    <!-- 성능 비교 탭 -->
+    <div v-show="activeTab === 'comparison'" style="margin-top: 20px">
+      <ComparisonMode :current-result="analysisResult" />
     </div>
   </div>
 </template>
@@ -410,6 +432,41 @@ async function saveResultToHistory(result: AnalysisResult) {
     }
   } catch (error) {
     console.error('Failed to save to history:', error);
+  }
+}
+
+function loadHistoryEntry(entry: any) {
+  // Show alert that history entries are summaries only
+  const shouldReanalyze = confirm(
+    `이 기록은 요약 정보만 포함하고 있습니다.\n전체 분석 결과를 보려면 URL을 다시 분석해야 합니다.\n\n"${entry.url}"을 다시 분석하시겠습니까?`
+  );
+
+  if (shouldReanalyze) {
+    url.value = entry.url;
+    // Restore options if available
+    if (entry.result.options) {
+      if (entry.result.options.networkThrottling) {
+        const throttleMap: Record<string, string> = {
+          'slow-3g': 'Slow 3G',
+          'fast-3g': '3G',
+          '4g': '4G',
+          none: 'Wi-Fi'
+        };
+        networkSpeed.value = throttleMap[entry.result.options.networkThrottling] || '4G';
+      }
+      if (entry.result.options.cpuThrottling) {
+        const cpuMap: Record<number, string> = {
+          1: 'Desktop',
+          2: 'Mobile (High-end)',
+          4: 'Mobile (Mid-range)',
+          6: 'Mobile (Low-end)'
+        };
+        deviceSpec.value = cpuMap[entry.result.options.cpuThrottling] || 'Desktop';
+      }
+    }
+    // Switch to frame tab and trigger analysis
+    activeTab.value = 'frame';
+    startAnalysis();
   }
 }
 </script>

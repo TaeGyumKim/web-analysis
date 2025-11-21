@@ -1,10 +1,10 @@
-import { PerformanceCollector } from '~/server/utils/performanceCollector';
+import { getAnalysisQueue, closeAnalysisQueue } from '~/server/utils/analysisQueue';
 import { LighthouseCollector } from '~/server/utils/lighthouseCollector';
 import { CustomMetricsCalculator } from '~/server/utils/customMetricsCalculator';
 import type { AnalysisOptions } from '~/types/performance';
 import { logger } from '~/server/utils/logger';
+import { createEnhancedError, formatErrorForResponse } from '~/server/utils/errorHandler';
 
-let collector: PerformanceCollector | null = null;
 let lighthouseCollector: LighthouseCollector | null = null;
 
 export default defineEventHandler(async event => {
@@ -33,14 +33,6 @@ export default defineEventHandler(async event => {
       });
     }
 
-    // Initialize collector if needed
-    currentStep = 'collector-initialization';
-    if (!collector) {
-      logger.debug('Initializing PerformanceCollector');
-      collector = new PerformanceCollector();
-      await collector.initialize();
-    }
-
     // Set default options
     const analysisOptions: AnalysisOptions = {
       captureScreenshots: options?.captureScreenshots ?? true,
@@ -51,12 +43,15 @@ export default defineEventHandler(async event => {
       lighthouseFormFactor: options?.lighthouseFormFactor ?? 'desktop',
       customMetrics: options?.customMetrics ?? [],
       viewportWidth: options?.viewportWidth ?? 1920,
-      viewportHeight: options?.viewportHeight ?? 1080
+      viewportHeight: options?.viewportHeight ?? 1080,
+      timeout: options?.timeout ?? 60000, // 60 seconds default
+      screenshotInterval: options?.screenshotInterval ?? 250 // Reduced from 100ms to 250ms
     };
 
-    // Perform analysis
+    // Perform analysis using queue to handle concurrency
     currentStep = 'performance-analysis';
-    const result = await collector.analyze(url, analysisOptions);
+    const queue = getAnalysisQueue();
+    const result = await queue.enqueue(url, analysisOptions);
 
     // Perform Lighthouse analysis if requested
     if (analysisOptions.useLighthouse) {
@@ -87,14 +82,12 @@ export default defineEventHandler(async event => {
     if (analysisOptions.customMetrics && analysisOptions.customMetrics.length > 0) {
       currentStep = 'custom-metrics';
       try {
-        const userTimingData = collector.getUserTimingData?.() || [];
-        const elementTimingData = collector.getElementTimingData?.() || [];
-
+        // Custom metrics are now calculated from the result data
         result.customMetrics = CustomMetricsCalculator.calculateMetrics(
           analysisOptions.customMetrics,
           result,
-          userTimingData,
-          elementTimingData
+          [],
+          []
         );
       } catch (customMetricsError) {
         logger.error('Custom metrics calculation failed:', customMetricsError);
@@ -109,23 +102,25 @@ export default defineEventHandler(async event => {
     };
   } catch (error: any) {
     logger.error(`Analysis failed at ${currentStep}:`, {
-      url: error.url,
       message: error.message,
       stack: error.stack
     });
 
-    throw createError({
-      statusCode: error.statusCode || 500,
-      statusMessage: `Failed at ${currentStep}: ${error.message || 'Unknown error'}`
-    });
+    // Create enhanced error with user-friendly message
+    const enhancedError = createEnhancedError(error, currentStep);
+    const errorResponse = formatErrorForResponse(enhancedError);
+
+    // Return structured error response instead of throwing
+    return {
+      ...errorResponse,
+      step: currentStep
+    };
   }
 });
 
 // Cleanup on server shutdown
 if (process.env.NODE_ENV !== 'production') {
   process.on('SIGTERM', async () => {
-    if (collector) {
-      await collector.close();
-    }
+    await closeAnalysisQueue();
   });
 }
