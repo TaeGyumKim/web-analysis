@@ -3,35 +3,80 @@
     <p>분석 결과가 없습니다. 먼저 분석을 실행해주세요.</p>
   </div>
 
+  <div v-else-if="!analysis || analysis.totalCount === 0" class="empty-state">
+    <div class="no-scripts-message">
+      <span class="no-scripts-icon">📜</span>
+      <h3>JavaScript 파일을 찾을 수 없습니다</h3>
+      <p>이 페이지에서 JavaScript 리소스가 감지되지 않았습니다.</p>
+      <p class="no-scripts-hint">
+        가능한 원인:
+        <br />• 페이지에 외부 JavaScript 파일이 없음
+        <br />• 인라인 스크립트만 사용됨
+        <br />• 스크립트가 다른 방식으로 로드됨
+      </p>
+      <p class="debug-info">
+        총 네트워크 요청: {{ result.networkRequests?.length || 0 }}개
+      </p>
+    </div>
+  </div>
+
   <div v-else class="bundle-analysis">
     <!-- Summary Cards -->
     <div class="summary-cards">
       <div class="summary-card">
-        <div class="card-label">총 JS 크기</div>
+        <div class="card-label">
+          총 JS 크기
+          <HelpTooltip
+            :text="glossary.totalJsSize.description"
+            :title="glossary.totalJsSize.title"
+            position="bottom"
+          />
+        </div>
         <div class="card-value">{{ formatBytes(analysis.totalSize) }}</div>
         <div class="card-subtitle">{{ analysis.totalCount }}개 파일</div>
       </div>
 
       <div class="summary-card">
-        <div class="card-label">자사 스크립트</div>
+        <div class="card-label">
+          자사 스크립트
+          <HelpTooltip
+            :text="glossary.firstPartyScript.description"
+            :title="glossary.firstPartyScript.title"
+            position="bottom"
+          />
+        </div>
         <div class="card-value">{{ formatBytes(analysis.firstPartySize) }}</div>
         <div class="card-subtitle">
-          {{ ((analysis.firstPartySize / analysis.totalSize) * 100).toFixed(1) }}%
+          {{ getPercentage(analysis.firstPartySize, analysis.totalSize) }}%
         </div>
       </div>
 
       <div class="summary-card">
-        <div class="card-label">서드파티 스크립트</div>
+        <div class="card-label">
+          서드파티 스크립트
+          <HelpTooltip
+            :text="glossary.thirdPartyScript.description"
+            :title="glossary.thirdPartyScript.title"
+            position="bottom"
+          />
+        </div>
         <div class="card-value">{{ formatBytes(analysis.thirdPartySize) }}</div>
         <div class="card-subtitle">
-          {{ ((analysis.thirdPartySize / analysis.totalSize) * 100).toFixed(1) }}%
+          {{ getPercentage(analysis.thirdPartySize, analysis.totalSize) }}%
         </div>
       </div>
     </div>
 
     <!-- Optimization Suggestions -->
     <div v-if="suggestions.length > 0" class="suggestions-section">
-      <h3>📋 최적화 제안</h3>
+      <h3 class="section-title-with-tooltip">
+        최적화 제안
+        <HelpTooltip
+          :text="glossary.bundleOptimization.description"
+          :title="glossary.bundleOptimization.title"
+          position="right"
+        />
+      </h3>
       <div class="suggestions-list">
         <div v-for="(suggestion, index) in suggestions" :key="index" class="suggestion-item">
           <span class="suggestion-icon">💡</span>
@@ -558,5 +603,74 @@ onMounted(() => {
   font-weight: 500;
   color: #1f2937;
   z-index: 1;
+}
+
+.no-library-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.no-library-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.no-library-message p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.no-library-hint {
+  margin-top: 8px !important;
+  font-size: 12px !important;
+  color: #9ca3af;
+}
+
+.no-scripts-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.no-scripts-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.no-scripts-message h3 {
+  margin: 0 0 12px 0;
+  color: #374151;
+  font-size: 18px;
+}
+
+.no-scripts-message p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.no-scripts-hint {
+  margin-top: 16px !important;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 13px !important;
+  line-height: 1.8;
+}
+
+.debug-info {
+  margin-top: 16px !important;
+  font-size: 12px !important;
+  color: #9ca3af;
+  font-family: monospace;
 }
 </style>
