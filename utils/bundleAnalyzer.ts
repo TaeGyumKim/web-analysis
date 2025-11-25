@@ -23,27 +23,34 @@ export interface BundleAnalysis {
  * Common JavaScript libraries and their CDN patterns
  */
 const LIBRARY_PATTERNS = [
-  { name: 'React', patterns: [/react\./, /react-dom\./] },
-  { name: 'Vue', patterns: [/vue\./, /@vue\//] },
-  { name: 'Angular', patterns: [/angular\./, /@angular\//] },
-  { name: 'jQuery', patterns: [/jquery\./, /jquery-/] },
-  { name: 'Lodash', patterns: [/lodash\./, /lodash-/] },
-  { name: 'Moment.js', patterns: [/moment\./, /moment-/] },
-  { name: 'Chart.js', patterns: [/chart\./, /chartjs/] },
-  { name: 'D3.js', patterns: [/d3\./, /d3-/] },
-  { name: 'Three.js', patterns: [/three\./, /threejs/] },
-  { name: 'Bootstrap', patterns: [/bootstrap\./, /bootstrap-/] },
+  { name: 'React', patterns: [/react[.\-_]/, /react-dom/, /\/react\//] },
+  { name: 'Vue', patterns: [/vue[.\-_]/, /\/vue\//, /@vue\//] },
+  { name: 'Angular', patterns: [/angular[.\-_]/, /@angular\//] },
+  { name: 'jQuery', patterns: [/jquery[.\-_]/, /\/jquery\//] },
+  { name: 'Lodash', patterns: [/lodash[.\-_]/, /\/lodash\//] },
+  { name: 'Moment.js', patterns: [/moment[.\-_]/, /\/moment\//] },
+  { name: 'Chart.js', patterns: [/chart[.\-_]?js/, /chartjs/] },
+  { name: 'D3.js', patterns: [/\/d3[.\-_]/, /\/d3\//] },
+  { name: 'Three.js', patterns: [/three[.\-_]/, /threejs/] },
+  { name: 'Bootstrap', patterns: [/bootstrap[.\-_]/, /\/bootstrap\//] },
   { name: 'Tailwind', patterns: [/tailwind/] },
-  { name: 'Next.js', patterns: [/next\./, /_next\//] },
-  { name: 'Nuxt', patterns: [/nuxt\./, /_nuxt\//] },
-  { name: 'Webpack', patterns: [/webpack/] },
+  { name: 'Next.js', patterns: [/\/_next\//, /next[.\-_]/] },
+  { name: 'Nuxt', patterns: [/\/_nuxt\//, /nuxt[.\-_]/] },
+  { name: 'Webpack', patterns: [/webpack/, /webpackJsonp/] },
   { name: 'Babel', patterns: [/babel/] },
-  { name: 'Polyfill', patterns: [/polyfill/] },
-  { name: 'Google Analytics', patterns: [/google-analytics/, /ga\.js/, /gtag/] },
-  { name: 'Google Tag Manager', patterns: [/googletagmanager/] },
-  { name: 'Font Awesome', patterns: [/font-?awesome/] },
-  { name: 'Axios', patterns: [/axios/] },
-  { name: 'Sentry', patterns: [/sentry/] }
+  { name: 'Polyfill', patterns: [/polyfill/, /core-js/] },
+  { name: 'Google Analytics', patterns: [/google-analytics/, /\/ga\.js/, /gtag/, /analytics\.js/] },
+  { name: 'Google Tag Manager', patterns: [/googletagmanager/, /gtm\.js/] },
+  { name: 'Facebook SDK', patterns: [/connect\.facebook/, /fbevents/, /fb-root/] },
+  { name: 'Twitter', patterns: [/platform\.twitter/, /widgets\.js/] },
+  { name: 'Font Awesome', patterns: [/font-?awesome/, /fontawesome/] },
+  { name: 'Axios', patterns: [/axios[.\-_]/, /\/axios\//] },
+  { name: 'Sentry', patterns: [/sentry[.\-_]/, /\/sentry\//] },
+  { name: 'Swiper', patterns: [/swiper[.\-_]/, /\/swiper\//] },
+  { name: 'GSAP', patterns: [/gsap[.\-_]/, /greensock/] },
+  { name: 'Lottie', patterns: [/lottie/] },
+  { name: 'Kakao SDK', patterns: [/developers\.kakao/, /kakao[.\-_]?sdk/] },
+  { name: 'Naver SDK', patterns: [/openapi\.map\.naver/, /naver[.\-_]?sdk/] }
 ] as const;
 
 /**
@@ -96,14 +103,45 @@ export function analyzeBundles(
   networkRequests: NetworkRequest[],
   pageUrl: string
 ): BundleAnalysis {
-  // Filter JavaScript requests
-  const jsRequests = networkRequests.filter(
-    req =>
-      req.type === 'script' ||
-      req.url.endsWith('.js') ||
-      req.url.endsWith('.mjs') ||
-      req.url.includes('.js?')
-  );
+  // Debug: log incoming data
+  if (process.dev) {
+    console.log('[BundleAnalyzer] Total network requests:', networkRequests.length);
+    console.log('[BundleAnalyzer] Request types:', [...new Set(networkRequests.map(r => r.type))]);
+  }
+
+  // Filter JavaScript requests (type is case-insensitive since CDP returns 'Script')
+  const jsRequests = networkRequests.filter(req => {
+    const type = req.type?.toLowerCase() || '';
+    const url = req.url?.toLowerCase() || '';
+
+    // Check for script type or JavaScript file extensions
+    const isScript = type === 'script';
+    const hasJsExtension =
+      url.endsWith('.js') ||
+      url.endsWith('.mjs') ||
+      url.includes('.js?') ||
+      url.includes('.js#');
+
+    // Also check for common script content types in URL patterns
+    const isJsContentType =
+      url.includes('/javascript') ||
+      url.includes('application/javascript') ||
+      url.includes('text/javascript');
+
+    return isScript || hasJsExtension || isJsContentType;
+  });
+
+  // Debug: log filtered results
+  if (process.dev) {
+    console.log('[BundleAnalyzer] JS requests found:', jsRequests.length);
+    if (jsRequests.length > 0) {
+      console.log('[BundleAnalyzer] Sample JS request:', {
+        url: jsRequests[0].url.substring(0, 100),
+        type: jsRequests[0].type,
+        size: jsRequests[0].size
+      });
+    }
+  }
 
   const pageDomain = extractDomain(pageUrl);
   const bundles: BundleInfo[] = [];
