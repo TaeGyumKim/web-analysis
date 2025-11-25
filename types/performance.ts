@@ -178,4 +178,6 @@ export interface AnalysisOptions {
   viewportHeight?: number;
   timeout?: number; // Page load timeout in milliseconds (default: 60000)
   screenshotInterval?: number; // Screenshot capture interval in milliseconds (default: 100)
+  maxRenderWaitTime?: number; // Maximum time to wait for render completion in ms (default: 30000)
+  renderStabilityTime?: number; // Time without DOM changes to consider render complete in ms (default: 1000)
 }
