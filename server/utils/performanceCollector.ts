@@ -89,14 +89,13 @@ export class PerformanceCollector {
         this.startFrameCapture(page, screenshotInterval);
       }
 
-      // Navigate to URL with configurable timeout (default 60s)
+      // Navigate to URL with no timeout (infinite wait)
       const waitCondition = options.waitUntil || 'networkidle2';
-      const timeout = options.timeout !== undefined ? options.timeout : 60000;
-      logger.debug(`Navigating with timeout: ${timeout}ms, waitUntil: ${waitCondition}`);
+      logger.debug(`Navigating with no timeout (infinite wait), waitUntil: ${waitCondition}`);
 
       await page.goto(url, {
         waitUntil: waitCondition as any,
-        timeout
+        timeout: 0
       });
 
       // Wait for animations and late resources
