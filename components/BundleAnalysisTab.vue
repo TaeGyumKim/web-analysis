@@ -168,6 +168,11 @@ function truncateUrl(url: string, maxLength: number = 60): string {
   return `${start}...${end}`;
 }
 
+function getPercentage(part: number, total: number): string {
+  if (!total || total === 0) return '0.0';
+  return ((part / total) * 100).toFixed(1);
+}
+
 async function renderCharts() {
   if (!analysis.value || !process.client) return;
 
