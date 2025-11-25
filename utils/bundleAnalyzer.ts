@@ -192,8 +192,11 @@ export function analyzeBundles(
     }
   }
 
-  // Sort bundles by size (largest first)
-  const largestBundles = [...bundles].sort((a, b) => b.size - a.size).slice(0, 10);
+  // Sort bundles by size (largest first), filter out size 0 items
+  const largestBundles = [...bundles]
+    .filter(b => b.size > 0)
+    .sort((a, b) => b.size - a.size)
+    .slice(0, 10);
 
   return {
     totalSize,
