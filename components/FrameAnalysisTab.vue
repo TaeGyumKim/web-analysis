@@ -64,18 +64,30 @@
             <h3>현재 프레임 정보</h3>
             <div v-if="currentFrame">
               <div>시간: {{ (currentFrame.timestamp * 1000).toFixed(0) }}ms</div>
-              <div style="margin-top: 8px">상태: 렌더링 진행 중</div>
-              <div style="margin-top: 8px">설명: 페이지 로딩 프레임</div>
+              <div style="margin-top: 8px">
+                상태:
+                <span :class="['status-badge', frameStatus.class]">{{ frameStatus.text }}</span>
+              </div>
+              <div style="margin-top: 8px; color: #666; font-size: 13px">
+                {{ frameDescription }}
+              </div>
             </div>
             <div v-else style="color: #999">분석 결과 없음</div>
           </div>
 
-          <!-- 로드된 리소스 -->
+          <!-- 로드된 리소스 (현재 프레임 시점 기준) -->
           <div v-if="result" class="section-card">
-            <h3>로드된 리소스</h3>
-            <div>총 요청: {{ result.networkRequests.length }}</div>
-            <div style="margin-top: 8px">총 크기: {{ formatBytes(totalSize) }}</div>
-            <div style="margin-top: 8px">이미지: {{ imageCount }}</div>
+            <h3>로드된 리소스 <span style="font-size: 11px; color: #999; font-weight: normal">({{ (currentFrame?.timestamp * 1000 || 0).toFixed(0) }}ms)</span></h3>
+            <div>로드 완료: {{ loadedResourcesAtFrame.count }} / {{ result.networkRequests.length }}</div>
+            <div style="margin-top: 8px">로드된 크기: {{ formatBytes(loadedResourcesAtFrame.size) }}</div>
+            <div style="margin-top: 8px">이미지: {{ loadedResourcesAtFrame.images }} / {{ imageCount }}</div>
+            <div style="margin-top: 8px">스크립트: {{ loadedResourcesAtFrame.scripts }}</div>
+            <div class="resource-progress">
+              <div
+                class="resource-progress-fill"
+                :style="{ width: `${(loadedResourcesAtFrame.count / Math.max(result.networkRequests.length, 1)) * 100}%` }"
+              ></div>
+            </div>
           </div>
 
           <!-- 핵심 메트릭 -->
@@ -203,6 +215,101 @@ const imageCount = computed(() => {
   return props.result.networkRequests.filter(req => req.type.toLowerCase() === 'image').length;
 });
 
+// 현재 프레임 시점까지 로드된 리소스 계산
+const loadedResourcesAtFrame = computed(() => {
+  if (!props.result || !currentFrame.value) {
+    return { count: 0, size: 0, images: 0, scripts: 0 };
+  }
+
+  const frameTimeMs = currentFrame.value.timestamp * 1000;
+  let count = 0;
+  let size = 0;
+  let images = 0;
+  let scripts = 0;
+
+  for (const req of props.result.networkRequests) {
+    // endTime이 현재 프레임 시간보다 작거나 같으면 로드 완료
+    const endTimeMs = req.endTime * 1000;
+    if (endTimeMs <= frameTimeMs) {
+      count++;
+      size += req.size;
+      if (req.type.toLowerCase() === 'image') {
+        images++;
+      }
+      if (req.type.toLowerCase() === 'script') {
+        scripts++;
+      }
+    }
+  }
+
+  return { count, size, images, scripts };
+});
+
+// 프레임 상태 계산 (메트릭 기준)
+const frameStatus = computed(() => {
+  if (!props.result || !currentFrame.value) {
+    return { text: '-', class: '' };
+  }
+
+  const frameTimeMs = currentFrame.value.timestamp * 1000;
+  const metrics = props.result.metrics;
+  const totalFrames = frames.value.length;
+  const isLastFrame = currentFrameIndex.value === totalFrames - 1;
+
+  // 완료 상태
+  if (isLastFrame) {
+    return { text: '로딩 완료', class: 'status-complete' };
+  }
+
+  // LCP 이후
+  if (metrics.lcp && frameTimeMs >= metrics.lcp) {
+    return { text: 'LCP 완료', class: 'status-lcp' };
+  }
+
+  // FCP 이후
+  if (metrics.fcp && frameTimeMs >= metrics.fcp) {
+    return { text: '콘텐츠 표시됨', class: 'status-fcp' };
+  }
+
+  // FCP 이전
+  if (metrics.fcp && frameTimeMs < metrics.fcp) {
+    return { text: '초기 로딩', class: 'status-loading' };
+  }
+
+  return { text: '렌더링 중', class: 'status-rendering' };
+});
+
+// 프레임 설명 생성
+const frameDescription = computed(() => {
+  if (!props.result || !currentFrame.value) {
+    return '';
+  }
+
+  const frameTimeMs = currentFrame.value.timestamp * 1000;
+  const metrics = props.result.metrics;
+  const loaded = loadedResourcesAtFrame.value;
+  const totalRequests = props.result.networkRequests.length;
+  const loadPercent = totalRequests > 0 ? Math.round((loaded.count / totalRequests) * 100) : 0;
+
+  const descriptions: string[] = [];
+
+  // 메트릭 기준 설명
+  if (metrics.fcp && frameTimeMs < metrics.fcp) {
+    const remaining = Math.round(metrics.fcp - frameTimeMs);
+    descriptions.push(`FCP까지 ${remaining}ms 남음`);
+  } else if (metrics.fcp && metrics.lcp && frameTimeMs >= metrics.fcp && frameTimeMs < metrics.lcp) {
+    const remaining = Math.round(metrics.lcp - frameTimeMs);
+    descriptions.push(`LCP까지 ${remaining}ms 남음`);
+  } else if (metrics.lcp && frameTimeMs >= metrics.lcp) {
+    descriptions.push('주요 콘텐츠 로딩 완료');
+  }
+
+  // 리소스 로딩 상태
+  descriptions.push(`리소스 ${loadPercent}% 로드됨`);
+
+  return descriptions.join(' · ');
+});
+
 const averageLongTaskDuration = computed(() => {
   if (!props.result || !props.result.longTasks || props.result.longTasks.length === 0) return 0;
   const sum = props.result.longTasks.reduce((acc, task) => acc + task.duration, 0);
@@ -298,3 +405,53 @@ watch(
   }
 );
 </script>
+
+<style scoped>
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-loading {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-rendering {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-fcp {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-lcp {
+  background: #c7d2fe;
+  color: #3730a3;
+}
+
+.status-complete {
+  background: #10b981;
+  color: white;
+}
+
+.resource-progress {
+  margin-top: 12px;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.resource-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+</style>
