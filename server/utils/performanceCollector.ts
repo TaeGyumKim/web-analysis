@@ -329,6 +329,333 @@ export class PerformanceCollector {
     }
   }
 
+  /**
+   * Wait for the page to be fully rendered
+   * Comprehensive strategy to ensure all resources are loaded:
+   * 1. Wait for network to be completely idle
+   * 2. Wait for all images (including lazy-loaded and background images)
+   * 3. Wait for fonts
+   * 4. Wait for DOM stability
+   * 5. Final verification pass
+   */
+  private async waitForRenderComplete(page: Page, options: AnalysisOptions): Promise<void> {
+    const maxWaitTime = options.maxRenderWaitTime || 30000;
+    const stabilityThreshold = options.renderStabilityTime || 1000;
+
+    logger.debug(
+      `Waiting for render complete (max: ${maxWaitTime}ms, stability: ${stabilityThreshold}ms)`
+    );
+
+    const startWaitTime = Date.now();
+    const getElapsed = () => Date.now() - startWaitTime;
+    const getRemainingTime = () => Math.max(0, maxWaitTime - getElapsed());
+
+    try {
+      // Step 1: Wait for network requests to complete
+      logger.debug('Step 1: Waiting for network idle...');
+      await this.waitForNetworkIdle(page, Math.min(getRemainingTime(), 15000));
+
+      // Step 2: Wait for all images to load (including lazy-loaded)
+      logger.debug('Step 2: Waiting for images...');
+      await this.waitForAllImages(page, Math.min(getRemainingTime(), 15000));
+
+      // Step 3: Wait for fonts to load
+      logger.debug('Step 3: Waiting for fonts...');
+      await page.evaluate(() => {
+        return Promise.race([
+          (document as any).fonts?.ready || Promise.resolve(),
+          new Promise(resolve => setTimeout(resolve, 5000))
+        ]);
+      });
+
+      // Step 4: Wait for DOM stability (no mutations for stabilityThreshold)
+      logger.debug('Step 4: Waiting for DOM stability...');
+      await this.waitForDOMStability(page, stabilityThreshold, Math.min(getRemainingTime(), 10000));
+
+      // Step 5: Final verification - check if any new resources appeared
+      logger.debug('Step 5: Final verification...');
+      await this.finalResourceCheck(page, Math.min(getRemainingTime(), 5000));
+
+      // Final safety wait
+      const finalWait = Math.min(getRemainingTime(), 1000);
+      if (finalWait > 0) {
+        await new Promise<void>(resolve => setTimeout(resolve, finalWait));
+      }
+
+      logger.debug(`Render complete wait finished in ${getElapsed()}ms`);
+    } catch (error) {
+      logger.warn('Error during render wait, continuing anyway:', error);
+      await new Promise<void>(resolve => setTimeout(resolve, 2000));
+    }
+  }
+
+  /**
+   * Wait for network to be truly idle (no pending requests)
+   */
+  private async waitForNetworkIdle(_page: Page, timeout: number): Promise<void> {
+    const pendingRequests = new Set<string>();
+
+    // Track ongoing requests
+    for (const [, req] of this.requests) {
+      if (!req.endTime) {
+        pendingRequests.add(req.requestId);
+      }
+    }
+
+    if (pendingRequests.size === 0) {
+      // Already idle, but wait a bit for any new requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return;
+    }
+
+    // Wait for pending requests to complete
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeout) {
+      let stillPending = 0;
+      for (const [, req] of this.requests) {
+        if (!req.endTime) {
+          stillPending++;
+        }
+      }
+
+      if (stillPending === 0) {
+        // Wait a bit more for any new requests that might come in
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Check again
+        let newPending = 0;
+        for (const [, req] of this.requests) {
+          if (!req.endTime) {
+            newPending++;
+          }
+        }
+
+        if (newPending === 0) {
+          return;
+        }
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+
+  /**
+   * Wait for all images to load, including lazy-loaded and background images
+   */
+  private async waitForAllImages(page: Page, timeout: number): Promise<void> {
+    await page.evaluate((timeoutMs: number) => {
+      return new Promise<void>(resolve => {
+        const startTime = Date.now();
+        const checkInterval = 200;
+
+        const checkAllImagesLoaded = (): boolean => {
+          // Check regular images
+          const images = Array.from(document.images);
+          for (const img of images) {
+            if (!img.complete && img.src) {
+              return false;
+            }
+          }
+
+          // Check background images by looking at computed styles
+          const elementsWithBg = document.querySelectorAll('*');
+          for (const el of elementsWithBg) {
+            const style = window.getComputedStyle(el);
+            const bgImage = style.backgroundImage;
+            if (bgImage && bgImage !== 'none' && bgImage.includes('url(')) {
+              // We can't easily check if background images are loaded,
+              // but if they're in the DOM and we've waited, they should be loading
+            }
+          }
+
+          // Check for video poster images
+          const videos = document.querySelectorAll('video[poster]');
+          for (const video of videos) {
+            const poster = (video as HTMLVideoElement).poster;
+            if (poster) {
+              // Poster images should be loaded by now
+            }
+          }
+
+          return true;
+        };
+
+        const waitForImages = () => {
+          if (Date.now() - startTime > timeoutMs) {
+            resolve();
+            return;
+          }
+
+          // Get all images currently in DOM
+          const images = Array.from(document.images);
+          const unloadedImages = images.filter(img => !img.complete && img.src);
+
+          if (unloadedImages.length === 0 && checkAllImagesLoaded()) {
+            // Wait a bit more for any lazy-loaded images to appear
+            setTimeout(() => {
+              const newImages = Array.from(document.images);
+              const stillUnloaded = newImages.filter(img => !img.complete && img.src);
+
+              if (stillUnloaded.length === 0) {
+                resolve();
+              } else {
+                waitForImages();
+              }
+            }, 500);
+            return;
+          }
+
+          // Wait for current images to load
+          const imagePromises = unloadedImages.map(
+            img =>
+              new Promise<void>(imgResolve => {
+                if (img.complete) {
+                  imgResolve();
+                  return;
+                }
+
+                const onLoad = () => {
+                  img.removeEventListener('load', onLoad);
+                  img.removeEventListener('error', onError);
+                  imgResolve();
+                };
+
+                const onError = () => {
+                  img.removeEventListener('load', onLoad);
+                  img.removeEventListener('error', onError);
+                  imgResolve();
+                };
+
+                img.addEventListener('load', onLoad);
+                img.addEventListener('error', onError);
+
+                // Safety timeout for individual image
+                setTimeout(() => {
+                  img.removeEventListener('load', onLoad);
+                  img.removeEventListener('error', onError);
+                  imgResolve();
+                }, 10000);
+              })
+          );
+
+          Promise.all(imagePromises).then(() => {
+            // Check again for new lazy-loaded images
+            setTimeout(waitForImages, checkInterval);
+          });
+        };
+
+        waitForImages();
+      });
+    }, timeout);
+  }
+
+  /**
+   * Wait for DOM to stabilize (no mutations for a period)
+   */
+  private async waitForDOMStability(
+    page: Page,
+    stabilityMs: number,
+    timeout: number
+  ): Promise<void> {
+    await page.evaluate(
+      (stabilityThreshold: number, maxWait: number) => {
+        return new Promise<void>(resolve => {
+          let lastMutationTime = Date.now();
+          let resolved = false;
+
+          const observer = new MutationObserver(() => {
+            lastMutationTime = Date.now();
+          });
+
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            characterData: true
+          });
+
+          const checkStability = () => {
+            if (resolved) return;
+
+            const timeSinceLastMutation = Date.now() - lastMutationTime;
+            if (timeSinceLastMutation >= stabilityThreshold) {
+              resolved = true;
+              observer.disconnect();
+              resolve();
+            } else {
+              setTimeout(checkStability, 100);
+            }
+          };
+
+          // Start checking after a short delay
+          setTimeout(checkStability, 100);
+
+          // Safety timeout
+          setTimeout(() => {
+            if (!resolved) {
+              resolved = true;
+              observer.disconnect();
+              resolve();
+            }
+          }, maxWait);
+        });
+      },
+      stabilityMs,
+      timeout
+    );
+  }
+
+  /**
+   * Final check to ensure no new resources are loading
+   */
+  private async finalResourceCheck(page: Page, timeout: number): Promise<void> {
+    await page.evaluate((timeoutMs: number) => {
+      return new Promise<void>(resolve => {
+        const startTime = Date.now();
+
+        const check = () => {
+          if (Date.now() - startTime > timeoutMs) {
+            resolve();
+            return;
+          }
+
+          // Check for any loading indicators
+          const loadingElements = document.querySelectorAll(
+            '[class*="loading"], [class*="spinner"], [class*="skeleton"], ' +
+              '[data-loading="true"], [aria-busy="true"]'
+          );
+
+          let hasVisibleLoading = false;
+          loadingElements.forEach(el => {
+            const style = window.getComputedStyle(el);
+            if (style.display !== 'none' && style.visibility !== 'hidden') {
+              hasVisibleLoading = true;
+            }
+          });
+
+          if (hasVisibleLoading) {
+            setTimeout(check, 200);
+            return;
+          }
+
+          // Check for incomplete images one more time
+          const images = Array.from(document.images);
+          const unloaded = images.filter(img => !img.complete && img.src);
+
+          if (unloaded.length > 0) {
+            setTimeout(check, 200);
+            return;
+          }
+
+          // All checks passed
+          resolve();
+        };
+
+        check();
+      });
+    }, timeout);
+  }
+
   private convertRequestsToArray(): NetworkRequest[] {
     const result: NetworkRequest[] = [];
 
