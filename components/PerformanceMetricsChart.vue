@@ -1,25 +1,25 @@
 <template>
   <div class="card">
-    <h3 class="text-2xl font-bold text-gray-900 mb-6">Core Web Vitals 시각화</h3>
+    <h3 class="chart-title">Core Web Vitals 시각화</h3>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="chart-grid">
       <!-- Radar Chart -->
-      <div class="bg-white p-6 rounded-lg border border-gray-200">
-        <h4 class="text-lg font-semibold mb-4 text-gray-700">성능 메트릭 분포</h4>
+      <div class="chart-box">
+        <h4 class="chart-subtitle">성능 메트릭 분포</h4>
         <canvas ref="radarChart"></canvas>
       </div>
 
       <!-- Doughnut Chart for Score -->
-      <div class="bg-white p-6 rounded-lg border border-gray-200">
-        <h4 class="text-lg font-semibold mb-4 text-gray-700">종합 성능 점수</h4>
-        <div class="relative">
+      <div class="chart-box">
+        <h4 class="chart-subtitle">종합 성능 점수</h4>
+        <div class="score-container">
           <canvas ref="scoreChart"></canvas>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="text-center">
-              <div class="text-4xl font-bold" :style="{ color: getScoreColor(overallScore) }">
+          <div class="score-overlay">
+            <div class="score-text">
+              <div class="score-value" :style="{ color: getScoreColor(overallScore) }">
                 {{ overallScore }}
               </div>
-              <div class="text-sm text-gray-500">/ 100</div>
+              <div class="score-max">/ 100</div>
             </div>
           </div>
         </div>
@@ -27,13 +27,13 @@
     </div>
 
     <!-- Metric Bars with Animations -->
-    <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h4 class="text-lg font-semibold mb-4 text-gray-700">메트릭 상세</h4>
-      <div class="space-y-4">
-        <div v-for="metric in metricsData" :key="metric.name" class="space-y-2">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-              <span class="font-medium text-gray-700">{{ metric.label }}</span>
+    <div class="chart-box">
+      <h4 class="chart-subtitle">메트릭 상세</h4>
+      <div class="metrics-list">
+        <div v-for="metric in metricsData" :key="metric.name" class="metric-row">
+          <div class="metric-header">
+            <div class="metric-label-group">
+              <span class="metric-label">{{ metric.label }}</span>
               <HelpTooltip
                 v-if="glossary[metric.name]"
                 :text="glossary[metric.name].description"
@@ -41,7 +41,7 @@
                 position="top"
               />
               <span
-                class="text-xs px-2 py-1 rounded"
+                class="metric-badge"
                 :style="{
                   backgroundColor: getMetricBadgeColor(metric.value, metric.thresholds),
                   color: 'white'
@@ -50,13 +50,13 @@
                 {{ formatMetricValue(metric.value, metric.unit) }}
               </span>
             </div>
-            <span class="text-sm text-gray-500">
+            <span class="metric-target">
               목표: {{ metric.thresholds.good }}{{ metric.unit }}
             </span>
           </div>
-          <div class="relative h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div class="metric-bar-bg">
             <div
-              class="absolute h-full transition-all duration-1000 ease-out rounded-full"
+              class="metric-bar-fill"
               :style="{
                 width: `${getMetricPercentage(metric.value, metric.thresholds)}%`,
                 backgroundColor: getMetricBarColor(metric.value, metric.thresholds)
@@ -68,8 +68,8 @@
     </div>
 
     <!-- Timeline Visualization -->
-    <div class="bg-white p-6 rounded-lg border border-gray-200 mt-6">
-      <h4 class="text-lg font-semibold mb-4 text-gray-700">로딩 타임라인</h4>
+    <div class="chart-box timeline-box">
+      <h4 class="chart-subtitle">로딩 타임라인</h4>
       <canvas ref="timelineChart"></canvas>
     </div>
   </div>
@@ -400,10 +400,122 @@ function formatMetricValue(value: number, unit: string): string {
 </script>
 
 <style scoped>
-.card {
-  background: white;
+.chart-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .chart-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.chart-box {
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-primary);
+}
+
+.timeline-box {
+  margin-top: 1.5rem;
+}
+
+.chart-subtitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.score-container {
+  position: relative;
+}
+
+.score-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-text {
+  text-align: center;
+}
+
+.score-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+}
+
+.score-max {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+}
+
+.metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.metric-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-label-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.metric-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.metric-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.metric-target {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+}
+
+.metric-bar-bg {
+  position: relative;
+  height: 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.metric-bar-fill {
+  position: absolute;
+  height: 100%;
+  transition: all 1s ease-out;
+  border-radius: 9999px;
 }
 </style>
