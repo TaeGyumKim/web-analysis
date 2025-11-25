@@ -4,8 +4,9 @@
 
 ## Features
 
-- 🎯 **6개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, 성능 예산, Lighthouse, 커스텀 메트릭
+- 🎯 **10개 탭 분석 시스템**: 프레임 분석, 네트워크 타임라인, 로딩 분포, **JS 번들 분석**, 성능 예산, Lighthouse, 커스텀 메트릭, DOM 검사, **분석 기록**, **성능 비교**
 - 📊 **종합 성능 분석**: FCP, LCP, TBT, CLS, TTFB 등 핵심 메트릭 측정
+- 🌙 **다크 모드 지원**: 시스템 설정 자동 감지 및 수동 토글 (localStorage에 저장)
 - 🎬 **프레임별 렌더링 과정**: 페이지 로드 과정을 프레임 단위로 캡처 및 재생
 - 🌊 **네트워크 워터폴 차트**: 모든 네트워크 요청을 타임라인으로 시각화
 - 📈 **고급 인터랙티브 시각화**:
@@ -20,6 +21,32 @@
 - 💾 **결과 내보내기**: JSON, 텍스트 리포트, CSV, **PDF 리포트** 형식으로 분석 결과 저장
 - 💰 **성능 예산**: 목표 메트릭 설정 및 실제 성능 비교
 - 🔍 **Lighthouse 통합**: Google Lighthouse 기반 성능, 접근성, SEO, PWA 분석
+- 📦 **JS 번들 분석** ✨ NEW:
+  - **자사/서드파티 분류**: 스크립트 origin 자동 구분
+  - **라이브러리 감지**: React, Vue, jQuery 등 20개 이상 라이브러리 자동 인식
+  - **도메인별 분포**: 도넛 차트로 크기 및 개수 시각화
+  - **최적화 제안**: 자동 생성된 번들 최적화 권장사항
+  - **Top 10 번들**: 크기별 상위 10개 스크립트 테이블
+- 🔄 **분석 기록** ✨ NEW:
+  - **히스토리 UI**: 과거 분석 결과 조회 및 재분석
+  - **자동 저장**: 모든 분석 결과 자동 히스토리 저장 (최대 100개)
+  - **빠른 재분석**: 클릭 한 번으로 이전 설정 복원 및 재실행
+- ⚖️ **성능 비교 모드** ✨ NEW:
+  - **Side-by-Side 비교**: Before/After 분석 결과 동시 표시
+  - **메트릭 변화 추적**: 각 Core Web Vitals 개선/퇴보 시각화
+  - **퍼센트 변화**: 절대값 및 상대값 모두 표시
+  - **네트워크 비교**: 요청 수, 총 크기 변화 비교
+- 🔧 **향상된 안정성** ✨ NEW:
+  - **동시성 처리**: 분석 큐로 다중 요청 안전하게 처리
+  - **재시도 로직**: 일시적 오류 시 최대 3회 자동 재시도
+  - **타임아웃 설정**: 기본 60초, 커스터마이징 가능
+  - **사용자 친화적 에러**: 상황별 구체적인 에러 메시지 및 해결방법 제공
+- 💻 **CLI 도구 for CI/CD** ✨ NEW:
+  - **명령줄 분석**: `web-analysis <url> [options]` 형식으로 실행
+  - **출력 형식**: JSON, Markdown 지원
+  - **임계값 검증**: 성능 점수 기반 Pass/Fail 판정
+  - **CI/CD 통합**: Exit codes로 파이프라인 연동
+  - **자동화**: GitHub Actions, GitLab CI 예제 제공
 - 🎛️ **커스텀 메트릭**: 사용자 정의 성능 지표 생성 및 추적
   - **User Timing API**: performance.mark()/measure() 기반 메트릭
   - **Element Timing**: 특정 요소의 렌더링 시간 측정
@@ -134,7 +161,44 @@ docker pull ghcr.io/TaeGyumKim/web-analysis:latest
 docker run -p 3000:3000 ghcr.io/TaeGyumKim/web-analysis:latest
 ```
 
-### Using the Analyzer
+### CLI Tool (CI/CD Integration)
+
+웹 인터페이스 외에도 명령줄에서 분석을 실행할 수 있습니다:
+
+```bash
+# Install globally
+npm install -g .
+
+# Basic usage
+web-analysis https://example.com
+
+# With options
+web-analysis https://example.com \
+  --threshold 80 \
+  --output markdown \
+  --file report.md \
+  --lighthouse \
+  --network 4g
+
+# CI/CD integration (exits with code 1 if score < threshold)
+web-analysis https://example.com --threshold 90 || exit 1
+```
+
+**Available Options:**
+
+- `--output, -o <format>`: Output format (json|markdown) [default: json]
+- `--file, -f <path>`: Output file path
+- `--threshold <score>`: Performance score threshold (0-100) [default: 75]
+- `--network <type>`: Network throttling (none|slow-3g|fast-3g|4g)
+- `--device <type>`: Device type (desktop|mobile-high|mobile-mid|mobile-low)
+- `--timeout <ms>`: Page load timeout [default: 60000]
+- `--lighthouse`: Enable Lighthouse audit
+- `--no-screenshots`: Disable screenshot capture
+- `--help, -h`: Show help message
+
+자세한 CLI 도구 사용법은 [CLI.md](CLI.md)를 참고하세요.
+
+### Using the Web Analyzer
 
 #### 1. 분석 시작
 
@@ -629,6 +693,38 @@ npm run test:ui
 - Tests actual Puppeteer-based performance collection
 
 ## Implemented Enhancements ✅
+
+### Latest Updates (2025)
+
+- [x] **JS 번들 분석 탭** ✨ NEW:
+  - JavaScript 번들 크기 분석 및 자사/서드파티 분류
+  - 20개 이상 라이브러리 자동 감지 (React, Vue, jQuery 등)
+  - 도메인별/라이브러리별 분포 차트 시각화
+  - 자동 최적화 제안 생성
+- [x] **CLI 도구 for CI/CD** ✨ NEW:
+  - 명령줄에서 성능 분석 실행 가능
+  - JSON/Markdown 출력 형식 지원
+  - 임계값 기반 Pass/Fail 판정
+  - CI/CD 파이프라인 통합 (GitHub Actions, GitLab CI 예제)
+- [x] **분석 기록 UI** ✨ NEW:
+  - 과거 분석 결과 조회 및 재분석
+  - 자동 히스토리 저장 (최대 100개)
+  - 원클릭 재분석 기능
+- [x] **성능 비교 모드** ✨ NEW:
+  - Before/After 결과 Side-by-Side 비교
+  - 메트릭 개선/퇴보 시각화
+  - 네트워크 변화 추적
+- [x] **향상된 안정성** ✨ NEW:
+  - 분석 큐로 동시 요청 처리
+  - 재시도 로직 (최대 3회)
+  - 타임아웃 설정 (기본 60초)
+  - 사용자 친화적 에러 메시지
+- [x] **다크 모드 지원** ✨ NEW:
+  - 시스템 설정 자동 감지
+  - 수동 토글 버튼 (☀️/🌙)
+  - localStorage 설정 저장
+
+### Previous Enhancements
 
 - [x] **CLS 메트릭 추가**: Cumulative Layout Shift 측정 및 시각화
 - [x] **Long Task 히스토그램**: 50ms 이상 차단 작업 분석 및 통계

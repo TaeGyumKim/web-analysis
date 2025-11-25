@@ -7,6 +7,16 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
+  runtimeConfig: {
+    public: {
+      APP_NAME: process.env.APP_NAME || 'Web Performance Analyzer',
+      GIT_COMMIT: process.env.GIT_COMMIT || '',
+      GIT_BRANCH: process.env.GIT_BRANCH || '',
+      GIT_TAG: process.env.GIT_TAG || '',
+      GIT_VERSION: process.env.GIT_VERSION || '',
+      GIT_DATETIME: process.env.GIT_DATETIME || ''
+    }
+  },
   app: {
     head: {
       title: 'Web Performance Analyzer',

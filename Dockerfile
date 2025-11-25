@@ -35,6 +35,21 @@ LABEL stage=builder
 
 WORKDIR /app
 
+# Git version information (injected during build)
+ARG GIT_COMMIT=""
+ARG GIT_BRANCH=""
+ARG GIT_TAG=""
+ARG GIT_VERSION=""
+ARG GIT_DATETIME=""
+ARG APP_NAME="Web Performance Analyzer"
+
+ENV GIT_COMMIT=${GIT_COMMIT} \
+    GIT_BRANCH=${GIT_BRANCH} \
+    GIT_TAG=${GIT_TAG} \
+    GIT_VERSION=${GIT_VERSION} \
+    GIT_DATETIME=${GIT_DATETIME} \
+    APP_NAME=${APP_NAME}
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
@@ -64,13 +79,27 @@ RUN apk add --no-cache \
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nuxt -u 1001
 
+# Git version information (passed from builder)
+ARG GIT_COMMIT=""
+ARG GIT_BRANCH=""
+ARG GIT_TAG=""
+ARG GIT_VERSION=""
+ARG GIT_DATETIME=""
+ARG APP_NAME="Web Performance Analyzer"
+
 # Puppeteer와 Lighthouse 환경 변수 설정
 ENV NODE_ENV=production \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/bin/chromium-browser \
     HOST=0.0.0.0 \
-    PORT=3000
+    PORT=3000 \
+    GIT_COMMIT=${GIT_COMMIT} \
+    GIT_BRANCH=${GIT_BRANCH} \
+    GIT_TAG=${GIT_TAG} \
+    GIT_VERSION=${GIT_VERSION} \
+    GIT_DATETIME=${GIT_DATETIME} \
+    APP_NAME=${APP_NAME}
 
 # Copy built application from builder
 COPY --from=builder --chown=nuxt:nodejs /app/.output /app/.output

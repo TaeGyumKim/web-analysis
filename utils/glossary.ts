@@ -117,6 +117,48 @@ export const glossary = {
     title: '커스텀 메트릭',
     description:
       '기본 메트릭 외에 사용자가 직접 정의한 성능 지표입니다. 특정 요소의 로딩 시간이나 중요한 이벤트 시점 등을 측정할 수 있습니다.'
+  },
+
+  // JS 번들 분석
+  totalJsSize: {
+    title: '총 JS 크기',
+    description:
+      '페이지에서 로드된 모든 JavaScript 파일의 총 크기입니다. JS 크기가 클수록 로딩 시간이 길어지고, 파싱/실행에 더 많은 시간이 소요됩니다. (200KB 이하 권장)'
+  },
+  firstPartyScript: {
+    title: '자사 스크립트',
+    description:
+      '분석 중인 사이트와 동일한 도메인에서 로드되는 JavaScript입니다. 직접 제어 가능하므로 최적화하기 쉽습니다.'
+  },
+  thirdPartyScript: {
+    title: '서드파티 스크립트',
+    description:
+      '외부 도메인에서 로드되는 JavaScript입니다 (예: 분석 도구, 광고, 소셜 미디어 위젯). 직접 제어가 어렵고 성능에 큰 영향을 줄 수 있습니다.'
+  },
+  bundleOptimization: {
+    title: '최적화 제안',
+    description:
+      'JavaScript 번들 분석을 기반으로 한 최적화 권장사항입니다. 코드 분할, 지연 로딩, 압축 등의 기법으로 성능을 개선할 수 있습니다.'
+  },
+  domainDistribution: {
+    title: '도메인별 분포',
+    description:
+      'JavaScript 파일이 어떤 도메인에서 로드되는지 보여줍니다. 서드파티 도메인이 많으면 성능 저하와 보안 위험이 증가할 수 있습니다.'
+  },
+  libraryDistribution: {
+    title: '라이브러리별 분포',
+    description:
+      '사용 중인 JavaScript 라이브러리와 그 크기를 보여줍니다. 불필요하거나 중복된 라이브러리를 식별하여 번들 크기를 줄일 수 있습니다.'
+  },
+  largestBundles: {
+    title: '가장 큰 번들',
+    description:
+      '크기가 큰 JavaScript 파일 목록입니다. 큰 번들은 로딩 시간에 큰 영향을 미치므로 코드 분할(Code Splitting)이나 트리 쉐이킹(Tree Shaking)을 고려해보세요.'
+  },
+  domainBreakdown: {
+    title: '도메인별 상세',
+    description:
+      '각 도메인에서 로드된 JavaScript 파일 수와 총 크기를 보여줍니다. 서드파티 스크립트의 영향을 파악하는 데 유용합니다.'
   }
 };
 

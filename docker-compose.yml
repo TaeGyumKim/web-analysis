@@ -8,8 +8,14 @@ services:
       dockerfile: Dockerfile
       args:
         NODE_ENV: production
+        GIT_COMMIT: ${GIT_COMMIT:-}
+        GIT_BRANCH: ${GIT_BRANCH:-}
+        GIT_TAG: ${GIT_TAG:-}
+        GIT_VERSION: ${GIT_VERSION:-}
+        GIT_DATETIME: ${GIT_DATETIME:-}
+        APP_NAME: ${APP_NAME:-Web Performance Analyzer}
 
-    image: web-perf-analyzer:latest
+    image: web-perf-analyzer:${GIT_VERSION:-latest}
 
     container_name: nuxt-web-perf
 
@@ -22,6 +28,13 @@ services:
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PORT=3000
+      # Application Info
+      - APP_NAME=${APP_NAME:-Web Performance Analyzer}
+      - GIT_COMMIT=${GIT_COMMIT:-}
+      - GIT_BRANCH=${GIT_BRANCH:-}
+      - GIT_TAG=${GIT_TAG:-}
+      - GIT_VERSION=${GIT_VERSION:-}
+      - GIT_DATETIME=${GIT_DATETIME:-}
       # Puppeteer 설정
       - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
       - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser

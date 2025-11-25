@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(npx nuxi typecheck:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(dir /s /b *.ts *.vue *.md)",
+      "Bash(findstr:*)",
+      "Bash(npm run lint)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -2,13 +2,69 @@
   <div style="margin: 40px; position: relative">
     <!-- 로딩 오버레이 -->
     <div v-if="isAnalyzing" class="loading-overlay">
-      <div class="loading-content">
-        <div class="spinner"></div>
-        <h2 style="margin: 20px 0 10px 0; color: #1f2937">분석 중...</h2>
-        <p style="color: #6b7280; margin: 0">
-          페이지 성능을 분석하고 있습니다. 잠시만 기다려주세요.
-        </p>
-        <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 14px">{{ url }}</p>
+      <div class="loading-content-wide">
+        <div class="loading-header">
+          <div class="spinner"></div>
+          <div class="loading-header-text">
+            <h2 class="loading-title">분석 중...</h2>
+            <p class="loading-url">{{ url }}</p>
+          </div>
+        </div>
+
+        <!-- 진행 상태 표시 -->
+        <div class="progress-section-wide">
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" :style="{ width: `${analysisProgress}%` }"></div>
+          </div>
+          <div class="progress-info">
+            <span class="progress-percentage">{{ analysisProgress }}%</span>
+            <span class="loading-time">{{ elapsedTimeDisplay }}</span>
+          </div>
+        </div>
+
+        <!-- 단계별 가로 레이아웃 -->
+        <div class="steps-horizontal">
+          <div
+            v-for="(step, index) in analysisSteps"
+            :key="index"
+            class="step-card"
+            :class="{
+              completed: index < currentStepIndex,
+              active: index === currentStepIndex,
+              pending: index > currentStepIndex
+            }"
+          >
+            <div class="step-card-header">
+              <span class="step-number">{{ index + 1 }}</span>
+              <span class="step-title">{{ step.label }}</span>
+              <span class="step-status-icon">
+                <template v-if="index < currentStepIndex">✓</template>
+                <template v-else-if="index === currentStepIndex">
+                  <span class="spinner-small"></span>
+                </template>
+              </span>
+            </div>
+            <div class="step-card-content">
+              <div
+                v-for="(subStep, subIndex) in step.subSteps"
+                :key="subIndex"
+                class="sub-step"
+                :class="{
+                  'sub-completed':
+                    index < currentStepIndex ||
+                    (index === currentStepIndex && subIndex < currentSubStepIndex),
+                  'sub-active': index === currentStepIndex && subIndex === currentSubStepIndex,
+                  'sub-pending':
+                    index > currentStepIndex ||
+                    (index === currentStepIndex && subIndex > currentSubStepIndex)
+                }"
+              >
+                <span class="sub-step-dot"></span>
+                <span class="sub-step-text">{{ subStep }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -26,10 +82,12 @@
           :
         </label>
         <select v-model="networkSpeed">
-          <option>3G</option>
-          <option selected>4G</option>
-          <option>Wi-Fi</option>
-          <option>Slow 3G</option>
+          <option selected>제한 없음</option>
+          <option>모바일 네트워크</option>
+          <option>5Mbps LTE QoS</option>
+          <option>3Mbps LTE QoS</option>
+          <option>1Mbps LTE QoS</option>
+          <option>400Kbps LTE QoS</option>
         </select>
 
         <label style="display: flex; align-items: center">
@@ -149,6 +207,10 @@
         로딩 분포
       </div>
       <span class="divider">|</span>
+      <div class="tab" :class="{ active: activeTab === 'bundle' }" @click="activeTab = 'bundle'">
+        JS 번들 분석
+      </div>
+      <span class="divider">|</span>
       <div class="tab" :class="{ active: activeTab === 'budget' }" @click="activeTab = 'budget'">
         성능 예산
       </div>
@@ -191,6 +253,13 @@
       </ClientOnly>
     </div>
 
+    <!-- JS 번들 분석 탭 -->
+    <div v-show="activeTab === 'bundle'" style="margin-top: 20px">
+      <ClientOnly>
+        <BundleAnalysisTab :result="analysisResult" />
+      </ClientOnly>
+    </div>
+
     <!-- 성능 예산 탭 -->
     <div v-show="activeTab === 'budget'" style="margin-top: 20px">
       <PerformanceBudget :result="analysisResult" />
@@ -221,13 +290,132 @@ import { exportAsJSON, exportAsTextReport, exportNetworkAsCSV } from '~/utils/ex
 import { glossary } from '~/utils/glossary';
 
 const url = ref('https://www.naver.com/');
-const networkSpeed = ref('4G');
+const networkSpeed = ref('제한 없음');
 const deviceSpec = ref('Desktop');
 const useLighthouse = ref(false);
 const activeTab = ref('frame');
 const isAnalyzing = ref(false);
 const isGeneratingPDF = ref(false);
 const analysisResult = ref<AnalysisResult | null>(null);
+
+// 분석 진행 상태 관련
+const analysisSteps = [
+  {
+    label: '페이지 로딩',
+    duration: 8000,
+    subSteps: ['브라우저 초기화', 'URL 접속', '리소스 다운로드']
+  },
+  {
+    label: '렌더링 대기',
+    duration: 12000,
+    subSteps: ['DOM 구성', '이미지 로딩', '스타일 적용']
+  },
+  {
+    label: '성능 분석',
+    duration: 8000,
+    subSteps: ['메트릭 수집', '네트워크 분석', '결과 생성']
+  }
+];
+
+const currentStepIndex = ref(0);
+const currentSubStepIndex = ref(0);
+const analysisProgress = ref(0);
+const analysisStartTime = ref(0);
+const elapsedTime = ref(0);
+let elapsedInterval: NodeJS.Timeout | null = null;
+let subStepInterval: NodeJS.Timeout | null = null;
+
+const elapsedTimeDisplay = computed(() => {
+  const seconds = Math.floor(elapsedTime.value / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  if (minutes > 0) {
+    return `${minutes}분 ${remainingSeconds}초`;
+  }
+  return `${remainingSeconds}초`;
+});
+
+function startProgressSimulation() {
+  // Clear any existing intervals before starting new ones
+  // This prevents orphaned intervals if called multiple times
+  stopProgressSimulation(false);
+
+  currentStepIndex.value = 0;
+  currentSubStepIndex.value = 0;
+  analysisProgress.value = 0;
+  analysisStartTime.value = Date.now();
+  elapsedTime.value = 0;
+
+  // 전체 서브스텝 수 계산
+  const totalSubSteps = analysisSteps.reduce((sum, step) => sum + step.subSteps.length, 0);
+  let completedSubSteps = 0;
+
+  // 경과 시간 업데이트
+  elapsedInterval = setInterval(() => {
+    elapsedTime.value = Date.now() - analysisStartTime.value;
+  }, 100);
+
+  // 서브스텝별 진행률 계산 함수
+  const updateProgressForSubStep = () => {
+    completedSubSteps++;
+    // 90%까지만 진행 (실제 완료 시 100%로)
+    const targetProgress = Math.min(Math.floor((completedSubSteps / totalSubSteps) * 90), 90);
+
+    // 부드러운 진행률 증가
+    const progressIncrement = () => {
+      if (analysisProgress.value < targetProgress) {
+        analysisProgress.value = Math.min(analysisProgress.value + 1, targetProgress);
+        setTimeout(progressIncrement, 30);
+      }
+    };
+    progressIncrement();
+  };
+
+  // 서브스텝 진행 시뮬레이션
+  const advanceSubStep = () => {
+    const currentStep = analysisSteps[currentStepIndex.value];
+    if (!currentStep) return;
+
+    const subStepCount = currentStep.subSteps.length;
+
+    // 현재 서브스텝 완료 처리
+    updateProgressForSubStep();
+
+    if (currentSubStepIndex.value < subStepCount - 1) {
+      currentSubStepIndex.value++;
+    } else {
+      // 현재 메인 스텝의 모든 서브스텝 완료, 다음 메인 스텝으로
+      if (currentStepIndex.value < analysisSteps.length - 1) {
+        currentStepIndex.value++;
+        currentSubStepIndex.value = 0;
+      }
+    }
+  };
+
+  // 서브스텝 인터벌 (각 서브스텝 완료 시마다 진행률 증가)
+  const subStepDuration = 2000; // 2초마다 서브스텝 진행
+  subStepInterval = setInterval(() => {
+    advanceSubStep();
+  }, subStepDuration);
+}
+
+function stopProgressSimulation(success: boolean = true) {
+  if (elapsedInterval) {
+    clearInterval(elapsedInterval);
+    elapsedInterval = null;
+  }
+  if (subStepInterval) {
+    clearInterval(subStepInterval);
+    subStepInterval = null;
+  }
+
+  if (success) {
+    // 성공 시 100%로 완료
+    currentStepIndex.value = analysisSteps.length;
+    currentSubStepIndex.value = 0;
+    analysisProgress.value = 100;
+  }
+}
 
 // Viewport settings
 const viewportPreset = ref('desktop-1920');
@@ -271,6 +459,7 @@ async function startAnalysis() {
   analysisResult.value = null;
 
   isAnalyzing.value = true;
+  startProgressSimulation();
 
   try {
     // Load custom metrics from localStorage
@@ -297,14 +486,36 @@ async function startAnalysis() {
       }
     });
 
-    if (response.success) {
-      analysisResult.value = response.data;
+    const result = response as { success: boolean; data?: AnalysisResult };
+    if (result.success && result.data) {
+      stopProgressSimulation(true);
+      analysisResult.value = result.data;
       // Save to history
-      saveResultToHistory(response.data);
+      saveResultToHistory(result.data);
     }
   } catch (err: any) {
     console.error('Analysis error:', err);
-    alert('분석 중 오류가 발생했습니다: ' + (err.data?.message || err.message));
+    stopProgressSimulation(false);
+
+    // Display enhanced error message if available
+    if (err.data?.error) {
+      const error = err.data.error;
+      let errorMessage = `❌ ${error.title}\n\n${error.message}`;
+
+      if (error.suggestions && error.suggestions.length > 0) {
+        errorMessage += '\n\n💡 제안사항:';
+        error.suggestions.forEach((suggestion: string) => {
+          errorMessage += `\n• ${suggestion}`;
+        });
+      }
+
+      alert(errorMessage);
+    } else {
+      // Fallback to generic error
+      alert(
+        '분석 중 오류가 발생했습니다:\n' + (err.data?.message || err.message || '알 수 없는 오류')
+      );
+    }
   } finally {
     isAnalyzing.value = false;
   }
@@ -316,12 +527,14 @@ function reAnalyze() {
   }
 }
 
-function getNetworkThrottling(speed: string): 'none' | 'slow-3g' | 'fast-3g' | '4g' {
-  const mapping: Record<string, 'none' | 'slow-3g' | 'fast-3g' | '4g'> = {
-    '3G': 'fast-3g',
-    '4G': '4g',
-    'Wi-Fi': 'none',
-    'Slow 3G': 'slow-3g'
+function getNetworkThrottling(speed: string): string {
+  const mapping: Record<string, string> = {
+    '제한 없음': 'none',
+    '모바일 네트워크': 'lte-network',
+    '5Mbps LTE QoS': '5mbps-lte',
+    '3Mbps LTE QoS': '3mbps-lte',
+    '1Mbps LTE QoS': '1mbps-lte',
+    '400Kbps LTE QoS': '400kbps-lte'
   };
   return mapping[speed] || 'none';
 }
@@ -380,7 +593,7 @@ async function exportPDF() {
     });
 
     // Create download link
-    const blob = new Blob([response as Blob], { type: 'application/pdf' });
+    const blob = new Blob([response as unknown as BlobPart], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -405,8 +618,9 @@ async function saveResultToHistory(result: AnalysisResult) {
       }
     });
 
-    if (!response.success) {
-      console.error('Failed to save to history:', response.error);
+    const historyResult = response as { success: boolean; error?: string };
+    if (!historyResult.success) {
+      console.error('Failed to save to history:', historyResult.error);
     }
   } catch (error) {
     console.error('Failed to save to history:', error);
@@ -429,21 +643,236 @@ async function saveResultToHistory(result: AnalysisResult) {
   z-index: 9999;
 }
 
-.loading-content {
-  text-align: center;
-  padding: 40px;
-  background: white;
+.loading-content-wide {
+  padding: 32px 40px;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 900px;
+}
+
+.loading-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.loading-header-text {
+  text-align: left;
+}
+
+.loading-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 20px;
+}
+
+.loading-url {
+  color: var(--text-tertiary);
+  margin: 6px 0 0 0;
+  font-size: 13px;
+  word-break: break-all;
+}
+
+.progress-section-wide {
+  margin-bottom: 24px;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #60a5fa);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.progress-percentage {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.loading-time {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.steps-horizontal {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.step-card {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.step-card.completed {
+  border-color: #10b981;
+  background: #ecfdf5;
+}
+
+.step-card.active {
+  border-color: var(--primary);
+  background: #eff6ff;
+}
+
+.step-card.pending {
+  opacity: 0.6;
+}
+
+.step-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #9ca3af;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.step-card.completed .step-number {
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.step-card.active .step-number {
+  background: #3b82f6;
+  color: #ffffff;
+  box-shadow:
+    0 0 0 4px rgba(59, 130, 246, 0.3),
+    0 0 12px rgba(59, 130, 246, 0.4);
+  animation: pulse-number 1.5s infinite;
+  transform: scale(1.1);
+}
+
+@keyframes pulse-number {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 4px rgba(59, 130, 246, 0.3),
+      0 0 12px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(59, 130, 246, 0.2),
+      0 0 20px rgba(59, 130, 246, 0.5);
+  }
+}
+
+.step-card.pending .step-number {
+  background: #d1d5db;
+  color: #6b7280;
+}
+
+.step-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.step-status-icon {
+  font-size: 16px;
+  color: #10b981;
+}
+
+.step-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sub-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.sub-step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d1d5db;
+  flex-shrink: 0;
+}
+
+.sub-step.sub-completed .sub-step-dot {
+  background: #10b981;
+}
+
+.sub-step.sub-active .sub-step-dot {
+  background: var(--primary);
+  animation: pulse 1s infinite;
+}
+
+.sub-step.sub-completed {
+  color: #10b981;
+}
+
+.sub-step.sub-active {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--bg-secondary);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .spinner {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto;
-  border: 4px solid #e5e7eb;
-  border-top-color: #3b82f6;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border: 4px solid var(--border-secondary);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

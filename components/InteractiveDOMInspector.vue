@@ -7,8 +7,8 @@
     >
       <div style="text-align: center; padding: 60px 20px">
         <div style="font-size: 48px; margin-bottom: 16px">🔍</div>
-        <h3 style="color: #6b7280; margin: 0 0 8px 0">인터랙티브 DOM 검사</h3>
-        <p style="color: #9ca3af; margin: 0">
+        <h3 class="empty-title">인터랙티브 DOM 검사</h3>
+        <p class="empty-desc">
           페이지 분석을 시작하면 DOM 요소별 로딩 정보를 확인할 수 있습니다.
         </p>
       </div>
@@ -37,7 +37,7 @@
       </div>
 
       <!-- 컨트롤 버튼 -->
-      <div style="margin-bottom: 16px; display: flex; gap: 12px;">
+      <div style="margin-bottom: 16px; display: flex; gap: 12px">
         <button
           class="toggle-button"
           :class="{ active: showAllBorders }"
@@ -46,7 +46,10 @@
           <span v-if="showAllBorders">🔳 전체 경계 숨기기</span>
           <span v-else>🔲 전체 경계 보기</span>
         </button>
-        <div v-if="pinnedElements.length > 0" style="color: #3b82f6; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+        <div
+          v-if="pinnedElements.length > 0"
+          style="color: #3b82f6; font-size: 13px; display: flex; align-items: center; gap: 6px"
+        >
           📌 {{ pinnedElements.length }}개 요소 고정됨
         </div>
       </div>
@@ -72,18 +75,19 @@
           />
 
           <!-- 전체 DOM 경계 표시 (토글 버튼 활성화 시) -->
-          <div
-            v-if="showAllBorders && result.domElements"
-            v-for="(element, index) in result.domElements"
-            :key="'border-' + index"
-            class="border-overlay"
-            :style="{
-              left: element.boundingBox.x / scale.x + 'px',
-              top: element.boundingBox.y / scale.y + 'px',
-              width: element.boundingBox.width / scale.x + 'px',
-              height: element.boundingBox.height / scale.y + 'px'
-            }"
-          ></div>
+          <template v-if="showAllBorders && result.domElements">
+            <div
+              v-for="(element, index) in result.domElements"
+              :key="'border-' + index"
+              class="border-overlay"
+              :style="{
+                left: element.boundingBox.x / scale.x + 'px',
+                top: element.boundingBox.y / scale.y + 'px',
+                width: element.boundingBox.width / scale.x + 'px',
+                height: element.boundingBox.height / scale.y + 'px'
+              }"
+            ></div>
+          </template>
 
           <!-- 고정된 요소 하이라이트 (초록색) -->
           <div
@@ -124,7 +128,10 @@
               overflowY: 'auto'
             }"
           >
-            <div v-if="hoveredElements.length > 1" class="tooltip-info" style="margin-bottom: 8px; font-size: 12px; color: #666;">
+            <div
+              v-if="hoveredElements.length > 1"
+              class="tooltip-info"
+            >
               겹친 요소 {{ hoveredElements.length }}개
             </div>
 
@@ -159,8 +166,7 @@
                 <div class="tooltip-row">
                   <span class="label">크기:</span>
                   <span class="value"
-                    >{{ element.boundingBox.width }} ×
-                    {{ element.boundingBox.height }} px</span
+                    >{{ element.boundingBox.width }} × {{ element.boundingBox.height }} px</span
                   >
                 </div>
 
@@ -171,9 +177,7 @@
                   >
                 </div>
 
-                <div
-                  v-if="element.resourceTimings && element.resourceTimings.length > 0"
-                >
+                <div v-if="element.resourceTimings && element.resourceTimings.length > 0">
                   <div class="tooltip-section-title">연관 리소스:</div>
                   <div
                     v-for="(resource, rIndex) in element.resourceTimings"
@@ -188,10 +192,7 @@
                   </div>
                 </div>
 
-                <div
-                  v-if="!element.loadTime && !element.resourceTimings"
-                  class="no-data"
-                >
+                <div v-if="!element.loadTime && !element.resourceTimings" class="no-data">
                   로딩 정보 없음 (정적 요소)
                 </div>
               </div>
@@ -210,12 +211,13 @@
             }"
           >
             <!-- 닫기 버튼 -->
-            <button class="close-button" @click="closePinnedTooltip" title="닫기 (ESC)">
-              ✕
-            </button>
+            <button class="close-button" title="닫기 (ESC)" @click="closePinnedTooltip">✕</button>
 
             <div class="pinned-badge">고정됨 (우클릭)</div>
-            <div v-if="pinnedElements.length > 1" class="tooltip-info" style="margin-bottom: 8px; font-size: 12px; color: #666;">
+            <div
+              v-if="pinnedElements.length > 1"
+              class="tooltip-info"
+            >
               겹친 요소 {{ pinnedElements.length }}개
             </div>
 
@@ -250,8 +252,7 @@
                 <div class="tooltip-row">
                   <span class="label">크기:</span>
                   <span class="value"
-                    >{{ element.boundingBox.width }} ×
-                    {{ element.boundingBox.height }} px</span
+                    >{{ element.boundingBox.width }} × {{ element.boundingBox.height }} px</span
                   >
                 </div>
 
@@ -262,9 +263,7 @@
                   >
                 </div>
 
-                <div
-                  v-if="element.resourceTimings && element.resourceTimings.length > 0"
-                >
+                <div v-if="element.resourceTimings && element.resourceTimings.length > 0">
                   <div class="tooltip-section-title">연관 리소스:</div>
                   <div
                     v-for="(resource, rIndex) in element.resourceTimings"
@@ -279,10 +278,7 @@
                   </div>
                 </div>
 
-                <div
-                  v-if="!element.loadTime && !element.resourceTimings"
-                  class="no-data"
-                >
+                <div v-if="!element.loadTime && !element.resourceTimings" class="no-data">
                   로딩 정보 없음 (정적 요소)
                 </div>
               </div>
@@ -386,7 +382,7 @@ watch(
 // Watch for tab activation to recalculate scale
 watch(
   () => props.isActive,
-  (newValue) => {
+  newValue => {
     if (newValue) {
       // Tab just became active, recalculate scale
       // Use setTimeout to ensure DOM is fully rendered after v-show changes
@@ -448,8 +444,14 @@ function handleMouseMove(event: MouseEvent) {
     hoveredElements.value = elements;
 
     // Position tooltip near cursor (add scroll offset for absolute positioning within scrollable container)
-    const tooltipX = Math.min(event.clientX - rect.left + container.scrollLeft + 15, rect.width - 350 + container.scrollLeft);
-    const tooltipY = Math.min(event.clientY - rect.top + container.scrollTop + 15, rect.height - 300 + container.scrollTop);
+    const tooltipX = Math.min(
+      event.clientX - rect.left + container.scrollLeft + 15,
+      rect.width - 350 + container.scrollLeft
+    );
+    const tooltipY = Math.min(
+      event.clientY - rect.top + container.scrollTop + 15,
+      rect.height - 300 + container.scrollTop
+    );
 
     tooltipPosition.value = { x: tooltipX, y: tooltipY };
   } else {
@@ -517,10 +519,7 @@ function findElementsAtPosition(x: number, y: number): DOMElementTiming[] {
     const p = parent.boundingBox;
     const c = child.boundingBox;
     return (
-      c.x >= p.x &&
-      c.y >= p.y &&
-      c.x + c.width <= p.x + p.width &&
-      c.y + c.height <= p.y + p.height
+      c.x >= p.x && c.y >= p.y && c.x + c.width <= p.x + p.width && c.y + c.height <= p.y + p.height
     );
   };
 
@@ -555,11 +554,21 @@ function calculateAverageLoadTime(): string {
 </script>
 
 <style scoped>
+.empty-title {
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+}
+
+.empty-desc {
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
 .inspector-container {
   position: relative;
   overflow: auto;
   max-height: 800px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   border-radius: 8px;
   cursor: crosshair;
 }
@@ -596,8 +605,8 @@ function calculateAverageLoadTime(): string {
 }
 
 .toggle-button {
-  background: white;
-  border: 2px solid #e5e7eb;
+  background: var(--bg-card);
+  border: 2px solid var(--border-primary);
   border-radius: 8px;
   padding: 8px 16px;
   font-size: 14px;
@@ -607,6 +616,7 @@ function calculateAverageLoadTime(): string {
   display: flex;
   align-items: center;
   gap: 6px;
+  color: var(--text-primary);
 }
 
 .toggle-button:hover {
@@ -622,16 +632,22 @@ function calculateAverageLoadTime(): string {
 
 .tooltip {
   position: absolute;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
   padding: 12px;
   min-width: 280px;
   max-width: 400px;
   z-index: 20;
   pointer-events: none;
   font-size: 13px;
+}
+
+.tooltip-info {
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
 .pinned-tooltip {
@@ -680,7 +696,7 @@ function calculateAverageLoadTime(): string {
 .tooltip-header {
   padding-bottom: 8px;
   margin-bottom: 8px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-primary);
   font-size: 14px;
 }
 
@@ -697,12 +713,12 @@ function calculateAverageLoadTime(): string {
 }
 
 .label {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
 .value {
-  color: #1f2937;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -715,7 +731,7 @@ function calculateAverageLoadTime(): string {
   margin-top: 8px;
   margin-bottom: 4px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
   font-size: 12px;
 }
 
@@ -724,7 +740,7 @@ function calculateAverageLoadTime(): string {
   justify-content: space-between;
   align-items: center;
   padding: 4px 8px;
-  background: #f3f4f6;
+  background: var(--bg-tertiary);
   border-radius: 4px;
   margin-top: 4px;
 }
@@ -732,17 +748,17 @@ function calculateAverageLoadTime(): string {
 .resource-type {
   font-size: 11px;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-secondary);
   text-transform: uppercase;
 }
 
 .resource-details {
   font-size: 11px;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .no-data {
-  color: #9ca3af;
+  color: var(--text-tertiary);
   font-style: italic;
   font-size: 12px;
   margin-top: 4px;
@@ -752,19 +768,19 @@ function calculateAverageLoadTime(): string {
   display: flex;
   gap: 24px;
   padding: 12px 16px;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-primary);
   border-radius: 0 0 8px 8px;
   margin-top: 16px;
 }
 
 .stat-item {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .stat-item strong {
-  color: #1f2937;
+  color: var(--text-primary);
   margin-right: 4px;
 }
 </style>
