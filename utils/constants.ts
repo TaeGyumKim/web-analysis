@@ -107,22 +107,38 @@ export const DEFAULT_ANALYSIS_OPTIONS = {
 
 /**
  * Network throttling profiles (bytes per second)
+ * Based on LTE QoS profiles
  */
 export const NETWORK_PROFILES = {
-  'slow-3g': {
-    downloadThroughput: (500 * 1024) / 8,
-    uploadThroughput: (500 * 1024) / 8,
-    latency: 400
+  'lte-network': {
+    // 모바일 네트워크 (LTE Network)
+    downloadThroughput: 8000000,
+    uploadThroughput: 8000000,
+    latency: 50
   },
-  'fast-3g': {
-    downloadThroughput: (1.6 * 1024 * 1024) / 8,
-    uploadThroughput: (750 * 1024) / 8,
-    latency: 150
+  '5mbps-lte': {
+    // 5Mbps LTE QoS
+    downloadThroughput: 630000,
+    uploadThroughput: 630000,
+    latency: 50
   },
-  '4g': {
-    downloadThroughput: (4 * 1024 * 1024) / 8,
-    uploadThroughput: (3 * 1024 * 1024) / 8,
-    latency: 20
+  '3mbps-lte': {
+    // 3Mbps LTE QoS
+    downloadThroughput: 400000,
+    uploadThroughput: 400000,
+    latency: 50
+  },
+  '1mbps-lte': {
+    // 1Mbps LTE QoS
+    downloadThroughput: 150000,
+    uploadThroughput: 150000,
+    latency: 50
+  },
+  '400kbps-lte': {
+    // 400Kbps LTE QoS (Very Slow Network)
+    downloadThroughput: 40000,
+    uploadThroughput: 40000,
+    latency: 70
   }
 } as const;
 

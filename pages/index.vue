@@ -26,10 +26,12 @@
           :
         </label>
         <select v-model="networkSpeed">
-          <option>3G</option>
-          <option selected>4G</option>
-          <option>Wi-Fi</option>
-          <option>Slow 3G</option>
+          <option selected>제한 없음</option>
+          <option>모바일 네트워크</option>
+          <option>5Mbps LTE QoS</option>
+          <option>3Mbps LTE QoS</option>
+          <option>1Mbps LTE QoS</option>
+          <option>400Kbps LTE QoS</option>
         </select>
 
         <label style="display: flex; align-items: center">
@@ -368,12 +370,14 @@ function reAnalyze() {
   }
 }
 
-function getNetworkThrottling(speed: string): 'none' | 'slow-3g' | 'fast-3g' | '4g' {
-  const mapping: Record<string, 'none' | 'slow-3g' | 'fast-3g' | '4g'> = {
-    '3G': 'fast-3g',
-    '4G': '4g',
-    'Wi-Fi': 'none',
-    'Slow 3G': 'slow-3g'
+function getNetworkThrottling(speed: string): string {
+  const mapping: Record<string, string> = {
+    '제한 없음': 'none',
+    '모바일 네트워크': 'lte-network',
+    '5Mbps LTE QoS': '5mbps-lte',
+    '3Mbps LTE QoS': '3mbps-lte',
+    '1Mbps LTE QoS': '1mbps-lte',
+    '400Kbps LTE QoS': '400kbps-lte'
   };
   return mapping[speed] || 'none';
 }
