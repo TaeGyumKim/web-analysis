@@ -38,7 +38,6 @@ body {
   border-radius: 16px;
   padding: 24px;
   box-shadow: var(--shadow-lg);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .topbar {
@@ -49,7 +48,6 @@ body {
   background: var(--bg-secondary);
   border-radius: 16px;
   box-shadow: var(--shadow-md);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .topbar select,
@@ -59,7 +57,6 @@ body {
   border: 1px solid var(--border-primary);
   background: var(--bg-tertiary);
   color: var(--text-primary);
-  transition: all 0.3s ease;
 }
 
 .btn {
@@ -97,7 +94,6 @@ body {
   margin-top: 20px;
   width: max-content;
   font-size: 15px;
-  transition: background-color 0.3s ease;
 }
 
 .tab {
@@ -123,7 +119,6 @@ body {
   padding: 20px;
   box-shadow: var(--shadow-md);
   margin-bottom: 16px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .metric-bar {
@@ -132,7 +127,6 @@ body {
   background: var(--bg-elevated);
   position: relative;
   margin-top: 6px;
-  transition: background-color 0.3s ease;
 }
 
 .metric-fill {
@@ -164,7 +158,6 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: background-color 0.3s ease;
 }
 
 .chart-grid {
@@ -178,7 +171,6 @@ body {
   border-radius: 16px;
   padding: 20px;
   box-shadow: var(--shadow-md);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .summary-cards {
@@ -194,7 +186,6 @@ body {
   padding: 16px;
   box-shadow: var(--shadow-md);
   text-align: center;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .suggestion-card {
