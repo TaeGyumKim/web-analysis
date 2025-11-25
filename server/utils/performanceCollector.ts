@@ -822,12 +822,47 @@ export class PerformanceCollector {
       // Match DOM elements with network resource timings
       const networkRequests = this.convertRequestsToArray();
 
+      // Helper function for flexible URL matching
+      const normalizeUrl = (url: string): string => {
+        try {
+          const parsed = new URL(url);
+          // Remove protocol and trailing slash for comparison
+          return (parsed.host + parsed.pathname).replace(/\/$/, '').toLowerCase();
+        } catch {
+          // If URL parsing fails, just normalize basic stuff
+          return url
+            .replace(/^https?:\/\//, '')
+            .replace(/\/$/, '')
+            .toLowerCase();
+        }
+      };
+
+      const findMatchingRequest = (resourceUrl: string) => {
+        // First try exact match
+        let matched = networkRequests.find(req => req.url === resourceUrl);
+        if (matched) return matched;
+
+        // Try normalized URL match
+        const normalizedResource = normalizeUrl(resourceUrl);
+        matched = networkRequests.find(req => normalizeUrl(req.url) === normalizedResource);
+        if (matched) return matched;
+
+        // Try partial match (resource URL contained in request URL or vice versa)
+        matched = networkRequests.find(req => {
+          const reqNorm = normalizeUrl(req.url);
+          return reqNorm.includes(normalizedResource) || normalizedResource.includes(reqNorm);
+        });
+
+        return matched;
+      };
+
       for (const element of domElements) {
         if (element.associatedResources && element.associatedResources.length > 0) {
           element.resourceTimings = [];
+          let maxEndTimeMs = 0; // Track in milliseconds
 
           for (const resourceUrl of element.associatedResources) {
-            const matchedRequest = networkRequests.find(req => req.url === resourceUrl);
+            const matchedRequest = findMatchingRequest(resourceUrl);
 
             if (matchedRequest) {
               element.resourceTimings.push({
@@ -837,11 +872,19 @@ export class PerformanceCollector {
                 type: matchedRequest.type
               });
 
+              // Calculate end time in milliseconds
+              const endTimeMs = matchedRequest.endTime * 1000;
+
               // Set element load time based on the slowest resource
-              if (!element.loadTime || matchedRequest.endTime > element.loadTime) {
-                element.loadTime = matchedRequest.endTime * 1000; // Convert to ms
+              if (endTimeMs > maxEndTimeMs) {
+                maxEndTimeMs = endTimeMs;
               }
             }
+          }
+
+          // Set loadTime if we found any resources
+          if (maxEndTimeMs > 0) {
+            element.loadTime = maxEndTimeMs;
           }
         }
       }
