@@ -98,8 +98,8 @@ export class PerformanceCollector {
         timeout: 0
       });
 
-      // Wait for animations and late resources
-      await new Promise<void>(resolve => setTimeout(resolve, 2000));
+      // Wait for page to be fully rendered
+      await this.waitForRenderComplete(page, options);
 
       // Collect all metrics
       const metrics = await this.collectMetrics(page);
