@@ -5,7 +5,7 @@
 **Web Performance Analyzer**는 웹 페이지의 성능을 종합적으로 분석하고 시각화하는 도구입니다. Nuxt 3 기반으로 구축되었으며, Puppeteer를 사용한 실시간 성능 측정과 다양한 분석 기능을 제공합니다.
 
 **현재 버전:** 1.0.0
-**최종 업데이트:** 2025-11-21
+**최종 업데이트:** 2025-11-25
 **브랜치:** `claude/implement-chatgpt-reference-018EJ4jm5UaTsiXAEWZxGbSh`
 
 ---
@@ -55,11 +55,12 @@ web-analysis/
 │   ├── InteractiveDOMInspector.vue  # DOM 검사
 │   ├── LighthouseTab.vue            # 라이트하우스
 │   ├── LoadingDistributionTab.vue   # 로딩 분포
+│   ├── LongTaskHistogram.vue        # 롱 태스크 히스토그램
 │   ├── NetworkHeatmap.vue           # 네트워크 히트맵
 │   ├── NetworkTimelineTab.vue       # 네트워크 타임라인
+│   ├── NetworkWaterfall.vue         # 네트워크 워터폴 차트
 │   ├── PerformanceBudget.vue        # 성능 예산
-│   ├── PerformanceMetricsChart.vue  # 메트릭 차트
-│   └── ReportTab.vue                # 리포트 탭
+│   └── PerformanceMetricsChart.vue  # 메트릭 차트
 ├── composables/          # Vue Composables
 │   └── useDarkMode.ts    # 다크 모드 상태 관리
 ├── pages/
@@ -117,7 +118,7 @@ web-analysis/
 ### 코드 품질
 
 - **린트 에러**: 0개 ✅
-- **린트 경고**: 38개 (대부분 `any` 타입 사용)
+- **린트 경고**: 35개 (대부분 `any` 타입 사용)
 - **빌드 상태**: 성공 ✅
 - **테스트**: E2E 테스트 포함
 
@@ -500,6 +501,6 @@ npm run dev
 
 ---
 
-**최종 업데이트**: 2025-11-21
+**최종 업데이트**: 2025-11-25
 **문서 버전**: 1.0.0
 **작성자**: Claude Code

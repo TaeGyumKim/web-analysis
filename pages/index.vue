@@ -50,9 +50,13 @@
                 :key="subIndex"
                 class="sub-step"
                 :class="{
-                  'sub-completed': index < currentStepIndex || (index === currentStepIndex && subIndex < currentSubStepIndex),
+                  'sub-completed':
+                    index < currentStepIndex ||
+                    (index === currentStepIndex && subIndex < currentSubStepIndex),
                   'sub-active': index === currentStepIndex && subIndex === currentSubStepIndex,
-                  'sub-pending': index > currentStepIndex || (index === currentStepIndex && subIndex > currentSubStepIndex)
+                  'sub-pending':
+                    index > currentStepIndex ||
+                    (index === currentStepIndex && subIndex > currentSubStepIndex)
                 }"
               >
                 <span class="sub-step-dot"></span>
@@ -277,7 +281,6 @@
         <InteractiveDOMInspector :result="analysisResult" :is-active="activeTab === 'inspector'" />
       </ClientOnly>
     </div>
-
   </div>
 </template>
 
@@ -333,6 +336,10 @@ const elapsedTimeDisplay = computed(() => {
 });
 
 function startProgressSimulation() {
+  // Clear any existing intervals before starting new ones
+  // This prevents orphaned intervals if called multiple times
+  stopProgressSimulation(false);
+
   currentStepIndex.value = 0;
   currentSubStepIndex.value = 0;
   analysisProgress.value = 0;
@@ -479,11 +486,12 @@ async function startAnalysis() {
       }
     });
 
-    if (response.success) {
+    const result = response as { success: boolean; data?: AnalysisResult };
+    if (result.success && result.data) {
       stopProgressSimulation(true);
-      analysisResult.value = response.data;
+      analysisResult.value = result.data;
       // Save to history
-      saveResultToHistory(response.data);
+      saveResultToHistory(result.data);
     }
   } catch (err: any) {
     console.error('Analysis error:', err);
@@ -585,7 +593,7 @@ async function exportPDF() {
     });
 
     // Create download link
-    const blob = new Blob([response as Blob], { type: 'application/pdf' });
+    const blob = new Blob([response as unknown as BlobPart], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -610,14 +618,14 @@ async function saveResultToHistory(result: AnalysisResult) {
       }
     });
 
-    if (!response.success) {
-      console.error('Failed to save to history:', response.error);
+    const historyResult = response as { success: boolean; error?: string };
+    if (!historyResult.success) {
+      console.error('Failed to save to history:', historyResult.error);
     }
   } catch (error) {
     console.error('Failed to save to history:', error);
   }
 }
-
 </script>
 
 <style scoped>
@@ -761,17 +769,24 @@ async function saveResultToHistory(result: AnalysisResult) {
 .step-card.active .step-number {
   background: #3b82f6;
   color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3), 0 0 12px rgba(59, 130, 246, 0.4);
+  box-shadow:
+    0 0 0 4px rgba(59, 130, 246, 0.3),
+    0 0 12px rgba(59, 130, 246, 0.4);
   animation: pulse-number 1.5s infinite;
   transform: scale(1.1);
 }
 
 @keyframes pulse-number {
-  0%, 100% {
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3), 0 0 12px rgba(59, 130, 246, 0.4);
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 4px rgba(59, 130, 246, 0.3),
+      0 0 12px rgba(59, 130, 246, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.5);
+    box-shadow:
+      0 0 0 6px rgba(59, 130, 246, 0.2),
+      0 0 20px rgba(59, 130, 246, 0.5);
   }
 }
 
@@ -843,8 +858,13 @@ async function saveResultToHistory(result: AnalysisResult) {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .spinner {

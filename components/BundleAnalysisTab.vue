@@ -10,13 +10,10 @@
       <p>이 페이지에서 JavaScript 리소스가 감지되지 않았습니다.</p>
       <p class="no-scripts-hint">
         가능한 원인:
-        <br />• 페이지에 외부 JavaScript 파일이 없음
-        <br />• 인라인 스크립트만 사용됨
-        <br />• 스크립트가 다른 방식으로 로드됨
+        <br />• 페이지에 외부 JavaScript 파일이 없음 <br />• 인라인 스크립트만 사용됨 <br />•
+        스크립트가 다른 방식으로 로드됨
       </p>
-      <p class="debug-info">
-        총 네트워크 요청: {{ result.networkRequests?.length || 0 }}개
-      </p>
+      <p class="debug-info">총 네트워크 요청: {{ result.networkRequests?.length || 0 }}개</p>
     </div>
   </div>
 
@@ -211,9 +208,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import type { AnalysisResult } from '~/types/performance';
-import { analyzeBundles, formatBytes, getBundleOptimizationSuggestions } from '~/utils/bundleAnalyzer';
+import {
+  analyzeBundles,
+  formatBytes,
+  getBundleOptimizationSuggestions
+} from '~/utils/bundleAnalyzer';
 import { glossary } from '~/utils/glossary';
 
 const props = defineProps<{
@@ -374,6 +375,18 @@ watch(
 
 onMounted(() => {
   renderCharts();
+});
+
+onUnmounted(() => {
+  // Clean up chart instances to prevent memory leaks
+  if (domainChart) {
+    domainChart.destroy();
+    domainChart = null;
+  }
+  if (libraryChart) {
+    libraryChart.destroy();
+    libraryChart = null;
+  }
 });
 </script>
 

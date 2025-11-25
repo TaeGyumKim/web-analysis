@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   text: string;
   title?: string;
   position?: 'top' | 'bottom' | 'left' | 'right';

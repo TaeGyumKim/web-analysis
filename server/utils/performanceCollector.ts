@@ -198,6 +198,10 @@ export class PerformanceCollector {
   }
 
   private startFrameCapture(page: Page, interval: number = 100) {
+    // Clear any existing interval before starting a new one
+    // This prevents orphaned intervals if startFrameCapture is called multiple times
+    this.stopFrameCapture();
+
     // Skip initial frames to avoid black/empty screens
     let captureCount = 0;
     const skipFrames = 3; // Skip first 3 captures (300ms at 100ms interval)

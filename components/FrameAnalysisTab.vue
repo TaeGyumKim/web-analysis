@@ -77,15 +77,28 @@
 
           <!-- 로드된 리소스 (현재 프레임 시점 기준) -->
           <div v-if="result" class="section-card">
-            <h3>로드된 리소스 <span style="font-size: 11px; color: #999; font-weight: normal">({{ (currentFrame?.timestamp * 1000 || 0).toFixed(0) }}ms)</span></h3>
-            <div>로드 완료: {{ loadedResourcesAtFrame.count }} / {{ result.networkRequests.length }}</div>
-            <div style="margin-top: 8px">로드된 크기: {{ formatBytes(loadedResourcesAtFrame.size) }}</div>
-            <div style="margin-top: 8px">이미지: {{ loadedResourcesAtFrame.images }} / {{ imageCount }}</div>
+            <h3>
+              로드된 리소스
+              <span style="font-size: 11px; color: #999; font-weight: normal"
+                >({{ (currentFrame?.timestamp * 1000 || 0).toFixed(0) }}ms)</span
+              >
+            </h3>
+            <div>
+              로드 완료: {{ loadedResourcesAtFrame.count }} / {{ result.networkRequests.length }}
+            </div>
+            <div style="margin-top: 8px">
+              로드된 크기: {{ formatBytes(loadedResourcesAtFrame.size) }}
+            </div>
+            <div style="margin-top: 8px">
+              이미지: {{ loadedResourcesAtFrame.images }} / {{ imageCount }}
+            </div>
             <div style="margin-top: 8px">스크립트: {{ loadedResourcesAtFrame.scripts }}</div>
             <div class="resource-progress">
               <div
                 class="resource-progress-fill"
-                :style="{ width: `${(loadedResourcesAtFrame.count / Math.max(result.networkRequests.length, 1)) * 100}%` }"
+                :style="{
+                  width: `${(loadedResourcesAtFrame.count / Math.max(result.networkRequests.length, 1)) * 100}%`
+                }"
               ></div>
             </div>
           </div>
@@ -205,11 +218,6 @@ let playInterval: NodeJS.Timeout | null = null;
 const frames = computed(() => props.result?.frames || []);
 const currentFrame = computed(() => frames.value[currentFrameIndex.value]);
 
-const totalSize = computed(() => {
-  if (!props.result) return 0;
-  return props.result.networkRequests.reduce((sum, req) => sum + req.size, 0);
-});
-
 const imageCount = computed(() => {
   if (!props.result) return 0;
   return props.result.networkRequests.filter(req => req.type.toLowerCase() === 'image').length;
@@ -297,7 +305,12 @@ const frameDescription = computed(() => {
   if (metrics.fcp && frameTimeMs < metrics.fcp) {
     const remaining = Math.round(metrics.fcp - frameTimeMs);
     descriptions.push(`FCP까지 ${remaining}ms 남음`);
-  } else if (metrics.fcp && metrics.lcp && frameTimeMs >= metrics.fcp && frameTimeMs < metrics.lcp) {
+  } else if (
+    metrics.fcp &&
+    metrics.lcp &&
+    frameTimeMs >= metrics.fcp &&
+    frameTimeMs < metrics.lcp
+  ) {
     const remaining = Math.round(metrics.lcp - frameTimeMs);
     descriptions.push(`LCP까지 ${remaining}ms 남음`);
   } else if (metrics.lcp && frameTimeMs >= metrics.lcp) {
