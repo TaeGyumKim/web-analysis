@@ -44,9 +44,9 @@ export default defineEventHandler(async event => {
       viewportWidth: options?.viewportWidth ?? 1920,
       viewportHeight: options?.viewportHeight ?? 1080,
       timeout: options?.timeout ?? 60000, // 60 seconds default
-      screenshotInterval: options?.screenshotInterval ?? 250, // Reduced from 100ms to 250ms
+      screenshotInterval: options?.screenshotInterval ?? 100, // 100ms for detailed frame capture
       maxRenderWaitTime: options?.maxRenderWaitTime ?? 30000, // 30 seconds max wait for render completion
-      renderStabilityTime: options?.renderStabilityTime ?? 1000 // 1 second of DOM stability
+      renderStabilityTime: options?.renderStabilityTime ?? 500 // 500ms of DOM stability (reduced for faster completion)
     };
 
     // Perform analysis using queue to handle concurrency
