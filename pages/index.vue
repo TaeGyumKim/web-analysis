@@ -110,13 +110,6 @@
         />
 
         <button class="btn" @click="reAnalyze">재분석</button>
-        <button
-          class="btn"
-          :title="isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환'"
-          @click="toggleDarkMode"
-        >
-          {{ isDarkMode ? '☀️' : '🌙' }}
-        </button>
         <button class="btn btn-primary" :disabled="isAnalyzing" @click="startAnalysis">
           {{ isAnalyzing ? '분석 중...' : '시작' }}
         </button>
@@ -260,16 +253,8 @@ import type { AnalysisResult, CustomMetricDefinition } from '~/types/performance
 import { exportAsJSON, exportAsTextReport, exportNetworkAsCSV } from '~/utils/exportUtils';
 import { glossary } from '~/utils/glossary';
 
-// Dark mode
-const { isDarkMode, toggleDarkMode, initDarkMode } = useDarkMode();
-
-// Initialize dark mode on mount
-onMounted(() => {
-  initDarkMode();
-});
-
 const url = ref('https://www.naver.com/');
-const networkSpeed = ref('4G');
+const networkSpeed = ref('제한 없음');
 const deviceSpec = ref('Desktop');
 const useLighthouse = ref(false);
 const activeTab = ref('frame');

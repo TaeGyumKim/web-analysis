@@ -27,30 +27,10 @@
   --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.12);
 }
 
-.dark {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --bg-card: #1e293b;
-  --bg-elevated: #334155;
-
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-
-  --border-primary: #475569;
-  --border-secondary: #334155;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.5);
-}
-
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: Arial, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .card {
