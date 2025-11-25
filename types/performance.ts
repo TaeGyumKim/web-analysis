@@ -168,7 +168,7 @@ export interface AnalysisResult {
 
 export interface AnalysisOptions {
   captureScreenshots: boolean;
-  networkThrottling?: 'none' | 'slow-3g' | 'fast-3g' | '4g';
+  networkThrottling?: 'none' | 'lte-network' | '5mbps-lte' | '3mbps-lte' | '1mbps-lte' | '400kbps-lte';
   cpuThrottling?: number;
   waitUntil?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
   useLighthouse?: boolean;

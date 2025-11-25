@@ -102,7 +102,9 @@ export const DEFAULT_ANALYSIS_OPTIONS = {
   useLighthouse: false,
   lighthouseFormFactor: 'desktop' as const,
   viewportWidth: 1920,
-  viewportHeight: 1080
+  viewportHeight: 1080,
+  maxRenderWaitTime: 30000, // 30 seconds max wait for render completion
+  renderStabilityTime: 1000 // 1 second of DOM stability before considering render complete
 } as const;
 
 /**
