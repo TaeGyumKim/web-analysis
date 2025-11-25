@@ -4,11 +4,11 @@
     <div v-if="isAnalyzing" class="loading-overlay">
       <div class="loading-content">
         <div class="spinner"></div>
-        <h2 style="margin: 20px 0 10px 0; color: #1f2937">분석 중...</h2>
-        <p style="color: #6b7280; margin: 0">
+        <h2 class="loading-title">분석 중...</h2>
+        <p class="loading-desc">
           페이지 성능을 분석하고 있습니다. 잠시만 기다려주세요.
         </p>
-        <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 14px">{{ url }}</p>
+        <p class="loading-url">{{ url }}</p>
       </div>
     </div>
 
@@ -519,18 +519,34 @@ function loadHistoryEntry(entry: any) {
 .loading-content {
   text-align: center;
   padding: 40px;
-  background: white;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   max-width: 500px;
+}
+
+.loading-title {
+  margin: 20px 0 10px 0;
+  color: var(--text-primary);
+}
+
+.loading-desc {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.loading-url {
+  color: var(--text-tertiary);
+  margin: 10px 0 0 0;
+  font-size: 14px;
 }
 
 .spinner {
   width: 60px;
   height: 60px;
   margin: 0 auto;
-  border: 4px solid #e5e7eb;
-  border-top-color: #3b82f6;
+  border: 4px solid var(--border-secondary);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
