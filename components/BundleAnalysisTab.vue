@@ -43,23 +43,49 @@
     <!-- Charts Section -->
     <div class="charts-section">
       <div class="chart-container">
-        <h3>도메인별 분포</h3>
+        <h3 class="section-title-with-tooltip">
+          도메인별 분포
+          <HelpTooltip
+            :text="glossary.domainDistribution.description"
+            :title="glossary.domainDistribution.title"
+            position="right"
+          />
+        </h3>
         <ClientOnly>
           <canvas ref="domainChartRef"></canvas>
         </ClientOnly>
       </div>
 
       <div class="chart-container">
-        <h3>라이브러리별 분포</h3>
+        <h3 class="section-title-with-tooltip">
+          라이브러리별 분포
+          <HelpTooltip
+            :text="glossary.libraryDistribution.description"
+            :title="glossary.libraryDistribution.title"
+            position="right"
+          />
+        </h3>
         <ClientOnly>
-          <canvas ref="libraryChartRef"></canvas>
+          <div v-if="analysis && analysis.byLibrary.size === 0" class="no-library-message">
+            <span class="no-library-icon">📦</span>
+            <p>감지된 라이브러리가 없습니다.</p>
+            <p class="no-library-hint">자사 코드이거나 알려지지 않은 라이브러리일 수 있습니다.</p>
+          </div>
+          <canvas v-else ref="libraryChartRef"></canvas>
         </ClientOnly>
       </div>
     </div>
 
     <!-- Largest Bundles Table -->
     <div class="table-section">
-      <h3>가장 큰 번들 (Top 10)</h3>
+      <h3 class="section-title-with-tooltip">
+        가장 큰 번들 (Top 10)
+        <HelpTooltip
+          :text="glossary.largestBundles.description"
+          :title="glossary.largestBundles.title"
+          position="right"
+        />
+      </h3>
       <div class="table-wrapper">
         <table class="bundles-table">
           <thead>
@@ -97,7 +123,14 @@
 
     <!-- Domain Breakdown -->
     <div class="table-section">
-      <h3>도메인별 상세</h3>
+      <h3 class="section-title-with-tooltip">
+        도메인별 상세
+        <HelpTooltip
+          :text="glossary.domainBreakdown.description"
+          :title="glossary.domainBreakdown.title"
+          position="right"
+        />
+      </h3>
       <div class="table-wrapper">
         <table class="domain-table">
           <thead>
@@ -117,10 +150,10 @@
                 <div class="progress-bar">
                   <div
                     class="progress-fill"
-                    :style="{ width: `${(stats.size / analysis.totalSize) * 100}%` }"
+                    :style="{ width: `${getPercentage(stats.size, analysis.totalSize)}%` }"
                   ></div>
                   <span class="progress-label">
-                    {{ ((stats.size / analysis.totalSize) * 100).toFixed(1) }}%
+                    {{ getPercentage(stats.size, analysis.totalSize) }}%
                   </span>
                 </div>
               </td>
@@ -136,6 +169,7 @@
 import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import type { AnalysisResult } from '~/types/performance';
 import { analyzeBundles, formatBytes, getBundleOptimizationSuggestions } from '~/utils/bundleAnalyzer';
+import { glossary } from '~/utils/glossary';
 
 const props = defineProps<{
   result: AnalysisResult | null;
@@ -329,6 +363,16 @@ onMounted(() => {
   font-size: 14px;
   color: #6b7280;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.section-title-with-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .card-value {
