@@ -113,6 +113,9 @@ export class PerformanceCollector {
       // Convert requests map to array
       const networkRequests = this.convertRequestsToArray();
 
+      // Trim frames to only include up to last resource load time + buffer
+      this.trimFramesToResourceLoadTime(networkRequests);
+
       // Calculate performance score
       const performanceScore = await import('~/utils/scoreCalculator').then(m =>
         m.computePerformanceScore(metrics, networkRequests, this.frames)
@@ -195,8 +198,20 @@ export class PerformanceCollector {
   }
 
   private startFrameCapture(page: Page, interval: number = 100) {
+    // Skip initial frames to avoid black/empty screens
+    let captureCount = 0;
+    const skipFrames = 3; // Skip first 3 captures (300ms at 100ms interval)
+
     this.captureInterval = setInterval(async () => {
       try {
+        captureCount++;
+
+        // Skip initial frames to avoid black screen during navigation start
+        if (captureCount <= skipFrames) {
+          return;
+        }
+
+        // Use full page screenshot to capture all content
         const screenshot = await page.screenshot({
           encoding: 'base64',
           type: 'png',
@@ -675,6 +690,41 @@ export class PerformanceCollector {
     }
 
     return result.sort((a, b) => a.startTime - b.startTime);
+  }
+
+  /**
+   * Trim frames to only include up to the last resource load time + buffer
+   * This prevents capturing unnecessary frames after all resources have loaded
+   */
+  private trimFramesToResourceLoadTime(networkRequests: NetworkRequest[]): void {
+    if (networkRequests.length === 0 || this.frames.length === 0) {
+      return;
+    }
+
+    // Find the maximum end time of all network requests (in seconds)
+    let maxEndTime = 0;
+    for (const req of networkRequests) {
+      if (req.endTime > maxEndTime) {
+        maxEndTime = req.endTime;
+      }
+    }
+
+    // Add a small buffer (1 second) after the last resource load
+    const cutoffTime = maxEndTime + 1;
+
+    // Filter frames to only include those before the cutoff time
+    const originalCount = this.frames.length;
+    this.frames = this.frames.filter(frame => frame.timestamp <= cutoffTime);
+
+    // Always keep at least the last frame if we have any frames
+    if (this.frames.length === 0 && originalCount > 0) {
+      // This shouldn't happen, but as a safety measure, keep the first few frames
+      this.frames = this.frames.slice(0, Math.min(5, originalCount));
+    }
+
+    logger.debug(
+      `Trimmed frames from ${originalCount} to ${this.frames.length} (cutoff: ${cutoffTime.toFixed(2)}s)`
+    );
   }
 
   private async collectDOMElements(page: Page): Promise<DOMElementTiming[]> {
