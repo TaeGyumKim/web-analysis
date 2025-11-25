@@ -712,21 +712,68 @@ export class PerformanceCollector {
           // Check for img src
           if (el.tagName === 'IMG') {
             const img = el as HTMLImageElement;
-            if (img.src) resources.push(img.src);
+            if (img.src && !img.src.startsWith('data:')) {
+              resources.push(img.src);
+            }
+            // Also check srcset
+            if (img.srcset) {
+              const srcsetUrls = img.srcset.split(',').map(s => s.trim().split(' ')[0]);
+              srcsetUrls.forEach(url => {
+                if (url && !url.startsWith('data:')) {
+                  resources.push(url);
+                }
+              });
+            }
           }
 
-          // Check for background images
+          // Check for picture source elements
+          if (el.tagName === 'SOURCE') {
+            const source = el as HTMLSourceElement;
+            if (source.srcset) {
+              const srcsetUrls = source.srcset.split(',').map(s => s.trim().split(' ')[0]);
+              srcsetUrls.forEach(url => {
+                if (url && !url.startsWith('data:')) {
+                  resources.push(url);
+                }
+              });
+            }
+          }
+
+          // Check for background images (can have multiple)
           const computedStyle = window.getComputedStyle(el);
           const bgImage = computedStyle.backgroundImage;
           if (bgImage && bgImage !== 'none') {
-            const matches = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
-            if (matches && matches[1]) resources.push(matches[1]);
+            // Match all url() patterns
+            const urlRegex = /url\(['"]?([^'")\s]+)['"]?\)/g;
+            let match;
+            while ((match = urlRegex.exec(bgImage)) !== null) {
+              if (match[1] && !match[1].startsWith('data:')) {
+                resources.push(match[1]);
+              }
+            }
           }
 
           // Check for video/audio sources
           if (el.tagName === 'VIDEO' || el.tagName === 'AUDIO') {
             const media = el as HTMLMediaElement;
-            if (media.src) resources.push(media.src);
+            if (media.src && !media.src.startsWith('data:')) {
+              resources.push(media.src);
+            }
+            // Check poster for video
+            if (el.tagName === 'VIDEO') {
+              const video = el as HTMLVideoElement;
+              if (video.poster && !video.poster.startsWith('data:')) {
+                resources.push(video.poster);
+              }
+            }
+          }
+
+          // Check for iframe src
+          if (el.tagName === 'IFRAME') {
+            const iframe = el as HTMLIFrameElement;
+            if (iframe.src && !iframe.src.startsWith('data:') && !iframe.src.startsWith('about:')) {
+              resources.push(iframe.src);
+            }
           }
 
           return resources;
