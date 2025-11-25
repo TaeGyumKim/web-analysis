@@ -1,1 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Add Node.js to PATH for Windows
+if [ -d "/c/nvm4w/nodejs" ]; then
+  export PATH="/c/nvm4w/nodejs:$PATH"
+elif [ -d "/c/Program Files/nodejs" ]; then
+  export PATH="/c/Program Files/nodejs:$PATH"
+fi
+
 npx lint-staged
