@@ -8,7 +8,7 @@
         position="right"
       />
     </h3>
-    <p style="font-size: 14px; color: #666; margin-top: 8px">
+    <p class="budget-description">
       각 메트릭의 목표 값을 설정하고 실제 성능과 비교합니다
     </p>
 
@@ -54,11 +54,11 @@
               type="number"
               min="0"
               step="100"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
+              class="budget-input"
             />
-            <span style="font-size: 14px; color: #666">ms</span>
+            <span class="budget-unit">ms</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 1000ms</div>
+          <div class="budget-hint">권장: ≤ 1000ms</div>
         </div>
 
         <!-- LCP Budget -->
@@ -77,11 +77,11 @@
               type="number"
               min="0"
               step="100"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
+              class="budget-input"
             />
-            <span style="font-size: 14px; color: #666">ms</span>
+            <span class="budget-unit">ms</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 2500ms</div>
+          <div class="budget-hint">권장: ≤ 2500ms</div>
         </div>
 
         <!-- TBT Budget -->
@@ -100,11 +100,11 @@
               type="number"
               min="0"
               step="50"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
+              class="budget-input"
             />
-            <span style="font-size: 14px; color: #666">ms</span>
+            <span class="budget-unit">ms</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 200ms</div>
+          <div class="budget-hint">권장: ≤ 200ms</div>
         </div>
 
         <!-- CLS Budget -->
@@ -123,11 +123,11 @@
               type="number"
               min="0"
               step="0.01"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
+              class="budget-input"
             />
-            <span style="font-size: 14px; color: #666">점수</span>
+            <span class="budget-unit">점수</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 0.1</div>
+          <div class="budget-hint">권장: ≤ 0.1</div>
         </div>
 
         <!-- Request Count Budget -->
@@ -139,11 +139,11 @@
               type="number"
               min="0"
               step="10"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
+              class="budget-input"
             />
-            <span style="font-size: 14px; color: #666">개</span>
+            <span class="budget-unit">개</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 50개</div>
+          <div class="budget-hint">권장: ≤ 50개</div>
         </div>
 
         <!-- Total Size Budget -->
@@ -155,11 +155,11 @@
               type="number"
               min="0"
               step="100"
-              style="flex: 1; padding: 8px; border: 1px solid #e0e0e0; border-radius: 6px"
+              class="budget-input"
             />
-            <span style="font-size: 14px; color: #666">KB</span>
+            <span class="budget-unit">KB</span>
           </div>
-          <div style="font-size: 12px; color: #999; margin-top: 4px">권장: ≤ 2000KB</div>
+          <div class="budget-hint">권장: ≤ 2000KB</div>
         </div>
       </div>
     </div>
@@ -494,7 +494,33 @@ const recommendations = computed(() => {
   display: block;
 }
 
+.budget-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.budget-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.budget-unit {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.budget-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
 table tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--bg-tertiary);
 }
 </style>
