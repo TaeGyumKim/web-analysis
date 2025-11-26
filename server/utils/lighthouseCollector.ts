@@ -53,12 +53,15 @@ export interface LighthouseResult {
 
 export class LighthouseCollector {
   async analyze(config: LighthouseConfig): Promise<LighthouseResult> {
-    // Use Puppeteer's bundled Chromium to avoid "No Chrome installations found" error
-    const chromePath = puppeteer.executablePath();
+    // Use system Chromium in Docker environment, fallback to Puppeteer's bundled Chromium
+    const chromePath =
+      process.env.PUPPETEER_EXECUTABLE_PATH ||
+      process.env.CHROME_PATH ||
+      puppeteer.executablePath();
 
     const chrome = await launch({
       chromePath,
-      chromeFlags: ['--headless', '--no-sandbox', '--disable-dev-shm-usage']
+      chromeFlags: ['--headless', '--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
     });
 
     try {

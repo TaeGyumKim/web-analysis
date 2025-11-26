@@ -29,15 +29,25 @@ export class PerformanceCollector {
 
   async initialize() {
     if (!this.browser) {
+      // Use system Chromium in Docker environment
+      const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH;
+
       this.browser = await puppeteer.launch({
         headless: true,
+        executablePath: executablePath || undefined,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
-          '--disable-gpu'
+          '--disable-gpu',
+          '--disable-software-rasterizer',
+          '--disable-extensions'
         ]
       });
+
+      logger.info(
+        `Browser initialized${executablePath ? ` with executable: ${executablePath}` : ' with bundled Chromium'}`
+      );
     }
   }
 
