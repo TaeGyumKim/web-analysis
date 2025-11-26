@@ -118,18 +118,40 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Validate SSH secrets
+        run: |
+          if [ -z "${{ secrets.SSH_HOST }}" ]; then
+            echo "::error::SSH_HOST secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SSH_USER }}" ]; then
+            echo "::error::SSH_USER secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.GHCR_PAT }}" ]; then
+            echo "::error::GHCR_PAT secret is not set"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured"
+
       - name: Add host to known_hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          ssh-keyscan -p ${{ vars.SSH_PORT || '22' }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || {
+            echo "::error::Failed to scan SSH host. Check if SSH_HOST is correct and port ${{ vars.SSH_PORT || '22' }} is accessible."
+            exit 1
+          }
+          chmod 600 ~/.ssh/known_hosts
+          echo "✅ Host added to known_hosts"
 
       - name: Copy docker-compose to server
         run: |
-          scp docker-compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ vars.DEPLOY_PATH || '/opt/web-perf' }}/docker-compose.yml
+          scp -P ${{ vars.SSH_PORT || '22' }} -o ConnectTimeout=10 docker-compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ vars.DEPLOY_PATH || '/opt/web-perf' }}/docker-compose.yml
 
       - name: Deploy to staging server
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          ssh -p ${{ vars.SSH_PORT || '22' }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             set -e
             cd ${{ vars.DEPLOY_PATH || '/opt/web-perf' }}
 
@@ -183,18 +205,40 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Validate SSH secrets
+        run: |
+          if [ -z "${{ secrets.SSH_HOST }}" ]; then
+            echo "::error::SSH_HOST secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SSH_USER }}" ]; then
+            echo "::error::SSH_USER secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.GHCR_PAT }}" ]; then
+            echo "::error::GHCR_PAT secret is not set"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured"
+
       - name: Add host to known_hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          ssh-keyscan -p ${{ vars.SSH_PORT || '22' }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || {
+            echo "::error::Failed to scan SSH host. Check if SSH_HOST is correct and port ${{ vars.SSH_PORT || '22' }} is accessible."
+            exit 1
+          }
+          chmod 600 ~/.ssh/known_hosts
+          echo "✅ Host added to known_hosts"
 
       - name: Copy docker-compose to server
         run: |
-          scp docker-compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ vars.DEPLOY_PATH || '/opt/web-perf' }}/docker-compose.yml
+          scp -P ${{ vars.SSH_PORT || '22' }} -o ConnectTimeout=10 docker-compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ vars.DEPLOY_PATH || '/opt/web-perf' }}/docker-compose.yml
 
       - name: Deploy to production server
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          ssh -p ${{ vars.SSH_PORT || '22' }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             set -e
             cd ${{ vars.DEPLOY_PATH || '/opt/web-perf' }}
 
