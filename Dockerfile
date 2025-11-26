@@ -84,9 +84,14 @@ ENV NODE_ENV=production \
 COPY --from=builder --chown=nuxt:nodejs /app/.output /app/.output
 COPY --from=builder --chown=nuxt:nodejs /app/package*.json /app/
 
-# Copy lighthouse node_modules for report assets (to both locations)
+# Copy lighthouse and its dependencies for report assets (to both locations)
 COPY --from=builder --chown=nuxt:nodejs /app/node_modules/lighthouse /app/node_modules/lighthouse
+COPY --from=builder --chown=nuxt:nodejs /app/node_modules/axe-core /app/node_modules/axe-core
 COPY --from=builder --chown=nuxt:nodejs /app/node_modules/lighthouse /app/.output/server/node_modules/lighthouse
+COPY --from=builder --chown=nuxt:nodejs /app/node_modules/axe-core /app/.output/server/node_modules/axe-core
+
+# Create data directory for history storage with proper permissions
+RUN mkdir -p /app/.data/history && chown -R nuxt:nodejs /app/.data
 
 # Switch to non-root user
 USER nuxt
