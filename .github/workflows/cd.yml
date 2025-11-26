@@ -17,7 +17,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 concurrency:
   group: cd-${{ github.ref }}
@@ -37,9 +36,14 @@ jobs:
       image_tag: ${{ steps.meta.outputs.version }}
       image_digest: ${{ steps.build.outputs.digest }}
       full_image: ${{ steps.meta.outputs.tags }}
+      image_name: ${{ steps.repo.outputs.lowercase }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set lowercase repository name
+        id: repo
+        run: echo "lowercase=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -55,7 +59,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ steps.repo.outputs.lowercase }}
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -94,7 +98,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Image | \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | \`${{ env.REGISTRY }}/${{ steps.repo.outputs.lowercase }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Tag | \`${{ steps.meta.outputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Digest | \`${{ steps.build.outputs.digest }}\` |" >> $GITHUB_STEP_SUMMARY
 
@@ -145,6 +149,10 @@ jobs:
           chmod 600 ~/.ssh/known_hosts
           echo "✅ Host added to known_hosts"
 
+      - name: Create deployment directory
+        run: |
+          ssh -p ${{ vars.SSH_PORT || '22' }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ vars.DEPLOY_PATH || '/opt/web-perf' }}"
+
       - name: Copy docker-compose to server
         run: |
           scp -P ${{ vars.SSH_PORT || '22' }} -o ConnectTimeout=10 docker-compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ vars.DEPLOY_PATH || '/opt/web-perf' }}/docker-compose.yml
@@ -156,14 +164,14 @@ jobs:
             cd ${{ vars.DEPLOY_PATH || '/opt/web-perf' }}
 
             # Set environment variables
-            export GITHUB_REPOSITORY=${{ github.repository }}
+            export GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}
             export IMAGE_TAG=${{ needs.docker.outputs.image_tag }}
 
             # Login to GHCR using PAT
             echo '${{ secrets.GHCR_PAT }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             # Update .env file
-            echo 'GITHUB_REPOSITORY=${{ github.repository }}' > .env
+            echo 'GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}' > .env
             echo 'IMAGE_TAG=${{ needs.docker.outputs.image_tag }}' >> .env
 
             # Pull and deploy
@@ -232,6 +240,10 @@ jobs:
           chmod 600 ~/.ssh/known_hosts
           echo "✅ Host added to known_hosts"
 
+      - name: Create deployment directory
+        run: |
+          ssh -p ${{ vars.SSH_PORT || '22' }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ vars.DEPLOY_PATH || '/opt/web-perf' }}"
+
       - name: Copy docker-compose to server
         run: |
           scp -P ${{ vars.SSH_PORT || '22' }} -o ConnectTimeout=10 docker-compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ vars.DEPLOY_PATH || '/opt/web-perf' }}/docker-compose.yml
@@ -243,7 +255,7 @@ jobs:
             cd ${{ vars.DEPLOY_PATH || '/opt/web-perf' }}
 
             # Set environment variables
-            export GITHUB_REPOSITORY=${{ github.repository }}
+            export GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}
             export IMAGE_TAG=${{ needs.docker.outputs.image_tag }}
 
             # Login to GHCR using PAT
@@ -253,7 +265,7 @@ jobs:
             docker compose config > docker-compose.backup.yml 2>/dev/null || true
 
             # Update .env file
-            echo 'GITHUB_REPOSITORY=${{ github.repository }}' > .env
+            echo 'GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}' > .env
             echo 'IMAGE_TAG=${{ needs.docker.outputs.image_tag }}' >> .env
 
             # Pull and deploy
@@ -319,7 +331,7 @@ jobs:
 
             ## Docker Image
             ```bash
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            docker pull ${{ env.REGISTRY }}/${{ needs.docker.outputs.image_name }}:${{ github.ref_name }}
             ```
           draft: false
           prerelease: false
