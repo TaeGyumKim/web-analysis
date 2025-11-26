@@ -2,7 +2,7 @@
 # 멀티 스테이지 빌드를 사용하여 이미지 크기 최적화
 
 # Stage 1: Builder
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 LABEL stage=builder
 
 WORKDIR /app
@@ -37,7 +37,7 @@ ENV NODE_ENV=production
 RUN echo "Building with GIT_COMMIT=${GIT_COMMIT}, GIT_VERSION=${GIT_VERSION}" && npm run build
 
 # Stage 2: Runner (Production)
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 LABEL maintainer="Web Performance Team"
 
 WORKDIR /app
