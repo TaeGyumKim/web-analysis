@@ -1,8 +1,6 @@
 # Production Docker Compose - Uses pre-built image from registry
 # Deploy: docker compose -f docker-compose.prod.yml up -d
 
-version: '3.8'
-
 services:
   web-perf:
     # Use image from GitHub Container Registry
@@ -24,20 +22,21 @@ services:
       - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
       - CHROME_PATH=/usr/bin/chromium-browser
 
+    # Chromium sandbox 비활성화를 위한 보안 설정
     security_opt:
       - seccomp:unconfined
 
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
+    # 공유 메모리 크기 증가 (Chromium 안정성)
+    shm_size: '2gb'
 
+    # 리소스 제한 (docker compose v2)
+    cpus: 2
+    mem_limit: 2g
+    mem_reservation: 512m
+
+    # 헬스 체크 (curl 사용)
     healthcheck:
-      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:3000/api/health']
+      test: ['CMD', 'curl', '-sf', 'http://localhost:3000/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -53,6 +52,7 @@ services:
         max-file: '3'
 
   # Nginx Reverse Proxy (optional)
+  # 사용법: docker compose -f docker-compose.prod.yml --profile with-nginx up -d
   nginx:
     image: nginx:alpine
     container_name: nginx-prod

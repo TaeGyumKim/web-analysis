@@ -7,7 +7,9 @@
       "Bash(npx vue-tsc:*)",
       "Bash(dir /s /b *.ts *.vue *.md)",
       "Bash(findstr:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(dir:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []
