@@ -189,11 +189,24 @@ jobs:
             # Pull and deploy with force-recreate to ensure new env vars are applied
             docker compose pull
             docker compose up -d --force-recreate
-            docker image prune -f
 
             # Health check
             sleep 15
             curl -sf http://localhost:3000/api/health || exit 1
+
+            # Diagnostic: Check NUXT_PUBLIC_* env vars in container
+            echo '📋 Container NUXT_PUBLIC_* environment variables:'
+            docker exec web-perf-prod printenv | grep NUXT_PUBLIC || echo 'No NUXT_PUBLIC_* vars found'
+
+            # Diagnostic: Check CSS files in container
+            echo '📋 CSS files in container:'
+            docker exec web-perf-prod ls -la /app/.output/public/_nuxt/ 2>/dev/null | head -20 || echo 'Directory not found'
+
+            # Diagnostic: Check /api/version response
+            echo '📋 /api/version response:'
+            curl -s http://localhost:3000/api/version || echo 'API not responding'
+
+            docker image prune -f
             echo '✅ Staging deployment complete!'
           "
 
@@ -317,6 +330,22 @@ jobs:
               echo '⚠️ Health check failed, but keeping container running for debugging'
               echo 'Check logs with: docker logs web-perf-prod'
             fi
+
+            # Diagnostic: Show .env contents (hide sensitive values)
+            echo '📋 .env file contents:'
+            cat .env | sed 's/=.*/=***HIDDEN***/'
+
+            # Diagnostic: Check NUXT_PUBLIC_* env vars in container
+            echo '📋 Container NUXT_PUBLIC_* environment variables:'
+            docker exec web-perf-prod printenv | grep NUXT_PUBLIC || echo 'No NUXT_PUBLIC_* vars found'
+
+            # Diagnostic: Check CSS files in container
+            echo '📋 CSS files in container:'
+            docker exec web-perf-prod ls -la /app/.output/public/_nuxt/ 2>/dev/null | head -20 || echo 'Directory not found'
+
+            # Diagnostic: Check /api/version response
+            echo '📋 /api/version response:'
+            curl -s http://localhost:3000/api/version || echo 'API not responding'
 
             docker image prune -f
             echo '✅ Production deployment complete!'

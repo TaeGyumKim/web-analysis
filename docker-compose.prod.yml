@@ -10,7 +10,7 @@ services:
 
     restart: unless-stopped
 
-    # Explicitly load .env file for NUXT_PUBLIC_* variables
+    # Load .env file for variable substitution AND pass to container
     env_file:
       - .env
 
@@ -25,6 +25,12 @@ services:
       - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
       - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
       - CHROME_PATH=/usr/bin/chromium-browser
+      # Runtime config override - NUXT_PUBLIC_* vars from .env
+      - NUXT_PUBLIC_GIT_COMMIT=${NUXT_PUBLIC_GIT_COMMIT:-}
+      - NUXT_PUBLIC_GIT_BRANCH=${NUXT_PUBLIC_GIT_BRANCH:-}
+      - NUXT_PUBLIC_GIT_TAG=${NUXT_PUBLIC_GIT_TAG:-}
+      - NUXT_PUBLIC_GIT_VERSION=${NUXT_PUBLIC_GIT_VERSION:-}
+      - NUXT_PUBLIC_GIT_DATETIME=${NUXT_PUBLIC_GIT_DATETIME:-}
 
     # Chromium sandbox 비활성화를 위한 보안 설정
     security_opt:
