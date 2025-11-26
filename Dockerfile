@@ -84,11 +84,8 @@ ENV NODE_ENV=production \
 COPY --from=builder --chown=nuxt:nodejs /app/.output /app/.output
 COPY --from=builder --chown=nuxt:nodejs /app/package*.json /app/
 
-# Copy lighthouse and its dependencies for report assets (to both locations)
-COPY --from=builder --chown=nuxt:nodejs /app/node_modules/lighthouse /app/node_modules/lighthouse
-COPY --from=builder --chown=nuxt:nodejs /app/node_modules/axe-core /app/node_modules/axe-core
-COPY --from=builder --chown=nuxt:nodejs /app/node_modules/lighthouse /app/.output/server/node_modules/lighthouse
-COPY --from=builder --chown=nuxt:nodejs /app/node_modules/axe-core /app/.output/server/node_modules/axe-core
+# Copy all node_modules for runtime dependencies (lighthouse, puppeteer, etc.)
+COPY --from=builder --chown=nuxt:nodejs /app/node_modules /app/node_modules
 
 # Create data directory for history storage with proper permissions
 RUN mkdir -p /app/.data/history && chown -R nuxt:nodejs /app/.data
@@ -106,5 +103,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-# Start application
-CMD ["node", ".output/server/index.mjs"]
+# Start application with increased memory limit for Lighthouse
+CMD ["node", "--max-old-space-size=1536", ".output/server/index.mjs"]
