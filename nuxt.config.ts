@@ -22,6 +22,13 @@ export default defineNuxtConfig({
     configPath: 'tailwind.config',
     exposeConfig: false
   },
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {}
+    }
+  },
+  ssr: true,
   app: {
     head: {
       title: 'Web Performance Analyzer',
@@ -45,6 +52,9 @@ export default defineNuxtConfig({
       script: {
         propsDestructure: false
       }
+    },
+    build: {
+      cssCodeSplit: false
     }
   },
   hooks: {
