@@ -175,15 +175,16 @@ jobs:
             docker stop web-perf-prod 2>/dev/null || true
             docker rm web-perf-prod 2>/dev/null || true
 
-            # Update .env file
+            # Update .env file with NUXT_PUBLIC_* keys for runtime config override
             echo 'GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}' > .env
             echo 'IMAGE_TAG=${{ needs.docker.outputs.image_tag }}' >> .env
             echo 'HOST_PORT=${{ vars.HOST_PORT }}' >> .env
-            echo 'GIT_COMMIT=${{ github.sha }}' >> .env
-            echo 'GIT_BRANCH=${{ github.ref_name }}' >> .env
-            echo 'GIT_TAG=${{ github.ref_type == 'tag' && github.ref_name || '' }}' >> .env
-            echo 'GIT_VERSION=${{ needs.docker.outputs.image_tag }}' >> .env
-            echo 'GIT_DATETIME=$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")' >> .env
+            echo 'NUXT_PUBLIC_GIT_COMMIT=${{ github.sha }}' >> .env
+            echo 'NUXT_PUBLIC_GIT_BRANCH=${{ github.ref_name }}' >> .env
+            echo 'NUXT_PUBLIC_GIT_TAG=${{ github.ref_type == 'tag' && github.ref_name || '' }}' >> .env
+            echo 'NUXT_PUBLIC_GIT_VERSION=${{ needs.docker.outputs.image_tag }}' >> .env
+            DEPLOY_DATETIME=\$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            echo \"NUXT_PUBLIC_GIT_DATETIME=\$DEPLOY_DATETIME\" >> .env
 
             # Pull and deploy
             docker compose pull
@@ -280,15 +281,16 @@ jobs:
             # Backup current state
             docker compose config > docker-compose.backup.yml 2>/dev/null || true
 
-            # Update .env file
+            # Update .env file with NUXT_PUBLIC_* keys for runtime config override
             echo 'GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}' > .env
             echo 'IMAGE_TAG=${{ needs.docker.outputs.image_tag }}' >> .env
             echo 'HOST_PORT=${{ vars.HOST_PORT }}' >> .env
-            echo 'GIT_COMMIT=${{ github.sha }}' >> .env
-            echo 'GIT_BRANCH=${{ github.ref_name }}' >> .env
-            echo 'GIT_TAG=${{ github.ref_type == 'tag' && github.ref_name || '' }}' >> .env
-            echo 'GIT_VERSION=${{ needs.docker.outputs.image_tag }}' >> .env
-            echo 'GIT_DATETIME=$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")' >> .env
+            echo 'NUXT_PUBLIC_GIT_COMMIT=${{ github.sha }}' >> .env
+            echo 'NUXT_PUBLIC_GIT_BRANCH=${{ github.ref_name }}' >> .env
+            echo 'NUXT_PUBLIC_GIT_TAG=${{ github.ref_type == 'tag' && github.ref_name || '' }}' >> .env
+            echo 'NUXT_PUBLIC_GIT_VERSION=${{ needs.docker.outputs.image_tag }}' >> .env
+            DEPLOY_DATETIME=\$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            echo \"NUXT_PUBLIC_GIT_DATETIME=\$DEPLOY_DATETIME\" >> .env
 
             # Pull and deploy
             docker compose pull
