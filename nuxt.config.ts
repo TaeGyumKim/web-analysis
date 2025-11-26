@@ -27,7 +27,8 @@ export default defineNuxtConfig({
           name: 'description',
           content: 'Analyze web page loading performance for designers and non-developers'
         }
-      ]
+      ],
+      link: [{ rel: 'stylesheet', href: '/css/variables.css' }]
     }
   },
   typescript: {
