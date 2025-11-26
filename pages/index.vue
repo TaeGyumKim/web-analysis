@@ -486,12 +486,41 @@ async function startAnalysis() {
       }
     });
 
-    const result = response as { success: boolean; data?: AnalysisResult };
+    const result = response as {
+      success: boolean;
+      data?: AnalysisResult;
+      error?: {
+        title: string;
+        message: string;
+        suggestions?: string[];
+      };
+    };
+
     if (result.success && result.data) {
       stopProgressSimulation(true);
       analysisResult.value = result.data;
       // Save to history
       saveResultToHistory(result.data);
+    } else if (!result.success) {
+      // API responded but analysis failed
+      stopProgressSimulation(false);
+      isAnalyzing.value = false;
+
+      if (result.error) {
+        let errorMessage = `❌ ${result.error.title}\n\n${result.error.message}`;
+
+        if (result.error.suggestions && result.error.suggestions.length > 0) {
+          errorMessage += '\n\n💡 제안사항:';
+          result.error.suggestions.forEach((suggestion: string) => {
+            errorMessage += `\n• ${suggestion}`;
+          });
+        }
+
+        alert(errorMessage);
+      } else {
+        alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+      return; // Exit early to prevent finally block issues
     }
   } catch (err: any) {
     console.error('Analysis error:', err);

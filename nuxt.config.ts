@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
-  css: ['~/assets/css/tailwind.css', '~/assets/css/main.css'],
+  css: ['~/assets/css/tailwind.css'],
   runtimeConfig: {
     public: {
       appName: process.env.APP_NAME || 'Web Performance Analyzer',

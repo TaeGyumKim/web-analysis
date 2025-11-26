@@ -69,4 +69,4 @@ temp
 .prettierrc*
 .editorconfig
 tsconfig.json
-nuxt.config.ts
+# nuxt.config.ts - MUST be included for Tailwind CSS and runtime config
