@@ -84,6 +84,9 @@ ENV NODE_ENV=production \
 COPY --from=builder --chown=nuxt:nodejs /app/.output /app/.output
 COPY --from=builder --chown=nuxt:nodejs /app/package*.json /app/
 
+# Copy lighthouse node_modules for report assets
+COPY --from=builder --chown=nuxt:nodejs /app/node_modules/lighthouse /app/node_modules/lighthouse
+
 # Switch to non-root user
 USER nuxt
 
