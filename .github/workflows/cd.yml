@@ -178,6 +178,7 @@ jobs:
             # Update .env file
             echo 'GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}' > .env
             echo 'IMAGE_TAG=${{ needs.docker.outputs.image_tag }}' >> .env
+            echo 'HOST_PORT=${{ vars.HOST_PORT || '3000' }}' >> .env
 
             # Pull and deploy
             docker compose pull
@@ -277,6 +278,7 @@ jobs:
             # Update .env file
             echo 'GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}' > .env
             echo 'IMAGE_TAG=${{ needs.docker.outputs.image_tag }}' >> .env
+            echo 'HOST_PORT=${{ vars.HOST_PORT || '3000' }}' >> .env
 
             # Pull and deploy
             docker compose pull
