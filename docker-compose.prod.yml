@@ -17,6 +17,12 @@ services:
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PORT=3000
+      # Git version info (Nuxt runtime config override)
+      - NUXT_PUBLIC_GIT_COMMIT=${GIT_COMMIT:-}
+      - NUXT_PUBLIC_GIT_BRANCH=${GIT_BRANCH:-}
+      - NUXT_PUBLIC_GIT_TAG=${GIT_TAG:-}
+      - NUXT_PUBLIC_GIT_VERSION=${GIT_VERSION:-}
+      - NUXT_PUBLIC_GIT_DATETIME=${GIT_DATETIME:-}
       # Puppeteer 설정
       - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
       - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
