@@ -170,13 +170,18 @@ jobs:
             # Login to GHCR using PAT
             echo '${{ secrets.GHCR_PAT }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+            # Stop existing containers
+            docker compose down 2>/dev/null || true
+            docker stop web-perf-prod 2>/dev/null || true
+            docker rm web-perf-prod 2>/dev/null || true
+
             # Update .env file
             echo 'GITHUB_REPOSITORY=${{ needs.docker.outputs.image_name }}' > .env
             echo 'IMAGE_TAG=${{ needs.docker.outputs.image_tag }}' >> .env
 
             # Pull and deploy
             docker compose pull
-            docker compose up -d --force-recreate
+            docker compose up -d
             docker image prune -f
 
             # Health check
@@ -261,6 +266,11 @@ jobs:
             # Login to GHCR using PAT
             echo '${{ secrets.GHCR_PAT }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+            # Stop existing containers
+            docker compose down 2>/dev/null || true
+            docker stop web-perf-prod 2>/dev/null || true
+            docker rm web-perf-prod 2>/dev/null || true
+
             # Backup current state
             docker compose config > docker-compose.backup.yml 2>/dev/null || true
 
@@ -270,7 +280,7 @@ jobs:
 
             # Pull and deploy
             docker compose pull
-            docker compose up -d --force-recreate --no-deps web-perf
+            docker compose up -d
 
             # Health check with retry
             echo 'Waiting for health check...'
