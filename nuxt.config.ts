@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/tailwind.css', '~/assets/css/main.css'],
   runtimeConfig: {
     public: {
       appName: process.env.APP_NAME || 'Web Performance Analyzer',
@@ -16,6 +16,11 @@ export default defineNuxtConfig({
       gitVersion: process.env.GIT_VERSION || '',
       gitDatetime: process.env.GIT_DATETIME || ''
     }
+  },
+  tailwindcss: {
+    cssPath: '~/assets/css/tailwind.css',
+    configPath: 'tailwind.config',
+    exposeConfig: false
   },
   app: {
     head: {
@@ -27,8 +32,7 @@ export default defineNuxtConfig({
           name: 'description',
           content: 'Analyze web page loading performance for designers and non-developers'
         }
-      ],
-      link: [{ rel: 'stylesheet', href: '/css/variables.css' }]
+      ]
     }
   },
   typescript: {
