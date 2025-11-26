@@ -10,11 +10,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       appName: process.env.APP_NAME || 'Web Performance Analyzer',
-      gitCommit: '',
-      gitBranch: '',
-      gitTag: '',
-      gitVersion: '',
-      gitDatetime: ''
+      gitCommit: process.env.GIT_COMMIT || '',
+      gitBranch: process.env.GIT_BRANCH || '',
+      gitTag: process.env.GIT_TAG || '',
+      gitVersion: process.env.GIT_VERSION || '',
+      gitDatetime: process.env.GIT_DATETIME || ''
     }
   },
   app: {
