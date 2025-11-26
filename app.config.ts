@@ -1,10 +1,10 @@
 export default defineAppConfig({
   appName: 'Web Performance Analyzer',
   git: {
-    commit: '',
-    branch: '',
-    tag: '',
-    version: '',
-    datetime: ''
+    commit: undefined,
+    branch: undefined,
+    tag: undefined,
+    version: undefined,
+    datetime: undefined
   }
 });
