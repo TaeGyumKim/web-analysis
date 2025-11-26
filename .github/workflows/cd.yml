@@ -186,9 +186,9 @@ jobs:
             DEPLOY_DATETIME=\$(date -u +'%Y-%m-%dT%H:%M:%SZ')
             echo \"NUXT_PUBLIC_GIT_DATETIME=\$DEPLOY_DATETIME\" >> .env
 
-            # Pull and deploy
+            # Pull and deploy with force-recreate to ensure new env vars are applied
             docker compose pull
-            docker compose up -d
+            docker compose up -d --force-recreate
             docker image prune -f
 
             # Health check
@@ -292,9 +292,9 @@ jobs:
             DEPLOY_DATETIME=\$(date -u +'%Y-%m-%dT%H:%M:%SZ')
             echo \"NUXT_PUBLIC_GIT_DATETIME=\$DEPLOY_DATETIME\" >> .env
 
-            # Pull and deploy
+            # Pull and deploy with force-recreate to ensure new env vars are applied
             docker compose pull
-            docker compose up -d
+            docker compose up -d --force-recreate
 
             # Wait for container to be ready
             echo 'Waiting for container to start...'
