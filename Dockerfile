@@ -7,22 +7,7 @@ LABEL stage=builder
 
 WORKDIR /app
 
-# Git version information (injected during build)
-ARG GIT_COMMIT=""
-ARG GIT_BRANCH=""
-ARG GIT_TAG=""
-ARG GIT_VERSION=""
-ARG GIT_DATETIME=""
-ARG APP_NAME="Web Performance Analyzer"
-
-ENV GIT_COMMIT=${GIT_COMMIT} \
-    GIT_BRANCH=${GIT_BRANCH} \
-    GIT_TAG=${GIT_TAG} \
-    GIT_VERSION=${GIT_VERSION} \
-    GIT_DATETIME=${GIT_DATETIME} \
-    APP_NAME=${APP_NAME}
-
-# Copy package files
+# Copy package files first for better caching
 COPY package*.json ./
 
 # Install ALL dependencies (including devDependencies for build)
@@ -31,9 +16,25 @@ RUN npm ci && npm cache clean --force
 # Copy application source
 COPY . .
 
-# Build application
+# Git version information (injected during build) - AFTER copy to bust cache
+ARG GIT_COMMIT=""
+ARG GIT_BRANCH=""
+ARG GIT_TAG=""
+ARG GIT_VERSION=""
+ARG GIT_DATETIME=""
+ARG APP_NAME="Web Performance Analyzer"
+ARG CACHE_BUST=""
+
+ENV GIT_COMMIT=${GIT_COMMIT} \
+    GIT_BRANCH=${GIT_BRANCH} \
+    GIT_TAG=${GIT_TAG} \
+    GIT_VERSION=${GIT_VERSION} \
+    GIT_DATETIME=${GIT_DATETIME} \
+    APP_NAME=${APP_NAME}
+
+# Build application (cache busted by git info args)
 ENV NODE_ENV=production
-RUN npm run build
+RUN echo "Building with GIT_COMMIT=${GIT_COMMIT}, GIT_VERSION=${GIT_VERSION}" && npm run build
 
 # Stage 2: Runner (Production)
 FROM node:20-alpine AS runner

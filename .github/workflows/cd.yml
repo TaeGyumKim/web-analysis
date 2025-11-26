@@ -89,8 +89,10 @@ jobs:
             GIT_TAG=${{ steps.git.outputs.tag }}
             GIT_VERSION=${{ steps.meta.outputs.version }}
             GIT_DATETIME=${{ steps.git.outputs.datetime }}
+            CACHE_BUST=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          no-cache-filters: builder
 
       - name: Output image info
         run: |
