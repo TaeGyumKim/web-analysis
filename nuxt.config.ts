@@ -29,6 +29,12 @@ export default defineNuxtConfig({
     }
   },
   ssr: true,
+  nitro: {
+    // Don't bundle these packages - they need to load their own file assets at runtime
+    rollupConfig: {
+      external: ['lighthouse', 'puppeteer', 'chrome-launcher', 'axe-core', 'http-link-header']
+    }
+  },
   app: {
     head: {
       title: 'Web Performance Analyzer',

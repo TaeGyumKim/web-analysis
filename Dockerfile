@@ -84,15 +84,10 @@ ENV NODE_ENV=production \
 COPY --from=builder --chown=nuxt:nodejs /app/.output /app/.output
 COPY --from=builder --chown=nuxt:nodejs /app/package*.json /app/
 
-# Copy all node_modules for runtime dependencies (lighthouse, puppeteer, etc.)
+# Copy all node_modules for runtime dependencies
+# lighthouse, puppeteer, chrome-launcher are marked as external in nuxt.config.ts
+# so they will be loaded from /app/node_modules at runtime (not bundled)
 COPY --from=builder --chown=nuxt:nodejs /app/node_modules /app/node_modules
-
-# Symlink node_modules to .output/server for Nitro bundled code
-RUN mkdir -p /app/.output/server/node_modules && \
-    ln -sf /app/node_modules/lighthouse /app/.output/server/node_modules/lighthouse && \
-    ln -sf /app/node_modules/axe-core /app/.output/server/node_modules/axe-core && \
-    ln -sf /app/node_modules/http-link-header /app/.output/server/node_modules/http-link-header && \
-    chown -R nuxt:nodejs /app/.output/server/node_modules
 
 # Create data directory for history storage with proper permissions
 RUN mkdir -p /app/.data/history && chown -R nuxt:nodejs /app/.data
