@@ -168,7 +168,13 @@ export interface AnalysisResult {
 
 export interface AnalysisOptions {
   captureScreenshots: boolean;
-  networkThrottling?: 'none' | 'lte-network' | '5mbps-lte' | '3mbps-lte' | '1mbps-lte' | '400kbps-lte';
+  networkThrottling?:
+    | 'none'
+    | 'lte-network'
+    | '5mbps-lte'
+    | '3mbps-lte'
+    | '1mbps-lte'
+    | '400kbps-lte';
   cpuThrottling?: number;
   waitUntil?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
   useLighthouse?: boolean;
@@ -180,4 +186,5 @@ export interface AnalysisOptions {
   screenshotInterval?: number; // Screenshot capture interval in milliseconds (default: 100)
   maxRenderWaitTime?: number; // Maximum time to wait for render completion in ms (default: 30000)
   renderStabilityTime?: number; // Time without DOM changes to consider render complete in ms (default: 1000)
+  bypassCache?: boolean; // Bypass browser cache for fresh results (default: true)
 }

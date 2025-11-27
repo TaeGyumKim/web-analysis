@@ -38,7 +38,7 @@ export default defineEventHandler(async event => {
       networkThrottling: options?.networkThrottling ?? 'none',
       cpuThrottling: options?.cpuThrottling ?? 1,
       waitUntil: options?.waitUntil ?? 'networkidle0',
-      useLighthouse: options?.useLighthouse ?? false,
+      useLighthouse: options?.useLighthouse ?? true, // Default to true for Lighthouse analysis
       lighthouseFormFactor: options?.lighthouseFormFactor ?? 'desktop',
       customMetrics: options?.customMetrics ?? [],
       viewportWidth: options?.viewportWidth ?? 1920,
@@ -46,7 +46,8 @@ export default defineEventHandler(async event => {
       timeout: options?.timeout ?? 60000, // 60 seconds default
       screenshotInterval: options?.screenshotInterval ?? 100, // 100ms for detailed frame capture
       maxRenderWaitTime: options?.maxRenderWaitTime ?? 30000, // 30 seconds max wait for render completion
-      renderStabilityTime: options?.renderStabilityTime ?? 500 // 500ms of DOM stability (reduced for faster completion)
+      renderStabilityTime: options?.renderStabilityTime ?? 500, // 500ms of DOM stability (reduced for faster completion)
+      bypassCache: options?.bypassCache ?? true // Default to true to bypass cache
     };
 
     // Perform analysis using queue to handle concurrency

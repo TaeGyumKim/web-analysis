@@ -155,6 +155,16 @@
             position="bottom"
           />
         </label>
+
+        <label style="display: flex; align-items: center; gap: 4px">
+          <input v-model="bypassCache" type="checkbox" />
+          캐시 무시
+          <HelpTooltip
+            text="브라우저 캐시를 무시하고 모든 리소스를 새로 다운로드합니다. 캐싱된 결과가 아닌 실제 성능을 측정하려면 이 옵션을 활성화하세요."
+            title="캐시 무시"
+            position="bottom"
+          />
+        </label>
       </div>
 
       <!-- 두 번째 줄 -->
@@ -292,7 +302,8 @@ import { glossary } from '~/utils/glossary';
 const url = ref('https://www.naver.com/');
 const networkSpeed = ref('제한 없음');
 const deviceSpec = ref('Desktop');
-const useLighthouse = ref(false);
+const useLighthouse = ref(true); // Default to true for Lighthouse analysis
+const bypassCache = ref(true); // Default to true to always get fresh results
 const activeTab = ref('frame');
 const isAnalyzing = ref(false);
 const isGeneratingPDF = ref(false);
@@ -481,7 +492,8 @@ async function startAnalysis() {
           lighthouseFormFactor: deviceSpec.value.includes('Mobile') ? 'mobile' : 'desktop',
           customMetrics: customMetrics,
           viewportWidth: viewport.width,
-          viewportHeight: viewport.height
+          viewportHeight: viewport.height,
+          bypassCache: bypassCache.value // Bypass browser cache for fresh results
         }
       }
     });

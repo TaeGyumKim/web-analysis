@@ -69,6 +69,12 @@ export class PerformanceCollector {
       await client.send('Performance.enable');
       await client.send('Page.enable');
 
+      // Bypass browser cache if requested (default: true)
+      if (options.bypassCache !== false) {
+        await client.send('Network.setCacheDisabled', { cacheDisabled: true });
+        logger.debug('Browser cache disabled for fresh results');
+      }
+
       // Apply network throttling if specified
       if (options.networkThrottling && options.networkThrottling !== 'none') {
         await this.applyNetworkThrottling(client, options.networkThrottling);
